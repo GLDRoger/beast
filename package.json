@@ -1,0 +1,34 @@
+{
+  "name": "beast-config",
+  "version": "0.1.0",
+  "description": "One agent config installed across Claude Code, Codex, and Grok",
+  "type": "module",
+  "bin": {
+    "beast": "./bin/beast.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "home",
+    "scripts",
+    "manifest",
+    "README.md",
+    "NOTICE.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "notice": "node scripts/gen-notice.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:vendored": "node --test home/agents/skill-modules/**/*.test.* || true"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ]
+}

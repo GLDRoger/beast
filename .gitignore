@@ -1,0 +1,23 @@
+node_modules/
+.DS_Store
+__pycache__/
+*.pyc
+
+# Never commit real tool config — only the .example files are tracked.
+home/claude/settings.json
+home/codex/config.toml
+home/grok/config.toml
+
+# Secrets never belong here; beast doctor also scans for them.
+*.env
+!*.env.example
+.zshrc.secrets
+auth.json
+.credentials.json
+
+# Bootstrap backups
+*.pre-beast
+*.bak-*
+
+# bootstrap staging (transient)
+.bootstrap-staging/

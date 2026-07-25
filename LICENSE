@@ -1,0 +1,57 @@
+This repository contains two kinds of content under different terms.
+
+===============================================================================
+1. beast itself — MIT
+===============================================================================
+
+Applies to `bin/`, `lib/`, `scripts/`, `test/`, the nine original skills
+(route, frontend, code, writing, motion, performance, security, growth, media),
+the BEAST system prompts, and the policy files.
+
+MIT License
+
+Copyright (c) 2026 the beast contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+===============================================================================
+2. Vendored skills — NOT covered by the above
+===============================================================================
+
+`home/agents/skills/` and `home/agents/skill-modules/` contain skills authored
+by other people and vendored into this repository. The MIT grant above does NOT
+extend to them. Each retains its own upstream license, and several ship their
+own LICENSE or NOTICE file inside their directory.
+
+See NOTICE.md for per-upstream attribution.
+
+Two known problems, stated rather than hidden:
+
+  * A number of shipped modules currently have NO recorded provenance. Their
+    license is unknown. `npm run notice` lists them and exits non-zero. This
+    repository is not fit for public redistribution until that list is empty.
+
+  * Several modules declare a license in their frontmatter while shipping no
+    corresponding license text. NOTICE.md enumerates these.
+
+Assets whose terms explicitly forbid redistribution have been removed rather
+than vendored (GSAP; the Cyberpunk 2077 fankit). See NOTICE.md.
+
+If you are an upstream author and want your work removed or credited
+differently, open an issue.
