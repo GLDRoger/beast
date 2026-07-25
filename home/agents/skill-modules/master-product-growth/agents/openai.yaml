@@ -1,0 +1,4 @@
+interface:
+  display_name: "Master Product Growth"
+  short_description: "Product, launch, monetization, and growth workflow"
+  default_prompt: "Use $master-product-growth to shape, launch, measure, and grow this product work."

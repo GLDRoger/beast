@@ -1,0 +1,24 @@
+# Copy into ~/.grok/config.toml. `beast install` does not write this file.
+
+[models]
+default = "grok-4.5"
+default_reasoning_effort = "high"
+
+[ui]
+compact_mode = false
+permission_mode = "ask"          # the source used "always-approve"; opt into that yourself
+
+# Grok discovers skills from ~/.agents/skills, which beast populates.
+# `ignore` keeps it from double-loading the same skills via the Claude mirror.
+[skills]
+paths = ["~/.agents/skills"]
+ignore = ["~/.claude/skills"]
+
+# Grok has no --system-prompt-file equivalent, so it reads the Codex prompt.
+# Point this at BEAST.v2.md, not the older BEAST.md — the original config had it
+# aimed at the stale file while the shell alias used the current one.
+[system-prompt-overrides]
+paths = ["~/.codex/BEAST.v2.md"]
+
+# The source config also listed [agents] paths at ~/.agents/agents and ~/.codex/agents.
+# Neither directory exists, so it is omitted here rather than shipped broken.

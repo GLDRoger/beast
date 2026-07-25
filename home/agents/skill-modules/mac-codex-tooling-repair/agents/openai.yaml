@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mac Codex Tooling Repair"
+  short_description: "Repair local Codex MCP and CUA tooling"
+  default_prompt: "Use $mac-codex-tooling-repair to diagnose and repair local Codex tooling, then verify daemon, registration, permissions, and import/use paths."

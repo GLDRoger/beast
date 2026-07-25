@@ -1,0 +1,4 @@
+interface:
+  display_name: "Master Engineering"
+  short_description: "Codebase debugging, implementation, and release loop"
+  default_prompt: "Use $master-engineering to inspect, implement, verify, and hand off this codebase task."

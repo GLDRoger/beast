@@ -1,0 +1,33 @@
+{
+  "//": "Copy to ~/.claude/settings.json and merge with what you already have.",
+  "//model": "Set to whatever your plan actually grants. 'opus[1m]' needs the 1M-context entitlement.",
+  "model": "sonnet",
+
+  "//skills": "BEAST routes through the skills in this repo. Bundled skills stay on by default here — turn them off only once you know you prefer the router.",
+  "disableBundledSkills": false,
+
+  "effortLevel": "high",
+  "autoCompactEnabled": true,
+
+  "//plugins": "ponytail enforces the smallest working solution. frontend-design is Anthropic's official skill.",
+  "enabledPlugins": {
+    "ponytail@ponytail": true,
+    "frontend-design@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "ponytail": {
+      "source": { "source": "github", "repo": "DietrichGebert/ponytail" }
+    }
+  },
+
+  "//permissions": "Deny tools you never want reached for. Plan mode is intentionally NOT denied here.",
+  "permissions": {
+    "deny": []
+  },
+
+  "//omitted": [
+    "statusLine and spinnerVerbs — the source setup ran an ad/affiliate statusline; deliberately not shipped.",
+    "skipDangerousModePermissionPrompt — removes a confirmation gate. Opt in yourself if you want it.",
+    "disableArtifact / disableClaudeAiConnectors — personal preference, not a default worth inheriting."
+  ]
+}

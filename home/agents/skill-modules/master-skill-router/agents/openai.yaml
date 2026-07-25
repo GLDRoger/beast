@@ -1,0 +1,4 @@
+interface:
+  display_name: "Master Skill Router"
+  short_description: "Route work into the right master workflow"
+  default_prompt: "Use $master-skill-router to choose and run the right end-to-end workflow for this task."

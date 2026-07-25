@@ -1,0 +1,92 @@
+# Copy the parts you want into ~/.codex/config.toml. This is a lean, safe-by-default
+# subset — the setup this came from had ~810 lines, most of it machine state.
+#
+# `beast install` never writes this file. Codex config holds your own project trust
+# list, auth, and hook hashes; merging that automatically would be destructive.
+
+# Model is deliberately NOT set here. Availability depends on your account and
+# plan, and a name hardcoded in an example goes stale fast — pick one your CLI
+# actually offers (`codex -m <model>` to try one first).
+# model = "gpt-5.6-sol"
+
+model_reasoning_effort = "high"
+model_reasoning_summary = "detailed"
+
+# The system prompt. `beast install` symlinks this path into the repo, so leave it as-is.
+# Requires [features] model_instructions_file = true below.
+model_instructions_file = "~/.codex/BEAST.v2.md"
+
+web_search = "live"
+file_opener = "vscode"          # or "cursor", "windsurf", "none"
+
+# ---------------------------------------------------------------------------
+# Safety. READ THIS BLOCK before uncommenting anything in it.
+# ---------------------------------------------------------------------------
+# The original config ran with all three of these plus skill_mcp_dependency_install,
+# which together mean: unattended shell execution with full filesystem access, and
+# automatic dependency installs, from the first launch. That is a reasonable trade for
+# someone who knows exactly what their agent runs. It is not a default to hand a stranger.
+#
+# sandbox_mode = "danger-full-access"
+# approval_policy = "never"
+# trust_level = "trusted"
+#
+# Start here instead and loosen deliberately:
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+[features]
+model_instructions_file = true   # required for model_instructions_file above
+view_image_tool = true
+shell_tool = true
+undo = true
+memories = true
+
+# Experimental. Each of these can break an install on a version mismatch, and the
+# original config also set suppress_unstable_features_warning = true, which hides
+# the warning you would otherwise get. Enable one at a time.
+#
+# unified_exec = true
+# apply_patch_freeform = true
+# enable_request_compression = true
+# rmcp_client = true
+# multi_agent = true
+
+[agents]
+max_threads = 8                  # the source used 20; that thrashes below ~12 cores
+
+[tui]
+notifications = true
+theme = "dracula"
+
+# ---------------------------------------------------------------------------
+# MCP servers — all disabled. Enable what you have accounts for.
+# Never put a token inline: use env_vars and export it from your shell secrets file.
+# ---------------------------------------------------------------------------
+[mcp_servers.sentry]
+url = "https://mcp.sentry.dev/mcp"
+enabled = false
+
+[mcp_servers.posthog]
+url = "https://mcp.posthog.com/mcp"
+enabled = false
+
+[mcp_servers.next-devtools]
+command = "npx"
+args = ["-y", "next-devtools-mcp@latest"]
+enabled = false
+
+# Example of the credential pattern. env_vars is pass-through by name from your
+# environment — codex errors with "env_vars entry `X` is not set" if it is missing,
+# so it fails loudly rather than silently running unauthenticated.
+# [mcp_servers.supabase]
+# command = "npx"
+# args = ["-y", "@supabase/mcp-server-supabase@latest", "--project-ref=YOUR_PROJECT_REF"]
+# enabled = false
+# env_vars = ["SUPABASE_ACCESS_TOKEN"]
+
+# ---------------------------------------------------------------------------
+# Verified against codex-cli 0.145.0: this file parses with exit 0 and no
+# stderr. Every key above is accepted by that version. If a future release
+# rejects one, it will name it — remove that line rather than the whole block.
+# ---------------------------------------------------------------------------
