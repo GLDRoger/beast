@@ -1,0 +1,195 @@
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, symlinkSync, rmSync, lstatSync, realpathSync, readlinkSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { linkFile, skillEntries, isJunk } from '../lib/fsutil.mjs'
+import { describe } from '../lib/skills.mjs'
+import { SKILL_CAP, EXCLUDE_PATHS, EXCLUDE_SKILLS } from '../lib/manifest.mjs'
+
+const tmp = () => mkdtempSync(join(tmpdir(), 'beast-'))
+
+test('linkFile creates a link and is idempotent', () => {
+  const d = tmp()
+  const target = join(d, 'src.md'); writeFileSync(target, 'x')
+  const link = join(d, 'nested', 'dst.md')
+
+  assert.equal(linkFile(link, target).status, 'linked')
+  // Compare resolved paths: linkFile stores the realpath so $HOME never holds a
+  // two-hop chain, and on macOS /var is itself a symlink to /private/var.
+  assert.equal(realpathSync(link), realpathSync(target))
+  assert.equal(readFileSync(link, 'utf8'), 'x')             // and it actually reads through
+  assert.equal(linkFile(link, target).status, 'ok')          // second run is a no-op
+  rmSync(d, { recursive: true, force: true })
+})
+
+test('linkFile refuses to invent a link for a missing source', () => {
+  const d = tmp()
+  const r = linkFile(join(d, 'dst'), join(d, 'nope'))
+  assert.equal(r.status, 'missing-source')
+  assert.equal(lstatSync(d).isDirectory(), true)
+  rmSync(d, { recursive: true, force: true })
+})
+
+test('linkFile replaces a stale symlink pointing elsewhere', () => {
+  const d = tmp()
+  const a = join(d, 'a'); writeFileSync(a, 'a')
+  const b = join(d, 'b'); writeFileSync(b, 'b')
+  const link = join(d, 'l')
+  symlinkSync(a, link)
+
+  assert.equal(linkFile(link, b).status, 'linked')
+  assert.equal(readFileSync(link, 'utf8'), 'b')             // repointed at the new target
+  rmSync(d, { recursive: true, force: true })
+})
+
+test('linkFile does not clobber a real dir when skipIfReal is set', () => {
+  const d = tmp()
+  const target = join(d, 'payload'); mkdirSync(target)
+  const link = join(d, 'live'); mkdirSync(link)
+  writeFileSync(join(link, 'local-only.txt'), 'asset the payload omits')
+
+  const r = linkFile(link, target, { skipIfReal: true })
+  assert.equal(r.status, 'kept-local')
+  assert.equal(lstatSync(link).isSymbolicLink(), false)       // still the real dir
+  rmSync(d, { recursive: true, force: true })
+})
+
+test('skillEntries ignores loose docs and tool-owned dot dirs', () => {
+  const d = tmp()
+  mkdirSync(join(d, 'code'))
+  mkdirSync(join(d, '.system'))                              // Codex-shipped, not ours
+  writeFileSync(join(d, 'README.md'), '# layout')
+
+  const names = skillEntries(d).map((e) => e.name)
+  assert.deepEqual(names, ['code'])
+  rmSync(d, { recursive: true, force: true })
+})
+
+test('isJunk catches what must never be committed', () => {
+  for (const n of ['.DS_Store', '__pycache__', 'node_modules', '.system', 'x.pyc'])
+    assert.equal(isJunk(n), true, n)
+  assert.equal(isJunk('SKILL.md'), false)
+})
+
+test('describe reads both inline and block-scalar descriptions', () => {
+  const d = tmp()
+  const a = join(d, 'a'); mkdirSync(a)
+  writeFileSync(join(a, 'SKILL.md'), 'name: a\ndescription: plain inline text\n---\n')
+  assert.equal(describe(a), 'plain inline text')
+
+  const b = join(d, 'b'); mkdirSync(b)
+  writeFileSync(join(b, 'SKILL.md'), 'name: b\ndescription: >\n  folded over\n  two lines\nother: 1\n')
+  assert.equal(describe(b), 'folded over two lines')
+
+  const c = join(d, 'c'); mkdirSync(c)
+  writeFileSync(join(c, 'SKILL.md'), 'name: c\n')
+  assert.equal(describe(c), '')
+  rmSync(d, { recursive: true, force: true })
+})
+
+test('exclusion lists are non-empty — a silent empty list would ship everything', () => {
+  assert.ok(EXCLUDE_SKILLS.length > 0)
+  assert.ok(EXCLUDE_PATHS.length > 0)
+  assert.ok(SKILL_CAP > 0 && SKILL_CAP <= 50)
+})
+
+// --- platform -------------------------------------------------------------
+// Windows and WSL cannot be executed here, so these test the pure decision
+// functions against the inputs those platforms produce. That is a weaker
+// guarantee than running on Windows and is labelled as such in the README.
+
+test('HOME comes from homedir(), never process.env.HOME', async () => {
+  const { HOME } = await import('../lib/platform.mjs')
+  assert.equal(typeof HOME, 'string')
+  assert.ok(HOME.length > 0)
+  // The old bug: process.env.HOME is undefined on Windows, so anything taking it
+  // as a path argument threw ERR_INVALID_ARG_TYPE mid-install. Guard against it
+  // coming back — in code, not in prose, so comments about it are allowed.
+  for (const f of ['fsutil.mjs', 'install.mjs', 'doctor.mjs', 'skills.mjs', 'platform.mjs']) {
+    const code = readFileSync(new URL(`../lib/${f}`, import.meta.url), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '')
+    assert.equal(code.includes('process.env.HOME'), false, `${f} reads process.env.HOME`)
+  }
+})
+
+test('isDrvFs identifies Windows drives mounted into WSL', async () => {
+  const { isDrvFs } = await import('../lib/platform.mjs')
+  for (const p of ['/mnt/c/Users/x/code', '/mnt/d/repo', '/mnt/C/x'])
+    assert.equal(isDrvFs(p), true, p)
+  for (const p of ['/home/x/code', '/mnt', '/mnttest/x', '/Users/x'])
+    assert.equal(isDrvFs(p), false, p)
+})
+
+test('symlinkType returns undefined off Windows so POSIX behaviour is unchanged', async () => {
+  const { symlinkType, IS_WINDOWS } = await import('../lib/platform.mjs')
+  const d = tmp()
+  if (!IS_WINDOWS) {
+    assert.equal(symlinkType(d), undefined)
+  } else {
+    assert.equal(symlinkType(d), 'junction')          // dirs need junction, no elevation
+  }
+  rmSync(d, { recursive: true, force: true })
+})
+
+test('whichBinary finds a real binary and returns null for a fake one', async () => {
+  const { whichBinary } = await import('../lib/platform.mjs')
+  assert.ok(whichBinary('node'))                       // resolves to a path
+  assert.equal(whichBinary('definitely-not-a-real-binary-xyz'), null)
+})
+
+test('describePlatform names the current platform', async () => {
+  const { describePlatform } = await import('../lib/platform.mjs')
+  assert.match(describePlatform(), /^(macOS|Linux|Windows|WSL[12] \(.+\))$/)
+})
+
+test('both shell snippets ship and agree on the three commands', async () => {
+  const { SHELL_SNIPPETS, inPayload } = await import('../lib/manifest.mjs')
+  assert.equal(SHELL_SNIPPETS.length, 2)
+  for (const s of SHELL_SNIPPETS) {
+    const body = readFileSync(inPayload(s.payload), 'utf8')
+    for (const fn of ['c', 'co', 'gro']) assert.ok(new RegExp(`\\b${fn}\\b`).test(body), `${s.payload} missing ${fn}`)
+    assert.equal(/--dangerously|--yolo/.test(body.replace(/^\s*#.*$/gm, '')), false, `${s.payload} has a dangerous default`)
+  }
+})
+
+test('parseWslRelease handles real WSL1, WSL2, and plain-Linux kernel strings', async () => {
+  const { parseWslRelease } = await import('../lib/platform.mjs')
+
+  // WSL2 — the "WSL2" marker is present in the release string
+  assert.deepEqual(
+    parseWslRelease('5.15.146.1-microsoft-standard-WSL2\n', { WSL_DISTRO_NAME: 'Ubuntu' }),
+    { version: 2, distro: 'Ubuntu' })
+
+  // WSL1 — says Microsoft but has no WSL marker and no WSL_INTEROP
+  assert.deepEqual(
+    parseWslRelease('4.4.0-19041-Microsoft\n', { WSL_DISTRO_NAME: 'Debian' }),
+    { version: 1, distro: 'Debian' })
+
+  // WSL2 where the string is ambiguous but WSL_INTEROP gives it away
+  assert.equal(parseWslRelease('5.15.0-microsoft\n', { WSL_INTEROP: '/run/WSL/8_interop' }).version, 2)
+
+  // distro unknown when the env var is absent
+  assert.equal(parseWslRelease('5.15-microsoft-standard-WSL2', {}).distro, 'unknown')
+
+  // real Linux and macOS kernels are not WSL
+  assert.equal(parseWslRelease('6.6.87.2-generic\n', {}), null)
+  assert.equal(parseWslRelease('Darwin Kernel Version 25.5.0\n', {}), null)
+  assert.equal(parseWslRelease('', {}), null)
+  assert.equal(parseWslRelease(undefined, {}), null)
+})
+
+test('linkFile collapses a payload-internal symlink instead of chaining', () => {
+  const d = tmp()
+  const real = join(d, 'library-item'); mkdirSync(real)
+  writeFileSync(join(real, 'SKILL.md'), 'content')
+  const view = join(d, 'active-view'); symlinkSync(real, view)   // the active-set view
+  const link = join(d, 'home-link')
+
+  linkFile(link, view)
+  // must point at the real dir, not at the view — one hop from real content
+  assert.equal(lstatSync(readlinkSync(link)).isSymbolicLink(), false)
+  assert.equal(readFileSync(join(link, 'SKILL.md'), 'utf8'), 'content')
+  rmSync(d, { recursive: true, force: true })
+})
