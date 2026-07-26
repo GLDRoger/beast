@@ -50,8 +50,13 @@ async function chooseInteractively() {
   })
   const present = harnessOpts.filter((o) => o.present).map((o) => o.value)
 
-  console.log(c.dim('  Unselected tools get no config and no delegation instructions,'))
-  console.log(c.dim('  so the prompts will not tell an agent to shell out to a CLI you lack.\n'))
+  console.log(`  ${c.yellow('Plan tiers matter.')} beast runs long sessions with sub-agents and a`)
+  console.log('  large skill context, so it burns quota fast. On $20/month tiers,')
+  console.log('  Anthropic Pro especially, expect to hit limits quickly. Higher tiers')
+  console.log('  are strongly recommended.')
+  console.log(c.dim('  Reference setup: $200 Codex, $100 Anthropic, $20 Grok (free with X Premium).\n'))
+  console.log(c.dim('  Only the tools you select are configured, and only those are offered'))
+  console.log(c.dim('  as delegation targets in the prompts.\n'))
   const targets = await multiselect('Which of these do you have access to?', harnessOpts, {
     preselected: present.length ? present : HARNESS_NAMES,
   })
