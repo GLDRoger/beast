@@ -50,7 +50,9 @@ async function chooseInteractively() {
   })
   const present = harnessOpts.filter((o) => o.present).map((o) => o.value)
 
-  const targets = await multiselect('Which harnesses?', harnessOpts, {
+  console.log(c.dim('  Unselected tools get no config and no delegation instructions,'))
+  console.log(c.dim('  so the prompts will not tell an agent to shell out to a CLI you lack.\n'))
+  const targets = await multiselect('Which of these do you have access to?', harnessOpts, {
     preselected: present.length ? present : HARNESS_NAMES,
   })
   console.log()

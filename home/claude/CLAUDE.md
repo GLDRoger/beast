@@ -37,6 +37,11 @@ You have a known tendency from pretraining and reinforcement learning to end you
 
 ## Model routing
 
+Before delegating work to another CLI, read `~/.beast/delegation.md`. It lists which
+CLIs actually exist on this machine. The routing below assumes all of them; that file
+is the authority when they disagree.
+
+
 Rankings, higher = better. These are opinionated starting values — retune them for your own
 plans and your own experience.
 

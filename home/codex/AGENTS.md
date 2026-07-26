@@ -43,6 +43,11 @@ Production-grade means correct and durable, not big. Reach it with the smallest 
 
 # Picking models for delegated work
 
+Before delegating work to another CLI, read `~/.beast/delegation.md`. It lists which
+CLIs actually exist on this machine. The routing below assumes all of them; that file
+is the authority when they disagree.
+
+
 Rankings, higher = better; higher cost score = cheaper. These are opinionated starting values —
 retune them for your own plans. **Cost** is effective marginal cost under the plans you already
 hold, not list price: a model bundled into a subscription you pay for anyway scores well even
