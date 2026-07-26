@@ -12,11 +12,13 @@
  * Exit code is 1 while any shipped module is unattributed, so this doubles as a
  * pre-publication gate rather than a document generator that always succeeds.
  */
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { REPO, PAYLOAD, LOCK_RENAMES, PROVENANCE, OWN_SKILLS } from '../lib/manifest.mjs'
-import { c } from '../lib/fsutil.mjs'
-import { skillEntries } from '../lib/fsutil.mjs'
+import { REPO, PAYLOAD, LOCK_RENAMES, PROVENANCE, OWN_SKILLS, SCRUB_EXT } from '../lib/manifest.mjs'
+import { c, skillEntries, walk } from '../lib/fsutil.mjs'
+
+/** `--strict` is the publication gate; without it this only regenerates the document. */
+const strict = process.argv.includes('--strict')
 
 const lock = JSON.parse(readFileSync(join(REPO, 'manifest/skills.lock.json'), 'utf8'))
 const LOCK = Object.entries(lock.skills ?? {})
@@ -74,6 +76,47 @@ const stale = LOCK
   })
   .map(([name, meta]) => ({ name, source: meta.source }))
 
+// --- derived gaps -----------------------------------------------------------
+// These were four hardcoded prose bullets, and three of them had gone stale: the
+// `design-eng` gap was closed by a rename, `talking-head-recut` IS in the lockfile, and
+// the four unfilled Apache stubs left with the four skills that were dropped. A generated
+// attribution file asserting things that are not true is worse than one saying nothing,
+// so every claim below is computed from the payload each run.
+
+/**
+ * A skill whose SKILL.md points at license text it does not ship.
+ * Keyed by `name:file` — the active set is a view onto the library, so every such skill
+ * is found twice and would otherwise be reported twice.
+ */
+const declaredMissingSet = new Map()
+for (const [tree, names] of Object.entries(shipped)) {
+  for (const name of names) {
+    let head
+    try {
+      head = readFileSync(join(PAYLOAD, tree, name, 'SKILL.md'), 'utf8').split('\n').slice(0, 12).join('\n')
+    } catch { continue }
+    for (const m of head.matchAll(/\b(NOTICE\.md|LICENSE(?:\.txt|\.md)?)\b/g)) {
+      if (!existsSync(join(PAYLOAD, tree, name, m[1]))) declaredMissingSet.set(`${name}:${m[1]}`, [name, m[1]])
+    }
+  }
+}
+const declaredMissing = [...declaredMissingSet.values()].sort()
+
+/** Apache-2.0 appendix text left as a template — a license naming no copyright holder. */
+const APACHE_STUB = /Copyright \[yyyy\]|\[name of copyright owner\]/
+const apacheStubs = []
+for (const [abs, rel] of walk(PAYLOAD)) {
+  if (!SCRUB_EXT.includes(rel.slice(rel.lastIndexOf('.')))) continue
+  let text
+  try { text = readFileSync(abs, 'utf8') } catch { continue }
+  if (APACHE_STUB.test(text)) apacheStubs.push(rel)
+}
+
+/** Upstreams whose redistribution grant was traced but not established. */
+const unresolved = Object.entries(PROVENANCE)
+  .filter(([name, meta]) => meta.unresolved && seen.has(name))
+  .map(([name, meta]) => ({ name, source: meta.source, license: meta.license }))
+
 // --- render ----------------------------------------------------------------
 const lines = [
   '# NOTICE',
@@ -122,6 +165,22 @@ for (const [source, { url, skills }] of [...attributed].sort()) {
   lines.push('')
 }
 
+// Naming a license is not shipping one. Apache-2.0 section 4(a) requires a copy of the
+// license to travel with every redistribution, and nothing carried that text before.
+const texts = [...new Set(Object.values(PROVENANCE).map((m) => m.licenseText).filter(Boolean))].sort()
+const missingTexts = texts.filter((t) => !existsSync(join(REPO, t)))
+lines.push(
+  '## Full license texts',
+  '',
+  'Naming a license is not the same as shipping one. Apache-2.0 section 4(a) requires a copy',
+  'of the license to travel with any redistribution, so the texts live in the repository:',
+  '',
+  ...texts.map((t) => `- [\`${t}\`](${t})`),
+  '',
+  'See [`licenses/README.md`](licenses/README.md) for which upstream each one covers.',
+  '',
+)
+
 lines.push(
   '## Deliberately not vendored',
   '',
@@ -131,15 +190,32 @@ lines.push(
   '- `gsap.min.js` (GreenSock Standard License) — install from npm or a CDN.',
   '- Cyberpunk 2077 fankit font and logos (CD Projekt Red IP, non-commercial only).',
   '',
-  '## Known attribution gaps',
-  '',
-  '- `impeccable` declares `See NOTICE.md for attribution` but shipped no such file upstream.',
-  '- `tushar-design` declares `LICENSE.txt` but shipped no such file.',
-  '- `design-eng` derives from `emilkowalski/skill` and lost its attribution in a rename.',
-  '- `talking-head-recut` derives from `notedit/vtake-skills`, never recorded in the lockfile.',
-  '- Four skills ship unfilled Apache-2.0 stubs (`Copyright [yyyy] [name of copyright owner]`).',
-  '',
 )
+
+if (unresolved.length) {
+  lines.push(
+    '## ⚠️ Unresolved redistribution grants — publication blocker',
+    '',
+    'Traced to an upstream, but the upstream does not clearly grant redistribution. Public',
+    'or npm release is **not cleared** until each of these is settled — by obtaining a',
+    'grant, rewriting the content, or dropping the skill. `npm run notice -- --strict`',
+    'exits non-zero while any remain.',
+    '',
+    ...unresolved.map((u) => `- \`${u.name}\` — ${u.source} (${u.license})`),
+    '',
+  )
+}
+
+if (declaredMissing.length || apacheStubs.length) {
+  lines.push('## Known attribution gaps', '')
+  for (const [name, file] of declaredMissing) {
+    lines.push(`- \`${name}\` declares \`${file}\` in its frontmatter but ships no such file.`)
+  }
+  for (const rel of apacheStubs) {
+    lines.push(`- \`${rel}\` carries an unfilled Apache-2.0 stub, naming no copyright holder.`)
+  }
+  lines.push('')
+}
 
 if (stale.length) {
   lines.push(
@@ -157,7 +233,31 @@ writeFileSync(join(REPO, 'NOTICE.md'), lines.join('\n'))
 const total = Object.values(shipped).flat().length
 console.log(`${c.green('✓')} NOTICE.md — ${total - unattributed.length}/${total} shipped skills attributed across ${attributed.size} upstreams`)
 if (stale.length) console.log(`  ${c.dim(`${stale.length} stale lockfile entries listed`)}`)
+
+// An unattributed module is a file of unknown origin shipping, which blocks the document
+// itself from being truthful. That always fails.
 if (unattributed.length) {
   console.log(`  ${c.red(`${unattributed.length} UNATTRIBUTED — not publishable until traced`)}`)
   process.exit(1)
+}
+
+// Unresolved grants and license files a skill promises but does not ship are recorded in
+// the document and block PUBLICATION, not generation. Previously `unresolved: true` counted
+// as attributed and the gate exited 0, so "✓ attribution complete" was reported over two
+// upstreams that grant nothing. `--strict` is the gate a release must pass.
+const blockers = [
+  ...unresolved.map((u) => `unresolved grant: ${u.name} (${u.source})`),
+  ...declaredMissing.map(([n, f]) => `${n} declares ${f} but does not ship it`),
+  ...apacheStubs.map((r) => `unfilled Apache-2.0 stub: ${r}`),
+  ...missingTexts.map((t) => `PROVENANCE names ${t} as the license text but it is not in the repo`),
+]
+if (blockers.length) {
+  const label = strict ? c.red : c.yellow
+  console.log(label(`  ${blockers.length} publication blocker(s)${strict ? '' : ' — recorded in NOTICE.md'}:`))
+  for (const b of blockers) console.log(`    ${b}`)
+  if (strict) {
+    console.log(c.dim('\n  settle each one, or drop the skill, before publishing.'))
+    process.exit(1)
+  }
+  console.log(c.dim('  run with --strict to gate a release on these'))
 }

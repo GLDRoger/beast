@@ -70,7 +70,6 @@ route, frontend, code, writing, motion, performance, security, growth, media.
 - `pr-to-video` ✓
 - `pricing-page` ✓
 - `product-brief` ✓
-- `product-design-psychology` ✓
 - `product-launch-video` ✓
 - `quieter` ✓
 - `rate-limit` ✓

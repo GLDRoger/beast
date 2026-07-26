@@ -40,14 +40,6 @@ License: MIT — © Leonxlnx
 - redesign-skill
 - taste-skill-gpt
 
-### Product Design Psychology (book) by Wouter de Bres
-
-<https://productdesignpsychology.com/>
-
-License: none stated
-
-- product-design-psychology (substantially rewritten, **grant unresolved**)
-
 ### cursor/plugins
 
 <https://github.com/cursor/plugins>
@@ -124,9 +116,9 @@ License: Apache-2.0
 
 <https://github.com/lixiaolin94/skills>
 
-License: MIT (README only — upstream ships no LICENSE file and names no holder)
+License: MIT — © lixiaolin94, with Huazi (github.com/HeyHuazi) credited for this skill
 
-- web-shader-extractor (**grant unresolved**)
+- web-shader-extractor
 
 ### mattpocock/skills
 
@@ -186,6 +178,8 @@ License: MIT — © Cua AI, Inc.
 
 <https://github.com/tushaarmehtaa/tushar-skills.git>
 
+License: MIT — © Tushar Mehta
+
 - aeo-ready
 - ai-streaming
 - app-copy
@@ -206,6 +200,18 @@ License: MIT — © Cua AI, Inc.
 - teardown
 - tushar-design
 
+## Full license texts
+
+Naming a license is not the same as shipping one. Apache-2.0 section 4(a) requires a copy
+of the license to travel with any redistribution, so the texts live in the repository:
+
+- [`home/agents/skill-modules/tushar-design/LICENSE.txt`](home/agents/skill-modules/tushar-design/LICENSE.txt)
+- [`home/agents/skill-modules/unslop/LICENSE`](home/agents/skill-modules/unslop/LICENSE)
+- [`licenses/Apache-2.0.txt`](licenses/Apache-2.0.txt)
+- [`licenses/lixiaolin94-skills-grant.md`](licenses/lixiaolin94-skills-grant.md)
+
+See [`licenses/README.md`](licenses/README.md) for which upstream each one covers.
+
 ## Deliberately not vendored
 
 Two asset classes are excluded because their terms forbid redistribution.
@@ -213,14 +219,6 @@ Skills that referenced them still work; supply the assets locally.
 
 - `gsap.min.js` (GreenSock Standard License) — install from npm or a CDN.
 - Cyberpunk 2077 fankit font and logos (CD Projekt Red IP, non-commercial only).
-
-## Known attribution gaps
-
-- `impeccable` declares `See NOTICE.md for attribution` but shipped no such file upstream.
-- `tushar-design` declares `LICENSE.txt` but shipped no such file.
-- `design-eng` derives from `emilkowalski/skill` and lost its attribution in a rename.
-- `talking-head-recut` derives from `notedit/vtake-skills`, never recorded in the lockfile.
-- Four skills ship unfilled Apache-2.0 stubs (`Copyright [yyyy] [name of copyright owner]`).
 
 ## Stale lockfile entries
 

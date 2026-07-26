@@ -11,69 +11,53 @@ skills, and a larger library loaded only when the work needs it. The same config
 works across all three harnesses and stays in one git repo.
 
 This setup has been tested in real work with **GPT-5.6 Sol**, **GPT-5.6 Terra**,
-**Claude Fable 5**, **Claude Opus 5**, **Kimi K3**, and **Grok 4.5**, Any model scoring higher than 51 on Artificial Analysis's intelligence index will work[https://artificialanalysis.ai/?cost=cost-per-task&total-cost=intelligence-vs-compute&speed=intelligence-vs-speed&intelligence=artificial-analysis-intelligence-index&intelligence-category=text-only-vs-multimodal&model-creators=xai%2Copenai&coding-agents=cost&agents=codex-gpt-5-6-luna-xhigh%2Ccodex-gpt-5-6-luna-none%2Ccodex-gpt-5-6-luna-medium%2Ccodex-gpt-5-6-luna-low%2Ccodex-gpt-5-6-luna-high%2Ccodex-gpt-5-6-luna-max%2Cgrok-build-grok-4-5-high#intelligence-tabs].
+**Claude Fable 5**, **Claude Opus 5**, **Kimi K3**, and **Grok 4.5**, Any model scoring higher than 51 on Artificial Analysis's intelligence index will work[https://artificialanalysis.ai/#intelligence-tabs].
 
 ```text
 Claude Code ─┐
 Codex ───────┼── beast prompt ── 9 routers ── 27 active skills ── 92-module library
-Grok ────────┘
+Grok ────────|
 Kimi─────────┘
 ```
 
 ## What changes
 
-|                         | Default harness setup                     | With beast                                                     |
-|-------------------------|-------------------------------------------|----------------------------------------------------------------|
-| System prompt           | Vendor default, tuned for broad appeal    | ~2,650 tokens on scope, verification, safety rails, handoffs    |
-| Skills visible          | None, or everything you ever installed    | 27 active, hard cap of 30                                      |
-| Skills available        | Whatever you remember installing          | 92-module library, loaded only when a router calls for it       |
-| Always-on skill cost    | Zero, or unbounded and unmeasured         | ~1,590 tokens, 0.8% of a 200k window                           |
-| Standing policy         | One file per tool, drifting apart         | One file, shared by all three harnesses                        |
-| Noticing config drift   | When something breaks                     | `git diff` and `beast doctor`                                  |
+What I actually got out of running every session through this, across Claude Code,
+Codex, and Grok. These are observations from daily use, not benchmark numbers.
 
-### Measured on the machine beast was extracted from
+- **Instructions stick.** A constraint set at turn 3 still holds at turn 40. Scope stays
+  where I put it, so I stopped restating the same boundary every few turns and stopped
+  finding half-finished work reported as done.
+- **It is better to talk to.** No preamble, no fake enthusiasm, no summary of what it is
+  about to say. Answers come back at the length the question deserves, and it tells me
+  when something is brittle instead of agreeing.
+- **The design taste is real.** UI arrives with hierarchy, spacing, and type decisions
+  someone made on purpose, rather than the same centered hero and three gradient cards
+  every model reaches for by default.
+- **Almost no slop, in code or in prose.** Code comes back without speculative
+  abstractions, wrapper layers, and defensive scaffolding nobody asked for. Writing comes
+  back without the triads, the em dash rash, and "it's not just X, it's Y."
+- **Fewer steps to the output I wanted.** Each turn carries a larger system prompt, so a
+  single turn costs more. A whole task costs less, because the wrong turns are what
+  burn a session, and there are far fewer of them.
+- **It tunes the model and the harness into a better version of themselves.** Routers
+  pull in the specialist module the work needs and leave the rest out of context, so the
+  same model behaves like a stronger one on the problem in front of it.
+- **It approaches problems whole.** Change requests come back with the callers checked,
+  the failure path handled, and the one risk worth knowing named, instead of a patch on
+  the symptom I happened to report.
+- **It is nicer to use.** The part I cannot quantify, and the part I would miss most.
+  Sessions end with the work finished rather than with me correcting tone, scope, and
+  taste for the fourth time.
 
-Not projections. These are the specific defects that existed before the config was
-consolidated, and they are why beast is shaped the way it is:
-
-- **Standing policy existed in four copies.** Two were byte-identical but unlinked, so
-  editing one left the other silently stale. A third was eight months out of date. They
-  now resolve to a single file, which `beast doctor` verifies by comparing inodes.
-- **The two system prompts had each collected safety rules the other lacked.**
-  `"Keep going" is not authorization` existed only in the Codex prompt. A rule about not
-  trusting your own review inside the same context existed only in the Claude one. Both
-  now carry both.
-- **37 skills were reaching Claude Code while only 27 were managed.** The other ten came
-  from plugins through a discovery path nothing was tracking, so the skill budget was
-  being blown without anything reporting it. `beast doctor` now counts every source.
-
-### What beast does not claim
-
-- **No speed or output-quality benchmark.** Prompt quality does not survive that kind of
-  measurement, and a percentage here would be invented.
-- **It does not reduce token spend.** Per-turn cost goes up: a larger system prompt plus
-  skill descriptions in every request. The trade is fewer wrong turns, which is worth it
-  when a wrong turn costs a full session, and is not worth it for one-line questions.
-- **It does not touch credentials, auth, or per-project config.** Those stay yours.
-
-## What beast gives you
-
-- **Better default behavior.** The system prompt covers design, taste, scope, charecter, verification, safety,
-  git hygiene, persistence, and clear handoffs.
-- **A controlled skill budget.** The active set is capped at 30 so skill descriptions
-  cost about 1,590 tokens, under 1% of a 200k context window.
-- **Specialists on demand.** Routers select focused modules for engineering, frontend,
-  writing, security, performance, growth, motion, and media work.
-- **One source of truth.** Claude Code, Codex, and Grok read files linked from this repo,
-  so `git diff` shows every local change.
-- **Safe installation.** Existing files are backed up. Personal config and credentials
-  are never merged automatically.
+Your credentials, auth, and per-project config stay yours. The installer offers to add
+the handful of config keys beast needs and touches nothing else in those files.
 
 ## Before you install
 
 You need:
 
-- Node.js 20 or newer
+- Node.js 22 or newer
 - At least one supported harness: `claude`, `codex`, or `grok`
 - Git
 
@@ -123,6 +107,9 @@ Re-run `beast install` after changing a subscription and the file updates.
 
 ## Quick start
 
+Node 22 or newer. The video pack installs by default and HyperFrames needs 22+, so a
+machine on Node 20 satisfies the installer and still cannot run what it installed.
+
 ```sh
 git clone https://github.com/Questili/beast.git ~/code/beast
 cd ~/code/beast
@@ -132,7 +119,14 @@ beast install
 
 There are no runtime or development dependencies. `npm link` only makes the `beast`
 command available globally. If you do not want that, replace any `beast` command with
-`node bin/beast.mjs` while inside the repo intall location.
+`node bin/beast.mjs` while inside the repo install location.
+
+**Cloning is the only supported install.** There is no npm package on purpose. beast
+links your home directory into this clone, so the clone has to stay put and stay
+writable — that is what makes `git diff` show your drift. An immutable copy under
+`node_modules` cannot do that job, and npm does not materialise symlinked directories:
+`npm pack` shipped 9 of the 27 active skills, silently. `package.json` is marked
+`private` so nobody can publish that tarball by accident.
 
 The installer asks which harnesses and skill packs you want. Installed harnesses are
 preselected, and every skill pack is selected by default. Press Enter to accept each
@@ -168,12 +162,39 @@ tool takes a different flag, which is the only reason they look different:
 |-------------|---------------------------------------------------------------------------------------------------|
 | Claude Code | `--system-prompt-file ~/.claude/BEAST.v2.md`                                                      |
 | Codex       | `-c model_instructions_file=~/.codex/BEAST.v2.md` plus `-c features.model_instructions_file=true` |
-| Grok        | `--system-prompt-override` pointing at the Codex prompt                                           |
+| Grok        | `--system-prompt-override` pointing at `~/.grok/BEAST.v2.md`                                      |
 
-You can still set `model_instructions_file` in `~/.codex/config.toml` if you want the
-prompt to apply to bare `codex` runs as well as `co`. The example file shows the lines.
-The installer never writes that file, because it holds your authentication, trust
-settings, and project list.
+### Bare `codex` and `grok`
+
+The helpers cover `c`, `co`, and `gro`. Typing `codex` or `grok` directly bypasses them,
+and those two read the prompt from their own config instead. The installer offers to add
+the keys that close that gap:
+
+| File                   | Key                                            | What it buys                              |
+|------------------------|------------------------------------------------|-------------------------------------------|
+| `~/.codex/config.toml` | `model_instructions_file` + the `[features]` flag | bare `codex` loads the beast prompt    |
+| `~/.grok/config.toml`  | `[system-prompt-overrides] paths`              | bare `grok` loads the beast prompt         |
+| `~/.grok/config.toml`  | `[skills] paths` and `ignore`                  | Grok loads the skill set once, not twice   |
+
+Nothing else in either file is read or rewritten. A key you have already set is left
+alone and reported, never overwritten.
+
+Answer no and nothing is touched; `--write-config` and `--no-write-config` decide it
+without the question, and a non-interactive run declines unless you pass the flag.
+`~/.claude/settings.json` is never written at all, because Claude Code needs no key for
+any of this and rewrites that file itself at runtime.
+
+Editing TOML that holds your auth is worth being careful about, so the writer:
+
+1. refuses to touch a file it cannot parse, and does nothing at all without a Python
+   3.11+ interpreter to parse with (`tomllib`)
+2. inserts each key positionally, because appending to the end of the file can drop it
+   into whatever `[table]` happens to be last. `model_instructions_file` landing inside
+   `[features]` makes Codex refuse to start
+3. re-parses the result and compares it against the original, key by key. Anything that
+   changed beyond the intended keys is discarded and the original file stays as it was
+4. copies the original to `~/.beast/pre-beast/` before replacing it, and preserves the
+   file's permissions
 
 On Windows, dot-source the PowerShell helpers from your profile instead:
 
@@ -254,8 +275,9 @@ clone, so the change appears in `git diff`.
 
 ### Existing files and personal config
 
-beast does not delete existing files. When a real file or directory already occupies a
-target path, the installer moves it to:
+beast does not delete existing files. When anything it did not create already occupies a
+target path — a real file, a directory, or a symlink of your own — the installer moves it
+to:
 
 ```text
 ~/.beast/pre-beast/<original path>
@@ -264,11 +286,16 @@ target path, the installer moves it to:
 Backups live outside the harness skill directories so they cannot be discovered as
 duplicate skills.
 
-These personal config files are never written:
+This covers the two files the installer generates as well, `~/.beast/delegation.md` and
+`~/.beast/selection.json`. Each carries a marker line, and beast overwrites a file only
+when it finds its own marker there. If it cannot back up what is in the way, the install
+reports it and exits non-zero rather than proceeding with stale routing.
 
-- `~/.claude/settings.json`
-- `~/.codex/config.toml`
-- `~/.grok/config.toml`
+Personal config is handled separately:
+
+- `~/.claude/settings.json` is never written
+- `~/.codex/config.toml` and `~/.grok/config.toml` get the few keys described under
+  [Bare `codex` and `grok`](#bare-codex-and-grok), if you say yes, and nothing else
 
 Safe examples live beside each harness under `home/`. Merge only the settings you want.
 The examples do not enable unattended full-filesystem access or automatic dependency
@@ -353,7 +380,12 @@ you chose a small install intentionally.
 
 **`doctor` reports an orphaned link**
 
-Run `beast install`. The installer removes broken links that point into this repo.
+Run `beast install`. It retires links pointing into this repo that your current selection
+no longer calls for. Links pointing anywhere else are yours and are never touched.
+
+**`doctor` says the payload has unscrubbed text**
+
+Run `npm run scrub`. A rewrite rule was added and has not been applied to `home/` yet.
 
 **`The repo moved`**
 
@@ -361,17 +393,35 @@ Run `npm link`, `beast install`, and `beast doctor` again from the new location.
 
 ## For contributors
 
-No dependency install is required.
+No dependency install is required. Node 22+.
 
 ```sh
-npm test
-npm run notice
+npm test               # installer, packs, platform logic, isolation, regressions
+npm run test:vendored  # the test suites inside the vendored skills
+npm run notice         # regenerate NOTICE.md from the payload
+npm run scrub          # apply every text-rewrite rule to home/
 beast doctor
 ```
 
-`npm test` covers the installer, pack selection, platform logic, and isolation behavior.
-Vendored skills keep their own test suites; `npm run test:vendored` runs them separately
-and does not gate this project.
+Every one of these gates. `npm test` runs 52 checks including a clean-install-then-doctor
+pass for each harness scope. `npm run test:vendored` enumerates all 57 vendored test files
+in Node — an earlier shell glob matched one of them and then discarded the exit code — and
+fails on any failure not listed in `KNOWN_FAILURES` in `scripts/test-vendored.mjs`, *and*
+on any listed failure that starts passing, so the list cannot rot.
+
+Four vendored tests are expected to fail, each for a reason written next to it. Two of
+them are worth knowing about as a user:
+
+- **`pr-to-video` cannot complete its design step.** The workflow fixes its style to the
+  `claude` frame preset, which is not in the vendored `hyperframes-creative` copy and is
+  not in the `hyperframes` npm package either. Recover it with
+  `npx hyperframes skills update pr-to-video` in a scratch directory, or pick one of the
+  13 presets that do ship.
+- **`talking-head-recut`'s contract test outlived its own SKILL.md**, which was rewritten
+  upstream. The workflow runs; the assertion is stale.
+
+The other two need the HyperFrames monorepo as an ancestor directory, which a vendored
+copy does not have.
 
 `scripts/bootstrap.mjs` is for maintainers refreshing `home/` from an existing local
 setup. New users do not need it. It stages, scrubs, scans, and normalizes the payload
@@ -381,6 +431,13 @@ before replacing anything:
 node scripts/bootstrap.mjs [--force]
 ```
 
+CI (`.github/workflows/ci.yml`) runs the unit suite on Node 22 and 24 across macOS, Linux
+and Windows; a clean install plus `doctor` plus `scan` for six different harness/pack
+scopes; an idempotence check; the vendored suites; and a check that `NOTICE.md` and the
+scrubbed payload are both committed up to date. The Windows clean-install job is
+informational until it has passed on real hardware once — GitHub's Windows runners are
+elevated, so they cannot stand in for a normal user's machine.
+
 Open a [GitHub issue](https://github.com/Questili/beast/issues) for bugs, proposed skill
 changes, or attribution corrections.
 
@@ -388,13 +445,37 @@ changes, or attribution corrections.
 
 Most library modules began as other people's work. [`NOTICE.md`](NOTICE.md) records
 each upstream, license, copyright holder, and substantial rewrite. `npm run notice`
-fails when a shipped skill lacks recorded provenance.
+fails when a shipped skill lacks recorded provenance, and lists every publication blocker
+it found. `npm run notice -- --strict` exits non-zero while any blocker remains — run that
+before publishing anything.
+
+Blockers are computed from the payload each run, not written by hand — an earlier version
+listed them as prose and three of the four claims had quietly gone stale. `--strict`
+currently exits 0, and how the last four were settled is worth knowing, because the same
+four questions will come up again:
+
+- **`impeccable`** promised `NOTICE.md` in its frontmatter and shipped none. Upstream
+  (`pbakaus/impeccable`) does ship one, so it is vendored into the skill, along with
+  upstream's own third-party notice carried forward as Apache-2.0 section 4(d) requires.
+- **`tushar-design`** promised `LICENSE.txt`. Upstream is MIT © 2026 Tushar Mehta, so that
+  text now ships with the skill.
+- **`web-shader-extractor`** looked ungranted because `lixiaolin94/skills` has no `LICENSE`
+  file — GitHub's detector returns 404. The README states `MIT` outright. The grant is
+  real, so [`licenses/lixiaolin94-skills-grant.md`](licenses/lixiaolin94-skills-grant.md)
+  records the verbatim text, the commit it was read at, and the date.
+- **`product-design-psychology` was dropped.** It was distilled from a paid book with no
+  repository, no stated license and nobody to ask, and it tracked the book's chapter
+  structure closely. There was no version of "settled" available, so it is out rather than
+  shipped with an asterisk. Recover it from git history if a grant is ever obtained.
+
+[`licenses/`](licenses/) holds the actual license texts. This matters more than it sounds:
+naming Apache-2.0 is not the same as shipping it, section 4(a) requires a copy to travel
+with any redistribution, and ~25 of the vendored skills are Apache-2.0.
 
 The root [`LICENSE`](LICENSE) explains the split:
 
 - beast's installer, prompts, scripts, tests, and original routers are MIT-licensed
-- vendored skills retain their upstream terms
-- modules with unresolved grants are marked in `NOTICE.md`
+- vendored skills retain their upstream terms, with full texts under `licenses/`
 
 Review both files before redistributing the full skill library. If your work appears
 here and you want it removed or credited differently, open an issue.

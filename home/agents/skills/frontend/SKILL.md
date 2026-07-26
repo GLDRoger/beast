@@ -25,7 +25,7 @@ Do not expect modules in the skills menu. If the file is missing, search `~/.age
 
 - `$shape` before greenfield UI
 - `$product-brief` if v1 scope is fuzzy
-- `$critique` / `$teardown` / `$product-design-psychology` when evaluating existing UI
+- `$critique` / `$teardown` when evaluating existing UI
 
 **Green:** Implementable without inventing product goals.
 
@@ -94,7 +94,6 @@ When a phase names a former skill like impeccable or unslop, **read**:
 | `shape` | `~/.agents/skill-modules/shape/SKILL.md` |
 | `critique` | `~/.agents/skill-modules/critique/SKILL.md` |
 | `teardown` | `~/.agents/skill-modules/teardown/SKILL.md` |
-| `product-design-psychology` | `~/.agents/skill-modules/product-design-psychology/SKILL.md` |
 | `redesign-skill` | `~/.agents/skill-modules/redesign-skill/SKILL.md` |
 | `tushar-design` | `~/.agents/skill-modules/tushar-design/SKILL.md` |
 | `taste-skill-gpt` | `~/.agents/skill-modules/taste-skill-gpt/SKILL.md` |
