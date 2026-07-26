@@ -4,8 +4,11 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, symlinkSync, rmSyn
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { linkFile, skillEntries, isJunk } from '../lib/fsutil.mjs'
-import { describe } from '../lib/skills.mjs'
-import { SKILL_CAP, EXCLUDE_PATHS, EXCLUDE_SKILLS, REPO } from '../lib/manifest.mjs'
+import { EXCLUDE_PATHS, EXCLUDE_SKILLS, REPO } from '../lib/manifest.mjs'
+import {
+  BUDGET_FRACTION, CHARS_PER_TOKEN, CONTEXT_TOKENS, MAX_DESC_CHARS,
+  entryCost, listingBudget, listingChars, fractionFor, frontmatter, maxDescChars,
+} from '../lib/listing.mjs'
 
 const tmp = () => mkdtempSync(join(tmpdir(), 'beast-'))
 
@@ -98,26 +101,39 @@ test('isJunk catches what must never be committed', () => {
   assert.equal(isJunk('SKILL.md'), false)
 })
 
-test('describe reads both inline and block-scalar descriptions', () => {
+test('frontmatter reads inline, folded and quoted descriptions', () => {
   const d = tmp()
   const a = join(d, 'a'); mkdirSync(a)
   writeFileSync(join(a, 'SKILL.md'), 'name: a\ndescription: plain inline text\n---\n')
-  assert.equal(describe(a), 'plain inline text')
+  assert.equal(frontmatter(a).description, 'plain inline text')
 
   const b = join(d, 'b'); mkdirSync(b)
   writeFileSync(join(b, 'SKILL.md'), 'name: b\ndescription: >\n  folded over\n  two lines\nother: 1\n')
-  assert.equal(describe(b), 'folded over two lines')
+  assert.equal(frontmatter(b).description, 'folded over two lines')
+
+  // A description is allowed to contain a colon; only the first one is the separator.
+  const q = join(d, 'q'); mkdirSync(q)
+  writeFileSync(join(q, 'SKILL.md'), '---\r\nname: q\r\ndescription: "Use for: a, b"\r\n---\r\n')
+  assert.equal(frontmatter(q).description, 'Use for: a, b', 'CRLF and quotes')
+
+  // YAML escapes: a doubled quote inside a single-quoted scalar is one character, and
+  // billing it as two would overstate the entry. Real payload skills are written this way.
+  const e = join(d, 'e'); mkdirSync(e)
+  writeFileSync(join(e, 'SKILL.md'), '---\nname: e\ndescription: \'a composition\'\'s port\'\n---\n')
+  assert.equal(frontmatter(e).description, "a composition's port")
+  const f = join(d, 'f'); mkdirSync(f)
+  writeFileSync(join(f, 'SKILL.md'), '---\nname: f\ndescription: "say \\"hi\\""\n---\n')
+  assert.equal(frontmatter(f).description, 'say "hi"')
 
   const c = join(d, 'c'); mkdirSync(c)
   writeFileSync(join(c, 'SKILL.md'), 'name: c\n')
-  assert.equal(describe(c), '')
+  assert.equal(frontmatter(c).description, undefined)
   rmSync(d, { recursive: true, force: true })
 })
 
 test('exclusion lists are non-empty — a silent empty list would ship everything', () => {
   assert.ok(EXCLUDE_SKILLS.length > 0)
   assert.ok(EXCLUDE_PATHS.length > 0)
-  assert.ok(SKILL_CAP > 0 && SKILL_CAP <= 50)
 })
 
 // --- platform -------------------------------------------------------------
@@ -252,14 +268,222 @@ test('scanSummary reports only what is worth reporting, and never throws', async
   assert.notEqual(s, null, 'scanSummary returned null; it must degrade, not fail')
   assert.equal(typeof s.worthReporting, 'boolean')
   assert.equal(typeof s.over, 'boolean')
-  assert.match(s.line, /^\d+\/\d+ loaded/)
+  assert.match(s.line, /^\d+ skills, [\d,]+\/[\d,]+(–[\d,]+)? listing chars/)
 
   // The summary must agree with the check it is derived from. A hint that contradicts
   // `beast scan` is worse than no hint.
   const { checkSkillHygiene } = await import('../lib/checks/skills.mjs')
   const res = checkSkillHygiene({ fail: () => {}, warn: () => {}, info: () => {} })
-  assert.equal(s.over, res.loaded > res.cap)
-  assert.ok(s.line.startsWith(`${res.loaded}/${res.cap}`))
+  assert.equal(s.over, res.listing.over)
+  assert.ok(s.line.startsWith(`${res.loaded} skills,`))
+})
+
+// --- the skill budget -----------------------------------------------------
+// The unit is characters, not skills. Claude Code caps the listing it sends every turn
+// at skillListingBudgetFraction x charsPerToken x contextWindow; going over shortens
+// descriptions instead of dropping skills. These tests pin the arithmetic to the
+// shipped behaviour, because a wrong budget is a fail nobody can act on.
+
+test('an entry costs exactly what Claude Code renders for it', () => {
+  const d = tmp()
+  const a = join(d, 'router'); mkdirSync(a)
+  writeFileSync(join(a, 'SKILL.md'), '---\nname: router\ndescription: picks a lane\n---\nbody\n')
+  const one = entryCost(a, 'ignored-when-frontmatter-names-it')
+  assert.equal(one.name, 'router')
+  assert.equal(one.chars, '- router: picks a lane'.length)
+
+  // whenToUse is appended to the description, the way OLt() composes it.
+  const b = join(d, 'b'); mkdirSync(b)
+  writeFileSync(join(b, 'SKILL.md'), '---\nname: b\ndescription: does x\nwhenToUse: when y\n---\n')
+  assert.equal(entryCost(b, 'b').chars, '- b: does x - when y'.length)
+
+  // A directory with no name: falls back to its own name, as Claude Code does.
+  const c2 = join(d, 'fallback'); mkdirSync(c2)
+  writeFileSync(join(c2, 'SKILL.md'), '---\ndescription: no name key\n---\n')
+  assert.equal(entryCost(c2, 'fallback').name, 'fallback')
+
+  // Long descriptions are truncated per entry, not billed in full.
+  const long = join(d, 'long'); mkdirSync(long)
+  writeFileSync(join(long, 'SKILL.md'), `---\nname: long\ndescription: ${'x'.repeat(40)}\n---\n`)
+  assert.equal(entryCost(long, 'long', 10).chars, '- long: '.length + 10)
+
+  // The listing joins entries with newlines, so n entries carry n-1 extra chars.
+  assert.equal(listingChars([{ chars: 10 }, { chars: 20 }]), 31)
+  assert.equal(listingChars([]), 0)
+  rmSync(d, { recursive: true, force: true })
+})
+
+test('the listing budget comes from settings, the env, or the documented default', () => {
+  // A machine that took beast's own advice would otherwise fail this test.
+  const preset = process.env.SLASH_COMMAND_TOOL_CHAR_BUDGET
+  delete process.env.SLASH_COMMAND_TOOL_CHAR_BUDGET
+  try {
+  const dflt = listingBudget(null)
+  // Both ends are live: kC() gives 3 chars/token on current models and 4 on the older
+  // set it hard-codes, and beast cannot know which model a session will run.
+  assert.equal(dflt.chars, BUDGET_FRACTION * CHARS_PER_TOKEN * CONTEXT_TOKENS)
+  assert.equal(dflt.chars, 6000, 'default on a current model: 1% of 200k at 3 chars/token')
+  assert.equal(dflt.charsHigh, 8000, 'default up to sonnet-4-6: the same at 4 chars/token')
+  assert.equal(dflt.source, 'default')
+  assert.equal(dflt.invalid, false)
+
+  const raised = listingBudget({ skillListingBudgetFraction: 0.02 })
+  assert.equal(raised.chars, 12000)
+  assert.equal(raised.charsHigh, 16000)
+  assert.equal(raised.source, 'settings.json')
+
+  // Claude Code's schema takes a number in (0, 1]. Anything else is ignored there, so
+  // beast must report the default it actually gets rather than the value in the file.
+  for (const bad of ['0.02', 0, 2, null]) {
+    const r = listingBudget({ skillListingBudgetFraction: bad })
+    assert.equal(r.chars, 6000, `${JSON.stringify(bad)} must fall back to the default`)
+    assert.equal(r.invalid, bad !== null, `${JSON.stringify(bad)} invalid flag`)
+  }
+
+  // An absolute budget in the environment beats the settings key inside Claude Code, and
+  // scales with nothing, so both ends of the range collapse onto it.
+  process.env.SLASH_COMMAND_TOOL_CHAR_BUDGET = '4321'
+  const env = listingBudget({ skillListingBudgetFraction: 0.5 })
+  assert.equal(env.chars, 4321, 'the env override wins, as it does in the CLI')
+  assert.equal(env.charsHigh, 4321)
+  assert.equal(env.source, 'SLASH_COMMAND_TOOL_CHAR_BUDGET')
+  // A fractional value floors to 0 without a guard, and every later percentage then
+  // divides by it.
+  process.env.SLASH_COMMAND_TOOL_CHAR_BUDGET = '0.5'
+  assert.equal(listingBudget(null).chars, 1, 'a 0-char budget would make every ratio Infinity')
+  delete process.env.SLASH_COMMAND_TOOL_CHAR_BUDGET
+
+  // The remediation beast prints has to fit the listing at the tighter rate, or it is
+  // advice that leaves the user truncated.
+  assert.equal(fractionFor(6000), 0.01)
+  assert.equal(fractionFor(6001), 0.02)
+  assert.equal(fractionFor(12000), 0.02)
+  for (const n of [6001, 12001, 40_000]) {
+    assert.ok(fractionFor(n) * CHARS_PER_TOKEN * CONTEXT_TOKENS >= n, `${n} must actually fit`)
+  }
+  assert.equal(fractionFor(9e9), 1, 'the fraction is capped at the whole window')
+
+  assert.equal(MAX_DESC_CHARS, 1536)
+  assert.equal(maxDescChars({ skillListingMaxDescChars: 0.5 }), 1,
+    'a sub-1 cap floors to 0 and then slice(0, -1) truncates nothing')
+  assert.equal(maxDescChars({ skillListingMaxDescChars: 900 }), 900)
+  } finally {
+    if (preset === undefined) delete process.env.SLASH_COMMAND_TOOL_CHAR_BUDGET
+    else process.env.SLASH_COMMAND_TOOL_CHAR_BUDGET = preset
+  }
+})
+
+test('nothing in lib still enforces a skill count cap', () => {
+  // The 30-skill cap was never Claude Code's rule. It blocked `beast skills add` and
+  // failed doctor on skills beast does not own, so a plugin could make doctor
+  // permanently red with no beast-side fix.
+  for (const f of ['manifest.mjs', 'skills.mjs', 'doctor.mjs', 'scan.mjs', 'checks/skills.mjs']) {
+    const src = readFileSync(new URL(`../lib/${f}`, import.meta.url), 'utf8')
+    assert.equal(/SKILL_CAP/.test(src), false, `${f} still references a count cap`)
+  }
+})
+
+test('doctor and scan read one budget measurement, and it adds up', async () => {
+  const { checkSkillHygiene } = await import('../lib/checks/skills.mjs')
+  const res = checkSkillHygiene({ fail: () => {}, warn: () => {}, info: () => {} })
+  const lst = res.listing
+
+  assert.equal(lst.rows.length, res.loaded, 'one measured row per loaded skill')
+  assert.equal(lst.chars, listingChars(lst.rows), 'the total must be the sum of its rows')
+  assert.ok(lst.budget <= lst.budgetHigh)
+  // Severity follows certainty: `over` means truncated on any 200k model, `tight` only
+  // on a current one. doctor fails on the first and warns on the second.
+  assert.equal(lst.over, lst.chars > lst.budgetHigh)
+  assert.equal(lst.tight, lst.chars > lst.budget)
+  assert.equal(lst.pct, Math.round((lst.chars / lst.budget) * 100))
+  assert.ok(lst.beastChars <= lst.chars, 'beast\'s share cannot exceed the whole listing')
+  // Ranked for `beast scan`, which prints the top entries by cost.
+  for (let i = 1; i < lst.rows.length; i++) assert.ok(lst.rows[i - 1].chars >= lst.rows[i].chars)
+})
+
+test('the loaded set is resolved per listing name, against a fixture $HOME', async () => {
+  // The rewritten resolution logic, on disk rather than against the live $HOME: which
+  // names load, which are dark, what each costs, and who shadows whom. The previous
+  // version of this code matched plugin ids by substring, so a fixture with deliberately
+  // overlapping ids ("p2" inside "p2extra") is the regression it guards.
+  const { checkSkillHygiene } = await import('../lib/checks/skills.mjs')
+  const home = tmp()
+  const mk = (dir, name, desc) => {
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, 'SKILL.md'), `---\nname: ${name}\ndescription: ${desc}\n---\nbody\n`)
+  }
+  mk(join(home, '.claude/skills/route'), 'route', 'picks a lane')
+  // A directory whose frontmatter claims another name. Claude Code keys the listing on
+  // the frontmatter name, so this shadows the plugin's `shared` and must be reported
+  // under `shared`, once.
+  mk(join(home, '.claude/skills/helper'), 'shared', 'the home copy')
+  mk(join(home, 'plug/p1/skills/shared'), 'shared', 'the plugin copy')
+  mk(join(home, 'plug/p2/skills/ghost'), 'ghost', 'only from a disabled plugin')
+  // Same name as the home copy, but inside the disabled plugin: shadows nothing.
+  mk(join(home, 'plug/p2/skills/route'), 'route', 'a cached copy that does not load')
+  mk(join(home, 'plug/p2extra/skills/extra'), 'extra', 'from the plugin whose id contains the other')
+  mkdirSync(join(home, '.claude/plugins'), { recursive: true })
+  writeFileSync(join(home, '.claude/plugins/installed_plugins.json'), JSON.stringify({
+    plugins: {
+      'p1@m': [{ installPath: join(home, 'plug/p1') }],
+      'p2@m': [{ installPath: join(home, 'plug/p2') }],
+      'p2extra@m': [{ installPath: join(home, 'plug/p2extra') }],
+    },
+  }))
+  writeFileSync(join(home, '.claude/settings.json'), JSON.stringify({ enabledPlugins: { 'p2@m': false } }))
+
+  const warnings = []
+  const res = checkSkillHygiene({ fail: () => {}, warn: (m) => warnings.push(m), info: () => {}, homeDir: home })
+
+  assert.deepEqual(res.listing.rows.map((r) => r.name).sort(), ['extra', 'route', 'shared'])
+  assert.equal(res.loaded, 3, '`ghost` comes only from the disabled plugin')
+  assert.equal(res.total, 4)
+  assert.equal(res.managed, 0, 'nothing here links into the payload')
+
+  // `shared` is one line, priced from the home copy, and the collision is reported.
+  const shared = res.listing.rows.find((r) => r.name === 'shared')
+  assert.equal(shared.chars, '- shared: the home copy'.length)
+  assert.equal(shared.plugin, null)
+  assert.deepEqual(res.inventory.duplicates.map((d) => d.name), ['shared'],
+    '`route` is also provided twice, but only one of those providers loads')
+  assert.match(warnings.join('\n'), /skill name "shared" provided 2x/)
+  assert.equal(/"route" provided/.test(warnings.join('\n')), false)
+  // `route` still loads, priced from the home copy rather than the disabled plugin's.
+  assert.equal(res.listing.rows.find((r) => r.name === 'route').chars, '- route: picks a lane'.length)
+  // The dir name never becomes a listing name.
+  assert.equal(res.listing.rows.some((r) => r.name === 'helper'), false)
+
+  // The enabled plugin whose id merely contains a disabled one's still loads.
+  assert.equal(res.listing.rows.find((r) => r.name === 'extra').plugin, 'p2extra@m')
+
+  const expect = ['- route: picks a lane', '- shared: the home copy',
+    '- extra: from the plugin whose id contains the other']
+  assert.equal(res.listing.chars, expect.reduce((n, s) => n + s.length, 0) + 2, 'entries plus two newlines')
+  rmSync(home, { recursive: true, force: true })
+})
+
+test('a malformed settings.json is reported, not silently defaulted', async () => {
+  const { checkSkillHygiene } = await import('../lib/checks/skills.mjs')
+  const home = tmp()
+  mkdirSync(join(home, '.claude'), { recursive: true })
+  writeFileSync(join(home, '.claude/settings.json'), '{ "enabledPlugins": ')
+  const warnings = []
+  checkSkillHygiene({ fail: () => {}, warn: (m) => warnings.push(m), info: () => {}, homeDir: home })
+  assert.match(warnings.join('\n'), /settings\.json is not valid JSON/)
+  rmSync(home, { recursive: true, force: true })
+})
+
+test('frontmatter is read once, by one parser', () => {
+  const d = tmp()
+  const a = join(d, 'a'); mkdirSync(a)
+  writeFileSync(join(a, 'SKILL.md'), '---\nname: a\ndescription: |\n  first\n  second\nallowed-tools: Read\n---\nbody: not frontmatter\n')
+  const fm = frontmatter(a)
+  assert.equal(fm.name, 'a')
+  assert.equal(fm.description, 'first second')
+  assert.equal(fm['allowed-tools'], 'Read')
+  assert.equal(fm.body, undefined, 'the body must not leak into frontmatter')
+  assert.deepEqual(frontmatter(join(d, 'missing')), {})
+  rmSync(d, { recursive: true, force: true })
 })
 
 test('the skill inventory exposes the detail scan needs', async () => {

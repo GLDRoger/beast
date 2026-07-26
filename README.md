@@ -216,8 +216,42 @@ beast separates skills into three layers:
 | 27 active skills   | Small set visible to the harness by default        |
 | 92 library modules | Focused instructions that routers load when needed |
 
-The active set has a hard cap of 30. Plugins can add their own skills outside beast,
-so `beast doctor` also reports the total each harness can discover.
+### What the active set costs
+
+Claude Code sends one line per skill every turn, `- name: description`, and caps that
+listing in **characters**, not skills:
+
+```
+budget = skillListingBudgetFraction × chars-per-token × context-window
+       = 0.01 (default)            × 3 or 4          × 200,000
+       = 6,000 to 8,000 characters
+```
+
+Two of those inputs depend on the model, which beast cannot know in advance, so it
+reports a range. Current models count 3 characters per token; a fixed older set
+(`claude-3-*` through `claude-{opus,sonnet}-4-6`) counts 4. A 1M-context session gets
+five times either. `beast doctor` warns when the listing passes the low end and fails
+when it passes the high end, so severity tracks certainty.
+
+Over budget nothing disappears: Claude Code shortens the lowest-scoring entries to bare
+names, ranked by how much you use each skill, so a freshly installed one is first to lose
+the description it is dispatched on.
+
+Two consequences. A verbose skill costs what five terse ones cost, so `beast skills` and
+`beast scan` rank entries by characters. And the budget is shared with anything else the
+harness discovers, including plugin skills beast neither installs nor can remove, so
+`beast doctor` measures everything that loads rather than only beast's own set.
+
+If the listing is over budget and every skill in it is one you want, raise the reservation
+instead of trimming. One extra percent of the window is usually the better trade:
+
+```jsonc
+// ~/.claude/settings.json
+"skillListingBudgetFraction": 0.02
+```
+
+`SLASH_COMMAND_TOOL_CHAR_BUDGET` sets an absolute character budget and overrides the
+setting; beast reports whichever one your machine is actually using.
 
 ### Skill packs
 
@@ -313,15 +347,19 @@ Every harness discovers skills from more than one place. beast manages one of th
 the number it controls is not the number your harness loads. `scan` lists every source
 with what it costs and the command that retires it:
 
-- **Claude Code plugins**, with the real always-on token cost reported by
+- **What each entry costs**, ranked by characters across every source, so the one
+  expensive description is visible next to the twelve cheap ones
+- **Claude Code plugins**, with their listing cost, the always-on token cost reported by
   `claude plugin details`, and `claude plugin disable <id>` for each enabled one
 - **Codex system skills**, shipped by the Codex CLI, with the `[[skills.config]]` block
   that disables one
 - **Skills beast does not manage**, which are yours and are left alone
 - **Names provided by more than one place**, where which one wins is undefined
 
-It ends with your position against the cap and the lever that applies to your situation.
-`beast install` points you here when there is something worth looking at.
+It ends with the characters you have spent against the budget, and every lever that
+applies: raising `skillListingBudgetFraction`, disabling a plugin, dropping a pack, or
+shortening a description. `beast install` points you here when there is something worth
+looking at.
 
 
 ```sh
