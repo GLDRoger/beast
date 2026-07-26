@@ -1,4 +1,4 @@
-This file layers on top of the system prompt (`~/.codex/BEAST.v2.md`). Behavioral basics — intent, scope, verification, safety, communication — live there. Keep this file to user-specific policy and config, and don't restate the base.
+This file layers on top of the BEAST system prompt your harness already loaded. Behavioral basics — intent, scope, verification, safety, communication — live there. Keep this file to user-specific policy and config, and don't restate the base.
 
 # Engineering bar
 

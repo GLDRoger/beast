@@ -6,8 +6,22 @@
   "bin": {
     "beast": "./bin/beast.mjs"
   },
+  "//private": [
+    "Not publishable, and not by accident. beast installs symlinks that point INTO the",
+    "clone, so the clone is the source of truth and `git diff` is how you see drift — an",
+    "immutable copy under node_modules cannot fill that role. npm also refuses to",
+    "materialise the 18 symlinked skill directories in the active set: `npm pack` shipped",
+    "9 of 27 active skills, silently, which is worse than not publishing at all.",
+    "Install with `git clone` + `npm link`; see README.md."
+  ],
+  "private": true,
+  "//engines": [
+    "22, not 20. The video pack installs by default and HyperFrames requires Node 22+,",
+    "so a machine that satisfied >=20 could still get default functionality that cannot",
+    "run. Several vendored media scripts also use import.meta.dirname (Node 20.11+)."
+  ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "files": [
     "bin",
@@ -21,9 +35,10 @@
   ],
   "scripts": {
     "bootstrap": "node scripts/bootstrap.mjs",
+    "scrub": "node scripts/scrub.mjs",
     "notice": "node scripts/gen-notice.mjs",
     "test": "node --test test/*.test.mjs",
-    "test:vendored": "node --test home/agents/skill-modules/**/*.test.* || true"
+    "test:vendored": "node scripts/test-vendored.mjs"
   },
   "license": "SEE LICENSE IN LICENSE",
   "os": [

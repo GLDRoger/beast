@@ -1,8 +1,10 @@
 # Copy the parts you want into ~/.codex/config.toml. This is a lean, safe-by-default
 # subset — the setup this came from had ~810 lines, most of it machine state.
 #
-# `beast install` never writes this file. Codex config holds your own project trust
-# list, auth, and hook hashes; merging that automatically would be destructive.
+# `beast install --write-config` adds two keys to this file and nothing else:
+# model_instructions_file and its [features] flag, both only when absent. The rest is
+# yours — Codex config holds your project trust list, auth, and hook hashes, and
+# merging that automatically would be destructive.
 
 # Model is deliberately NOT set here. Availability depends on your account and
 # plan, and a name hardcoded in an example goes stale fast — pick one your CLI

@@ -20,9 +20,11 @@ function co {
       -c model_reasoning_summary_format=experimental
 }
 
-# Grok, pointed at the Codex prompt (it has no --system-prompt-file equivalent).
+# Grok. It has no --system-prompt-file equivalent, so it reads the prompt from a path.
+# ~/.grok/BEAST.v2.md is the same real file as the Codex prompt, under Grok's own
+# namespace, so a grok-only install has it.
 function gro {
-    grok --system-prompt-override "read and follow ~/.codex/BEAST.v2.md" --effort max @args
+    grok --system-prompt-override "read and follow ~/.grok/BEAST.v2.md" --effort max @args
 }
 
 # ponytail: no --dangerously-skip-permissions / --yolo defaults here on purpose,

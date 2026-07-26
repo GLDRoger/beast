@@ -1,0 +1,139 @@
+name: ci
+
+# Nothing enforced these before, so every check below had at least one way to be
+# quietly wrong: the vendored suite masked its own exit code, NOTICE.md drifted from the
+# payload it is generated from, and a clean install failed `beast doctor` on every
+# platform while passing on the author's machine because of leftover local state.
+#
+# There are no dependencies to install. Every job is `checkout` + `setup-node` + a script.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: unit · node ${{ matrix.node }} · ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+
+  # The check that used to be impossible to pass. Every scope a user can choose must
+  # install AND then report healthy, in a home directory with nothing in it.
+  clean-install:
+    name: clean install + doctor · ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: every harness scope, from an empty $HOME
+        run: |
+          set -euo pipefail
+          for scope in "--all" "--harness=claude" "--harness=codex" "--harness=grok" \
+                       "--harness=codex,grok" "--harness=claude --packs=core"; do
+            scratch="$(mktemp -d)/home"
+            mkdir -p "$scratch"
+            echo "::group::beast install $scope"
+            HOME="$scratch" node bin/beast.mjs install $scope
+            HOME="$scratch" node bin/beast.mjs doctor
+            HOME="$scratch" node bin/beast.mjs scan
+            echo "::endgroup::"
+          done
+
+      - name: install is idempotent
+        run: |
+          set -euo pipefail
+          scratch="$(mktemp -d)/home"; mkdir -p "$scratch"
+          HOME="$scratch" node bin/beast.mjs install --all > /dev/null
+          HOME="$scratch" node bin/beast.mjs install --all | tee second.txt
+          grep -q 'already correct' second.txt
+          if grep -qE 'moved aside|retired|failed' second.txt; then
+            echo "second install was not a no-op"; exit 1
+          fi
+
+  # Windows is the one platform never exercised on real hardware, so this reports rather
+  # than blocks until it has passed once. Remove continue-on-error at that point.
+  # File symlinks need elevation or Developer Mode; GitHub's Windows runners are elevated,
+  # which is exactly why this cannot stand in for a real user's machine.
+  clean-install-windows:
+    name: clean install + doctor · windows (informational)
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: install and verify in a scratch profile
+        shell: pwsh
+        run: |
+          $scratch = Join-Path $env:RUNNER_TEMP "beast-home"
+          New-Item -ItemType Directory -Force -Path $scratch | Out-Null
+          $env:USERPROFILE = $scratch   # os.homedir() reads this on Windows
+          node bin/beast.mjs install --all
+          node bin/beast.mjs doctor
+
+  vendored:
+    name: vendored skill suites
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Gates on any failure not in KNOWN_FAILURES, and on any known failure that
+      # starts passing. The old command globbed in /bin/sh and ran 1 of 57 files.
+      - run: npm run test:vendored
+
+  generated:
+    name: generated files are current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: NOTICE.md matches the payload
+        run: |
+          npm run notice
+          git diff --exit-code NOTICE.md \
+            || { echo "NOTICE.md is stale — run npm run notice and commit it"; exit 1; }
+      # The publication gate. It passes today, so any new skill without a settled grant,
+      # or any frontmatter naming license text that does not ship, fails here rather than
+      # at release time.
+      - name: every attribution question is settled
+        run: npm run notice -- --strict
+      - name: every scrub rule is applied to the payload
+        run: |
+          npm run scrub
+          git diff --exit-code home/ \
+            || { echo "payload has unscrubbed text — run npm run scrub and commit it"; exit 1; }
+      - name: not publishable to npm by accident
+        run: |
+          node -e "
+            const p = require('./package.json');
+            if (p.private !== true) {
+              console.error('package.json must stay private: npm pack drops the 18 symlinked skill dirs');
+              process.exit(1);
+            }
+          "

@@ -145,6 +145,17 @@ export function hyperframesPackageSpec(packageName) {
   const version = readBundledHyperframesVersion();
   if (version) return `${packageName}@${version}`;
 
+  // beast patch (supply-chain): a vendored skill has no hyperframes package.json in its
+  // ancestor chain, so the version was unknowable and every spec fell through to @latest
+  // below — an install of whatever shipped this morning, then imported. A committed pin
+  // beside this loader closes that.
+  // Deliberately a sibling FILE, not an inline constant: the fallback below is correct
+  // for a genuine global install, and upstream proves it by copying this loader alone
+  // into a temp directory. Without the sibling, that path still behaves as designed.
+  // Re-apply after `npx hyperframes skills update`. See NOTICE.md.
+  const pinned = readBeastPinnedVersion();
+  if (pinned) return `${packageName}@${pinned}`;
+
   // Global skill installs have no hyperframes package.json
   // in their ancestor chain, so the bundled version is unknowable. Fall back to
   // @latest instead of throwing: already-installed packages still import, and a
@@ -203,6 +214,17 @@ function readBundledHyperframesVersion() {
     if (monorepoCliVersion) return monorepoCliVersion;
   }
   return null;
+}
+
+// beast patch (supply-chain): read the committed pin. Absent file, unparseable JSON or a
+// non-semver value all mean "no pin" — this must never be able to widen a spec.
+function readBeastPinnedVersion() {
+  try {
+    const pin = JSON.parse(readFileSync(join(HERE, "hyperframes-version.json"), "utf8")).hyperframes;
+    return typeof pin === "string" && /^\d+\.\d+\.\d+(?:-[\w.]+)?$/.test(pin) ? pin : null;
+  } catch {
+    return null;
+  }
 }
 
 function readPackageVersion(packageJsonPath) {
@@ -285,12 +307,27 @@ function assertPinnedPackageSpecs(packageSpecs) {
   );
 }
 
+// beast patch (supply-chain): a dist-tag is NOT a pin. Upstream only checked for the
+// presence of "@", so `pkg@latest` satisfied the "refusing to bootstrap unpinned
+// package spec(s)" guard — and hyperframesPackageSpec deliberately returns @latest
+// when it cannot detect a version. The package is then installed AND imported, so
+// --ignore-scripts does not contain the risk.
+// Re-apply after `npx hyperframes skills update`. See NOTICE.md.
+const DIST_TAGS = new Set(["latest", "next", "beta", "alpha", "canary", "rc", "dev", "experimental"]);
+
 function hasVersionSpec(packageSpec) {
+  let at;
   if (packageSpec.startsWith("@")) {
     const slash = packageSpec.indexOf("/");
-    return slash !== -1 && packageSpec.indexOf("@", slash + 1) !== -1;
+    if (slash === -1) return false;
+    at = packageSpec.indexOf("@", slash + 1);
+  } else {
+    at = packageSpec.indexOf("@");
   }
-  return packageSpec.includes("@");
+  if (at === -1) return false;
+  const spec = packageSpec.slice(at + 1).trim();
+  if (!spec) return false;
+  return !DIST_TAGS.has(spec.toLowerCase());
 }
 
 async function confirmBootstrap(packageSpecs) {

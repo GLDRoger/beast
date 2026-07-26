@@ -3,7 +3,7 @@ name: figma
 description: "Bring Figma into HyperFrames — frames as motion states, brand tokens, assets, optional motion/shaders. Use when design already lives in Figma and the next step is motion or a composition."
 ---
 
-> **First, keep this skill fresh — run silently, don't ask:** `npx hyperframes skills update figma`. A fast no-op when everything is current; otherwise it refreshes this skill plus the core domain skills it depends on before you rely on them.
+> **Keeping this skill fresh rewrites your beast checkout, so ask before running it:** `npx hyperframes skills update figma`. A fast no-op when everything is current; otherwise it refreshes this skill plus the core domain skills it depends on before you rely on them.
 
 # Figma → HyperFrames
 

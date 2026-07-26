@@ -20,9 +20,12 @@ co() {
     -c model_reasoning_summary_format=experimental
 }
 
-# Grok, pointed at the Codex prompt (it has no --system-prompt-file equivalent).
+# Grok. It has no --system-prompt-file equivalent, so it reads the prompt from a path.
+# ~/.grok/BEAST.v2.md, not ~/.codex/BEAST.v2.md: the same real file, but under Grok's own
+# namespace so a grok-only install still has it. Pointing at the Codex path meant the one
+# supported single-harness setup started Grok with no system policy at all.
 gro() {
-  grok --system-prompt-override "read and follow ~/.codex/BEAST.v2.md" --effort max "$@"
+  grok --system-prompt-override "read and follow ~/.grok/BEAST.v2.md" --effort max "$@"
 }
 
 # ponytail: no --dangerously-skip-permissions / --yolo defaults here on purpose.
