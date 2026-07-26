@@ -219,3 +219,36 @@ test('SKILL_MIRRORS entries are objects; path consumers must use SKILL_MIRROR_PA
       `${f} iterates SKILL_MIRRORS and joins the object`)
   }
 })
+
+test('scanSummary reports only what is worth reporting, and never throws', async () => {
+  const { scanSummary } = await import('../lib/scan.mjs')
+  const s = scanSummary()
+  assert.notEqual(s, null, 'scanSummary returned null; it must degrade, not fail')
+  assert.equal(typeof s.worthReporting, 'boolean')
+  assert.equal(typeof s.over, 'boolean')
+  assert.match(s.line, /^\d+\/\d+ loaded/)
+
+  // The summary must agree with the check it is derived from. A hint that contradicts
+  // `beast scan` is worse than no hint.
+  const { checkSkillHygiene } = await import('../lib/checks/skills.mjs')
+  const res = checkSkillHygiene({ fail: () => {}, warn: () => {}, info: () => {} })
+  assert.equal(s.over, res.loaded > res.cap)
+  assert.ok(s.line.startsWith(`${res.loaded}/${res.cap}`))
+})
+
+test('the skill inventory exposes the detail scan needs', async () => {
+  const { checkSkillHygiene } = await import('../lib/checks/skills.mjs')
+  const { inventory: inv, managed } = checkSkillHygiene({ fail: () => {}, warn: () => {}, info: () => {} })
+
+  for (const k of ['plugins', 'foreign', 'system', 'duplicates', 'managedNames']) {
+    assert.ok(Array.isArray(inv[k]), `inventory.${k} must be an array`)
+  }
+  // managedNames is what scan reports as "beast's"; it must match the count doctor prints.
+  assert.equal(inv.managedNames.length, managed)
+  // Every plugin entry needs the names, or scan cannot say what it would retire.
+  for (const p of inv.plugins) {
+    assert.equal(typeof p.id, 'string')
+    assert.ok(Array.isArray(p.names))
+    assert.equal(p.names.length, p.count)
+  }
+})

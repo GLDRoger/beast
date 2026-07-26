@@ -276,6 +276,27 @@ installation.
 
 ## Check your setup
 
+### See what else is loading skills
+
+```sh
+beast scan
+```
+
+Every harness discovers skills from more than one place. beast manages one of them, so
+the number it controls is not the number your harness loads. `scan` lists every source
+with what it costs and the command that retires it:
+
+- **Claude Code plugins**, with the real always-on token cost reported by
+  `claude plugin details`, and `claude plugin disable <id>` for each enabled one
+- **Codex system skills**, shipped by the Codex CLI, with the `[[skills.config]]` block
+  that disables one
+- **Skills beast does not manage**, which are yours and are left alone
+- **Names provided by more than one place**, where which one wins is undefined
+
+It ends with your position against the cap and the lever that applies to your situation.
+`beast install` points you here when there is something worth looking at.
+
+
 ```sh
 beast doctor
 ```

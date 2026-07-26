@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { install } from '../lib/install.mjs'
 import { doctor } from '../lib/doctor.mjs'
+import { scan } from '../lib/scan.mjs'
 import { list, add, rm } from '../lib/skills.mjs'
 import { c } from '../lib/fsutil.mjs'
 import { HARNESSES, HARNESS_NAMES } from '../lib/manifest.mjs'
@@ -15,6 +16,7 @@ const USAGE = `${c.bold('beast')} — install one agent config across Claude Cod
   beast install --all          everything, no prompts
   beast install --harness=claude,codex --packs=core,design
   beast install --dry-run      show every link without touching anything
+  beast scan                   list every skill source and how to retire each
   beast doctor                 verify links, config, skill budget, secrets
   beast skills                 list the active set
   beast skills add <name>      activate a module from the library
@@ -127,6 +129,8 @@ async function run() {
   switch (cmd) {
     case 'install':
       return runInstall()
+    case 'scan':
+      return scan()
     case 'doctor':
       return doctor()
     case 'skills': {
