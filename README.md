@@ -20,12 +20,48 @@ Grok ────────┘
 Kimi─────────┘
 ```
 
+## What changes
+
+|                         | Default harness setup                     | With beast                                                     |
+|-------------------------|-------------------------------------------|----------------------------------------------------------------|
+| System prompt           | Vendor default, tuned for broad appeal    | ~2,650 tokens on scope, verification, safety rails, handoffs    |
+| Skills visible          | None, or everything you ever installed    | 27 active, hard cap of 30                                      |
+| Skills available        | Whatever you remember installing          | 92-module library, loaded only when a router calls for it       |
+| Always-on skill cost    | Zero, or unbounded and unmeasured         | ~1,590 tokens, 0.8% of a 200k window                           |
+| Standing policy         | One file per tool, drifting apart         | One file, shared by all three harnesses                        |
+| Noticing config drift   | When something breaks                     | `git diff` and `beast doctor`                                  |
+
+### Measured on the machine beast was extracted from
+
+Not projections. These are the specific defects that existed before the config was
+consolidated, and they are why beast is shaped the way it is:
+
+- **Standing policy existed in four copies.** Two were byte-identical but unlinked, so
+  editing one left the other silently stale. A third was eight months out of date. They
+  now resolve to a single file, which `beast doctor` verifies by comparing inodes.
+- **The two system prompts had each collected safety rules the other lacked.**
+  `"Keep going" is not authorization` existed only in the Codex prompt. A rule about not
+  trusting your own review inside the same context existed only in the Claude one. Both
+  now carry both.
+- **37 skills were reaching Claude Code while only 27 were managed.** The other ten came
+  from plugins through a discovery path nothing was tracking, so the skill budget was
+  being blown without anything reporting it. `beast doctor` now counts every source.
+
+### What beast does not claim
+
+- **No speed or output-quality benchmark.** Prompt quality does not survive that kind of
+  measurement, and a percentage here would be invented.
+- **It does not reduce token spend.** Per-turn cost goes up: a larger system prompt plus
+  skill descriptions in every request. The trade is fewer wrong turns, which is worth it
+  when a wrong turn costs a full session, and is not worth it for one-line questions.
+- **It does not touch credentials, auth, or per-project config.** Those stay yours.
+
 ## What beast gives you
 
 - **Better default behavior.** The system prompt covers design, taste, scope, charecter, verification, safety,
   git hygiene, persistence, and clear handoffs.
 - **A controlled skill budget.** The active set is capped at 30 so skill descriptions
-  do not consume more than 2% of the context window.
+  cost about 1,590 tokens, under 1% of a 200k context window.
 - **Specialists on demand.** Routers select focused modules for engineering, frontend,
   writing, security, performance, growth, motion, and media work.
 - **One source of truth.** Claude Code, Codex, and Grok read files linked from this repo,
@@ -43,6 +79,47 @@ You need:
 
 beast creates symlinks from your home directory into the cloned repo. Keep the clone
 where it is after installation, or re-run the installer after moving it.
+
+### Plan tiers matter
+
+beast is built for long sessions. The system prompt is large, routers pull in modules as
+the work needs them, and several skills fan work out to sub-agents. That consumes quota
+considerably faster than typing one-off prompts.
+
+**On a $20/month tier you will hit limits quickly.** Anthropic's Pro plan is the
+tightest of the three in practice, because Claude Code sub-agents each carry the full
+system prompt.
+
+The setup this was extracted from runs:
+
+| Tool        | Plan                                     |
+|-------------|------------------------------------------|
+| Codex       | $200/month                               |
+| Claude Code | $100/month                               |
+| Grok        | $20/month, included with X Premium       |
+
+Grok is the cheapest third opinion available, since an X Premium subscription already
+covers it.
+
+You do not need all three. One well-funded harness beats three throttled ones, and the
+same beast configuration works whether you install one or all of them.
+
+### Select only the tools you pay for
+
+The installer asks which CLIs you have access to. Answer accurately, because the answer
+changes what gets written.
+
+The routing guidance in the policy files assumes cross-CLI delegation is possible: Claude
+hands bulk mechanical work to Codex, Codex asks Claude for a second read, and either can
+reach Grok. If you select a harness you cannot run, an agent will try to invoke
+it mid-task, fail, and spend a turn working out why.
+
+Your answer does two things. It decides whose config files get written, and it decides
+what goes into `~/.beast/delegation.md`, which the prompts treat as the authoritative
+list of delegation targets. That file names only the tools you selected, so an agent on a
+single-harness install is never pointed at something it cannot reach.
+
+Re-run `beast install` after changing a subscription and the file updates.
 
 ## Quick start
 
@@ -87,11 +164,11 @@ This adds three short commands:
 All three pass the prompt as a launch flag, so **no config file needs editing**. Each
 tool takes a different flag, which is the only reason they look different:
 
-| Tool | How it receives the prompt |
-|---|---|
-| Claude Code | `--system-prompt-file ~/.claude/BEAST.v2.md` |
-| Codex | `-c model_instructions_file=~/.codex/BEAST.v2.md` plus `-c features.model_instructions_file=true` |
-| Grok | `--system-prompt-override` pointing at the Codex prompt |
+| Tool        | How it receives the prompt                                                                        |
+|-------------|---------------------------------------------------------------------------------------------------|
+| Claude Code | `--system-prompt-file ~/.claude/BEAST.v2.md`                                                      |
+| Codex       | `-c model_instructions_file=~/.codex/BEAST.v2.md` plus `-c features.model_instructions_file=true` |
+| Grok        | `--system-prompt-override` pointing at the Codex prompt                                           |
 
 You can still set `model_instructions_file` in `~/.codex/config.toml` if you want the
 prompt to apply to bare `codex` runs as well as `co`. The example file shows the lines.
