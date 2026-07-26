@@ -193,3 +193,29 @@ test('linkFile collapses a payload-internal symlink instead of chaining', () => 
   assert.equal(readFileSync(join(link, 'SKILL.md'), 'utf8'), 'content')
   rmSync(d, { recursive: true, force: true })
 })
+
+test('SKILL_MIRRORS entries are objects; path consumers must use SKILL_MIRROR_PATHS', async () => {
+  const m = await import('../lib/manifest.mjs')
+  // Regression guard. SKILL_MIRRORS became {home, target} objects when harness
+  // targeting landed. install.mjs and doctor.mjs were updated; skills.mjs was not, and
+  // join(object, name) threw ERR_INVALID_ARG_TYPE *after* the payload had already been
+  // mutated, leaving a skill unlinked from the active set but still linked into every
+  // harness. Any module that joins these into a path must use the string form.
+  for (const e of m.SKILL_MIRRORS) {
+    assert.equal(typeof e, 'object')
+    assert.equal(typeof e.home, 'string')
+    assert.equal(typeof e.target, 'string')
+  }
+  for (const p of m.SKILL_MIRROR_PATHS) assert.equal(typeof p, 'string')
+  assert.equal(m.SKILL_MIRROR_PATHS.length, m.SKILL_MIRRORS.length)
+
+  // And no module may pass the object form to a path join.
+  const { readFileSync } = await import('node:fs')
+  for (const f of ['skills.mjs', 'install.mjs', 'doctor.mjs']) {
+    const src = readFileSync(new URL(`../lib/${f}`, import.meta.url), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+    assert.equal(/join\(inHome\(m\)/.test(src), false, `${f} joins a mirror object as a path`)
+    assert.equal(/of SKILL_MIRRORS\b[\s\S]{0,200}?join\(inHome\(m\),/.test(src), false,
+      `${f} iterates SKILL_MIRRORS and joins the object`)
+  }
+})
