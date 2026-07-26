@@ -1,13 +1,20 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { mkdtempSync, writeFileSync, readFileSync, rmSync, existsSync, chmodSync, statSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { tmpdir, platform } from 'node:os'
 import { join } from 'node:path'
 import { insertKey, onlyAdded, applyPlan, configQuestion, EDITS } from '../lib/config-write.mjs'
 import { parseTomlFile, tomlInterpreter } from '../lib/toml.mjs'
 
 const tmp = () => mkdtempSync(join(tmpdir(), 'beast-cfg-'))
 const NO_TOML = !tomlInterpreter()
+
+/**
+ * Windows has no POSIX mode bits: chmodSync(f, 0o600) leaves the file reporting 0o666, so
+ * "an edit must not widen permissions" cannot be asserted there. The behaviour it protects
+ * is real on POSIX, where config files hold tokens — so this skips rather than relaxes.
+ */
+const NO_MODES = platform() === 'win32' && 'POSIX file modes do not exist on Windows'
 
 /** Parse a string of TOML by way of a temp file, since tomllib reads files. */
 function parse(text) {
@@ -154,7 +161,7 @@ test('applyPlan creates a config file when there is none', { skip: NO_TOML && 'n
   rmSync(d, { recursive: true, force: true })
 })
 
-test('applyPlan keeps the original file mode', { skip: NO_TOML && 'no python3 with tomllib' }, () => {
+test('applyPlan keeps the original file mode', { skip: NO_MODES || (NO_TOML && 'no python3 with tomllib') }, () => {
   const d = tmp()
   const file = join(d, 'config.toml')
   writeFileSync(file, '[features]\nshell_tool = true\n')

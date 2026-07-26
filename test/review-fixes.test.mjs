@@ -13,12 +13,27 @@ import {
   FILES, EXAMPLES, SHELL_SNIPPETS, HARNESS_NAMES, wanted,
 } from '../lib/manifest.mjs'
 import { scanText } from '../lib/secrets.mjs'
-import { isDrvFs, drvFsRoot } from '../lib/platform.mjs'
+import { isDrvFs, drvFsRoot, symlinkType, IS_WINDOWS } from '../lib/platform.mjs'
+
+/** chmod is a no-op on Windows, so a test that needs an unwritable directory cannot run. */
+const NO_CHMOD = IS_WINDOWS && 'chmod has no effect on Windows'
 
 const CLI = join(dirname(fileURLToPath(import.meta.url)), '..', 'bin', 'beast.mjs')
 const tmp = () => mkdtempSync(join(tmpdir(), 'beast-fix-'))
+
+/**
+ * Run the CLI against a scratch home.
+ *
+ * USERPROFILE as well as HOME, always. beast reads os.homedir(), which uses HOME on POSIX
+ * and USERPROFILE on Windows — setting only HOME meant every one of these tests ran
+ * against the real profile on Windows. CI caught it: four assertions failed because the
+ * files had been written to C:\Users\runneradmin instead of the temp dir.
+ */
 const beast = (args, home) =>
-  spawnSync(process.execPath, [CLI, ...args], { encoding: 'utf8', env: { ...process.env, HOME: home } })
+  spawnSync(process.execPath, [CLI, ...args], {
+    encoding: 'utf8',
+    env: { ...process.env, HOME: home, USERPROFILE: home },
+  })
 
 // --- ownership boundary -----------------------------------------------------
 
@@ -42,7 +57,9 @@ test('narrowing a selection leaves an unmanaged link alone', () => {
 
   assert.equal(beast(['install', '--all'], home).status, 0)
   const mine = join(home, '.claude', 'skills', 'unmanaged')
-  symlinkSync(sibling, mine)
+  // symlinkType, not a bare symlinkSync: on Windows a link to a directory must be created
+  // as a junction, and the default 'file' fails with ENOENT.
+  symlinkSync(sibling, mine, symlinkType(sibling))
 
   // Narrow hard: this retires ~140 beast links and must not touch the one above.
   assert.equal(beast(['install', '--harness=codex', '--packs=core'], home).status, 0)
@@ -82,7 +99,7 @@ test('install parks a hand-written delegation.md instead of truncating it', () =
   rmSync(d, { recursive: true, force: true })
 })
 
-test('install fails when it cannot write generated state', () => {
+test('install fails when it cannot write generated state', { skip: NO_CHMOD }, () => {
   const d = tmp()
   const home = join(d, 'home')
   // A directory where selection.json belongs: rename can move it aside, but a file
@@ -166,7 +183,7 @@ test('a non-interactive install with no flags configures only the CLIs on PATH',
   // falls back to all three (better a broad install than none).
   const r = spawnSync(process.execPath, [CLI, 'install', '--dry-run'], {
     encoding: 'utf8',
-    env: { ...process.env, HOME: home, PATH: join(d, 'empty') },
+    env: { ...process.env, HOME: home, USERPROFILE: home, PATH: join(d, 'empty') },
   })
   assert.equal(r.status, 0)
   assert.match(r.stdout, /no CLI found on PATH/)
