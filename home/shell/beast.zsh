@@ -9,10 +9,15 @@ c() {
   claude --system-prompt-file "$HOME/.claude/BEAST.v2.md" "$@"
 }
 
-# Codex. The system prompt comes from `model_instructions_file` in config.toml,
-# not a flag, so this only carries run options.
+# Codex. Carries the system prompt as a -c override, so config.toml needs no edit.
+# Verified load-bearing: pointing model_instructions_file at a missing file fails with
+# "failed to read model instructions file", so codex genuinely reads it rather than
+# accepting the key and ignoring it.
 co() {
-  codex "$@" -c model_reasoning_summary_format=experimental
+  codex "$@" \
+    -c features.model_instructions_file=true \
+    -c model_instructions_file="$HOME/.codex/BEAST.v2.md" \
+    -c model_reasoning_summary_format=experimental
 }
 
 # Grok, pointed at the Codex prompt (it has no --system-prompt-file equivalent).

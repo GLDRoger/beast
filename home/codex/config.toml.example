@@ -12,9 +12,11 @@
 model_reasoning_effort = "high"
 model_reasoning_summary = "detailed"
 
-# The system prompt. `beast install` symlinks this path into the repo, so leave it as-is.
-# Requires [features] model_instructions_file = true below.
-model_instructions_file = "~/.codex/BEAST.v2.md"
+# The system prompt. OPTIONAL: the `co` shell helper passes this as `-c` overrides, so
+# bare `co` already gets the prompt without touching this file. Set it here only if you
+# also want plain `codex` runs to pick it up. Requires [features] model_instructions_file
+# below, which the helper also sets via -c.
+# model_instructions_file = "~/.codex/BEAST.v2.md"
 
 web_search = "live"
 file_opener = "vscode"          # or "cursor", "windsurf", "none"
