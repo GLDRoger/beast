@@ -17,7 +17,7 @@
  * So: copy into <dest>.staging, scan every staged tree, and only then swap. A
  * rejected run leaves the existing payload byte-for-byte untouched.
  */
-import { cpSync, existsSync, mkdirSync, rmSync, renameSync, statSync, readFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, rmSync, renameSync, statSync, readFileSync, realpathSync } from 'node:fs'
 import { join, basename, sep, dirname } from 'node:path'
 import {
   SOURCES, EXCLUDE_SKILLS, EXCLUDE_PROMPTS, EXCLUDE_PATHS, EXCLUDE_FILES, SECRET_PATTERNS,
@@ -25,6 +25,7 @@ import {
 } from '../lib/manifest.mjs'
 import { isJunk, tilde, c, walk } from '../lib/fsutil.mjs'
 import { normalizePayload, countDuplicates } from '../lib/normalize.mjs'
+import { scanFile } from '../lib/secrets.mjs'
 import { scrubTree, reportScrub } from '../lib/scrub.mjs'
 
 const force = process.argv.includes('--force')
@@ -74,6 +75,26 @@ function keep(src, destRel) {
 
 const discardStaging = () => rmSync(STAGE_ROOT, { recursive: true, force: true })
 
+/**
+ * True when `p` resolves inside any of `roots`.
+ *
+ * Two roots are legitimate, not one. After `beast install` the $HOME sources ARE
+ * symlinks into the payload, so a child of ~/.agents/skills resolves into the REPO and
+ * not into the source root. Checking only the source root rejected every correctly
+ * linked skill and cut the payload from 1084 files to 10.
+ *
+ * Anything resolving outside both is an escape: `skill-modules/x/private -> ~/.ssh`
+ * copied that tree in with exit 0 and no scanner hit, because the scanner knows only a
+ * short pattern list and skips large files.
+ */
+function containedIn(p, roots) {
+  let real
+  try { real = realpathSync(p) } catch { return false }
+  return roots.some((r) => r && (real === r || real.startsWith(r + sep)))
+}
+
+const repoReal = (() => { try { return realpathSync(REPO) } catch { return REPO } })()
+
 // ---------------------------------------------------------------------------
 // 1. copy into staging
 // ---------------------------------------------------------------------------
@@ -89,6 +110,8 @@ for (const [payloadRel, homeRel] of Object.entries(SOURCES)) {
   if (!existsSync(src)) { console.log(`  ${c.yellow('absent')} ${tilde(src)}`); continue }
 
   mkdirSync(dirname(stage), { recursive: true })
+  let srcReal
+  try { srcReal = realpathSync(src) } catch { srcReal = src }
 
   // `recursive: true` even for single files. cpSync with dereference:true on a
   // symlink source refuses with ERR_FS_EISDIR ("cannot copy a directory") unless
@@ -106,6 +129,15 @@ for (const [payloadRel, homeRel] of Object.entries(SOURCES)) {
       // these legitimately — deactivating a skill leaves an orphaned mirror link —
       // so one stale link must not be able to block a bootstrap.
       if (!existsSync(s)) { skipped.push(['broken symlink', s.replace(HOME, '~')]); return false }
+      // Containment. dereference:true follows nested symlinks without checking where
+      // they land, so `skill-modules/x/private -> ~/.ssh` copies that tree into the
+      // payload. Verified: content outside the source tree reached home/ with exit 0
+      // and no scanner hit, because the scanner only knows a short pattern list. The
+      // resolved path must stay inside the resolved source root.
+      if (!containedIn(s, [srcReal, repoReal])) {
+        skipped.push(['escapes source tree', s.replace(HOME, '~')])
+        return false
+      }
       return keep(s, join(payloadRel, s.slice(src.length + 1)))
     },
   })
@@ -131,18 +163,15 @@ for (const [stage] of staged) {
 //    scan staging — a secret here must never reach the payload
 // ---------------------------------------------------------------------------
 const leaks = []
+let unscannable = 0
 for (const [stage] of staged) {
   for (const [abs, rel] of walk(stage)) {
-    let st
-    try { st = statSync(abs) } catch { continue }
-    if (st.size > 2_000_000) continue
-    let text
-    try { text = readFileSync(abs, 'utf8') } catch { continue }
-    for (const [re, label] of SECRET_PATTERNS) {
-      if (re.test(text)) leaks.push([label, join(stage.slice(STAGE_ROOT.length + 1), rel)])
-    }
+    const r = scanFile(abs)
+    if (!r.scanned) { unscannable++; continue }
+    for (const label of r.hits) leaks.push([label, join(stage.slice(STAGE_ROOT.length + 1), rel)])
   }
 }
+if (unscannable) console.log(c.yellow(`  ${unscannable} staged file(s) could not be scanned for secrets`))
 
 if (leaks.length) {
   console.log()

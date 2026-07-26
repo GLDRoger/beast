@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { linkFile, skillEntries, isJunk } from '../lib/fsutil.mjs'
 import { describe } from '../lib/skills.mjs'
-import { SKILL_CAP, EXCLUDE_PATHS, EXCLUDE_SKILLS } from '../lib/manifest.mjs'
+import { SKILL_CAP, EXCLUDE_PATHS, EXCLUDE_SKILLS, REPO } from '../lib/manifest.mjs'
 
 const tmp = () => mkdtempSync(join(tmpdir(), 'beast-'))
 
@@ -31,15 +31,38 @@ test('linkFile refuses to invent a link for a missing source', () => {
   rmSync(d, { recursive: true, force: true })
 })
 
-test('linkFile replaces a stale symlink pointing elsewhere', () => {
+test('linkFile refuses to destroy a symlink it cannot back up', () => {
+  // This test previously asserted that a user-owned symlink was silently deleted and
+  // replaced, which contradicts the never-delete invariant. An independent review
+  // flagged the test itself as locking in the defect. A link pointing outside the repo
+  // belongs to the user, so it is preserved or the operation is refused.
   const d = tmp()
-  const a = join(d, 'a'); writeFileSync(a, 'a')
-  const b = join(d, 'b'); writeFileSync(b, 'b')
+  const users = join(d, 'users-target'); writeFileSync(users, 'USER')
+  const payload = join(d, 'payload'); writeFileSync(payload, 'repo')
   const link = join(d, 'l')
-  symlinkSync(a, link)
+  symlinkSync(users, link)
 
-  assert.equal(linkFile(link, b).status, 'linked')
-  assert.equal(readFileSync(link, 'utf8'), 'b')             // repointed at the new target
+  const r = linkFile(link, payload)
+  // Outside $HOME there is nowhere under BACKUP_ROOT to park it, so it refuses rather
+  // than deleting. Inside $HOME the same case yields 'linked-with-backup'.
+  assert.equal(r.status, 'outside-home')
+  assert.equal(readFileSync(link, 'utf8'), 'USER', 'the user\'s symlink must survive')
+  rmSync(d, { recursive: true, force: true })
+})
+
+test('linkFile repoints a link it already owns, without a backup', () => {
+  // A link already pointing into the payload is beast's own, so replacing it is not
+  // data loss and needs no backup.
+  const d = tmp()
+  const repoish = join(REPO, 'package.json')          // a real path inside the repo
+  const link = join(d, 'l')
+  symlinkSync(repoish, link)
+  const other = join(REPO, 'README.md')
+
+  const r = linkFile(link, other)
+  assert.equal(r.status, 'linked')
+  assert.ok(!r.backup, 'a link beast already owns needs no backup')
+  assert.match(readlinkSync(link), /README\.md$/)
   rmSync(d, { recursive: true, force: true })
 })
 
