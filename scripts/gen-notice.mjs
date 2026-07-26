@@ -66,7 +66,10 @@ for (const [tree, names] of Object.entries(shipped)) {
 // --- reverse: lockfile records with nothing on disk -------------------------
 const stale = LOCK
   .filter(([name]) => {
-    const slug = slugify(name)
+    // Apply the rename map here as well as in the forward pass. Without it a renamed
+    // skill was reported BOTH as unattributed and as a stale lockfile entry: one skill
+    // counted as two separate faults.
+    const slug = LOCK_RENAMES[name] ?? slugify(name)
     return !Object.keys(shipped).some((t) => existsSync(join(PAYLOAD, t, slug)))
   })
   .map(([name, meta]) => ({ name, source: meta.source }))

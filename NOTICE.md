@@ -229,7 +229,6 @@ Recorded as installed, but not present in this payload:
 - remotion-best-practices (remotion-dev/skills)
 - Agent Browser (am-will/codex-skills)
 - Frontend Responsive Design Standards (am-will/codex-skills)
-- frontend-design (pbakaus/impeccable)
 - llm-council (am-will/codex-skills)
 - markdown-url (am-will/codex-skills)
 - parallel (am-will/codex-skills)
@@ -238,5 +237,3 @@ Recorded as installed, but not present in this payload:
 - super-swarm-spark (am-will/codex-skills)
 - vercel-react-best-practices (am-will/codex-skills)
 - find-skills (vercel-labs/skills)
-- teach-impeccable (pbakaus/impeccable)
-- emil-design-eng (emilkowalski/skill)

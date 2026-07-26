@@ -78,14 +78,17 @@ test('linkFile does not clobber a real dir when skipIfReal is set', () => {
   rmSync(d, { recursive: true, force: true })
 })
 
-test('skillEntries ignores loose docs and tool-owned dot dirs', () => {
+test('skillEntries returns only directories holding a SKILL.md', () => {
   const d = tmp()
   mkdirSync(join(d, 'code'))
+  writeFileSync(join(d, 'code', 'SKILL.md'), 'name: code')
   mkdirSync(join(d, '.system'))                              // Codex-shipped, not ours
   writeFileSync(join(d, 'README.md'), '# layout')
+  // A directory with no SKILL.md used to count as a skill, which fed the cap, the link
+  // set, and pack coverage a number that included empty directories.
+  mkdirSync(join(d, 'not-a-skill'))
 
-  const names = skillEntries(d).map((e) => e.name)
-  assert.deepEqual(names, ['code'])
+  assert.deepEqual(skillEntries(d).map((e) => e.name), ['code'])
   rmSync(d, { recursive: true, force: true })
 })
 
