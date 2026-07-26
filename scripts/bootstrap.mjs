@@ -102,12 +102,17 @@ console.log(c.bold(`staging into ${tilde(PAYLOAD)}\n`))
 
 discardStaging()           // never inherit a partial run
 const staged = []          // [stagePath, finalPath]
+const absent = []          // [payloadRel, srcPath] — no source in $HOME to refresh from
 for (const [payloadRel, homeRel] of Object.entries(SOURCES)) {
   const src = inHome(homeRel)
   const final = inPayload(payloadRel)
   const stage = join(STAGE_ROOT, payloadRel)
 
-  if (!existsSync(src)) { console.log(`  ${c.yellow('absent')} ${tilde(src)}`); continue }
+  if (!existsSync(src)) {
+    absent.push([payloadRel, src])
+    console.log(`  ${c.yellow('absent')} ${tilde(src)}`)
+    continue
+  }
 
   mkdirSync(dirname(stage), { recursive: true })
   let srcReal
@@ -183,15 +188,65 @@ if (leaks.length) {
 }
 
 // ---------------------------------------------------------------------------
-// 3. swap staging into place
+// 3. swap staging into place, all or nothing
 // ---------------------------------------------------------------------------
-for (const [stage, final] of staged) {
-  const old = final + '.previous'
-  rmSync(old, { recursive: true, force: true })
-  if (existsSync(final)) renameSync(final, old)
-  renameSync(stage, final)
-  rmSync(old, { recursive: true, force: true })
+// The old loop committed each source as it went and deleted its .previous copy
+// immediately. A rename failing on the fourth source therefore left three already
+// replaced with no way back, and the fourth absent entirely: its final had been moved
+// aside but the stage never landed. The payload ended up a mix of old and new with
+// nothing recording which was which.
+//
+// Two phases with rollback instead. Park every current final first, then place every
+// stage. A failure in either phase undoes the whole run. Individual renames are atomic,
+// the sequence is not, so rollback is what makes the result all-or-nothing.
+const parked = []   // [final, parkedPath] — moved aside, restore on failure
+const placed = []   // [stage, final]      — moved into place, undo on failure
+
+function rollback(reason) {
+  console.error(c.red(`\nswap failed: ${reason}`))
+  console.error('rolling back — the payload is being returned to its previous state')
+  const problems = []
+  // Undo in reverse: pull the new content back out, then put the old content back.
+  for (const [stage, final] of [...placed].reverse()) {
+    try { renameSync(final, stage) } catch (e) { problems.push(`could not un-place ${final}: ${e.code ?? e.message}`) }
+  }
+  for (const [final, parkedPath] of [...parked].reverse()) {
+    try { renameSync(parkedPath, final) } catch (e) { problems.push(`could not restore ${final}: ${e.code ?? e.message}`) }
+  }
+  if (problems.length) {
+    // Say exactly what is where. A half-rolled-back payload that claims success is
+    // worse than one that names its own broken pieces.
+    console.error(c.red('\nrollback was incomplete. Current state:'))
+    for (const p of problems) console.error(`  ${p}`)
+    console.error(`\nStaging is preserved at ${tilde(STAGE_ROOT)} and .previous copies remain.`)
+    console.error('Resolve by hand, then re-run. Nothing was deleted.')
+    return false
+  }
+  console.error('\nrollback complete. The payload is unchanged; staging was discarded.')
+  discardStaging()
+  return true
 }
+
+try {
+  for (const [, final] of staged) {
+    if (!existsSync(final)) continue
+    const parkedPath = final + '.previous'
+    rmSync(parkedPath, { recursive: true, force: true })
+    renameSync(final, parkedPath)
+    parked.push([final, parkedPath])
+  }
+  for (const [stage, final] of staged) {
+    renameSync(stage, final)
+    placed.push([stage, final])
+  }
+} catch (err) {
+  rollback(err.code ?? err.message)
+  process.exit(1)
+}
+
+// Commit. Only now is the old content unrecoverable, and only because the new content
+// is fully in place.
+for (const [, parkedPath] of parked) rmSync(parkedPath, { recursive: true, force: true })
 discardStaging()
 
 // bootstrap dereferences, so an active entry that was a view onto the library comes
@@ -202,4 +257,15 @@ reportScrub(scrub)
 console.log()
 const groups = skipped.reduce((a, [k]) => ({ ...a, [k]: (a[k] ?? 0) + 1 }), {})
 for (const [k, n] of Object.entries(groups)) console.log(`  ${c.dim(`excluded ${n} × ${k}`)}`)
+// State the retention rather than letting it look like a full mirror. A source missing
+// from $HOME is skipped, so its existing payload content survives untouched. Deleting it
+// because a $HOME path vanished could destroy the only remaining copy, so keeping is the
+// safe default — but silence made `--force` look like a rewrite of $HOME when it is a
+// refresh of whatever $HOME still has.
+if (absent.length) {
+  console.log(`\n${c.yellow(`${absent.length} source(s) absent from $HOME`)} — existing payload content kept:`)
+  for (const [rel, src] of absent) console.log(`  ${rel}  ${c.dim(`(no ${tilde(src)})`)}`)
+  console.log(c.dim('  bootstrap refreshes what $HOME still has; it does not mirror deletions.'))
+}
+
 console.log(`\n${c.green('✓')} payload ready — next: ${c.bold('beast install --dry-run')}`)
