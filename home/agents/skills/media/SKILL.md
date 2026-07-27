@@ -41,6 +41,8 @@ Do not expect modules in the skills menu. If the file is missing, search `~/.age
 | Any video/composition (entry) | `$hyperframes` |
 | CLI/render/doctor | `$hyperframes-cli` |
 | Registry blocks | `$hyperframes-registry` |
+| Video in React/TSX (entry) | `$remotion` |
+| Remotion render/deploy | `$remotion-cli` |
 | Media resolve (BGM/TTS/images) | `$media-use` |
 | Known type | `$product-launch-video`, `$faceless-explainer`, `$general-video`, `$motion-graphics`, `$talking-head-recut`, `$embedded-captions`, … |
 | Lottie | `$text-to-lottie` |
@@ -79,6 +81,10 @@ When a phase names a former skill like impeccable or unslop, **read**:
 | `hyperframes-animation` | `~/.agents/skill-modules/hyperframes-animation/SKILL.md` |
 | `hyperframes-keyframes` | `~/.agents/skill-modules/hyperframes-keyframes/SKILL.md` |
 | `hyperframes-registry` | `~/.agents/skill-modules/hyperframes-registry/SKILL.md` |
+| `remotion` | `~/.agents/skill-modules/remotion/SKILL.md` |
+| `remotion-core` | `~/.agents/skill-modules/remotion-core/SKILL.md` |
+| `remotion-animation` | `~/.agents/skill-modules/remotion-animation/SKILL.md` |
+| `remotion-cli` | `~/.agents/skill-modules/remotion-cli/SKILL.md` |
 | `media-use` | `~/.agents/skill-modules/media-use/SKILL.md` |
 | `product-launch-video` | `~/.agents/skill-modules/product-launch-video/SKILL.md` |
 | `faceless-explainer` | `~/.agents/skill-modules/faceless-explainer/SKILL.md` |

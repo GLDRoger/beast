@@ -7,7 +7,7 @@ import { c } from '../lib/fsutil.mjs'
 import { HARNESSES, HARNESS_NAMES } from '../lib/manifest.mjs'
 import { PACKS, PACK_NAMES, REQUIRED_PACKS } from '../lib/packs.mjs'
 import { whichBinary } from '../lib/platform.mjs'
-import { isInteractive, multiselect, confirm } from '../lib/prompt.mjs'
+import { isInteractive, multiselect, select, confirm } from '../lib/prompt.mjs'
 import { coverageWarning } from '../lib/coverage.mjs'
 import { planConfigEdits, hasPendingEdits, configQuestion, EDITABLE } from '../lib/config-write.mjs'
 
@@ -60,6 +60,32 @@ function unknownOptions(allowed) {
   return bad
 }
 
+/** The two video stacks. Alternatives, not complements — see the comment in packs.mjs. */
+const VIDEO_PACKS = ['video', 'remotion']
+
+/**
+ * Narrow both video packs down to the stack the user actually wants.
+ *
+ * Only asked when the pack answer contains both, which the default preselection does.
+ * Installing both is allowed and sometimes right; it is just never right by accident,
+ * because each stack's skills sit in the harness's listing budget whether or not the
+ * project uses that stack. Flags skip this entirely: `--packs=video,remotion` means both.
+ */
+async function chooseVideoStack(packs) {
+  if (VIDEO_PACKS.filter((p) => packs.includes(p)).length < 2) return packs
+
+  const cost = (p) => `${PACKS[p].skills.length} skills`
+  console.log()
+  const keep = await select('Two video stacks are available. Which do you want?', [
+    { value: ['video'], label: 'HyperFrames', hint: `${cost('video')} · HTML + GSAP, hyperframes CLI` },
+    { value: ['remotion'], label: 'Remotion', hint: `${cost('remotion')} · React/TSX, remotion CLI` },
+    { value: VIDEO_PACKS, label: 'Both', hint: 'every video skill loads, in every session' },
+    { value: [], label: 'Neither', hint: 'skip video skills' },
+  ])
+  const rest = packs.filter((p) => !VIDEO_PACKS.includes(p))
+  return PACK_NAMES.filter((p) => rest.includes(p) || keep.includes(p))
+}
+
 /** Ask which harnesses and packs, preselecting what looks already present. */
 async function chooseInteractively() {
   console.log(`\n${c.bold('beast install')}\n`)
@@ -95,7 +121,9 @@ async function chooseInteractively() {
     hint: `${PACKS[n].skills.length} skills · ${PACKS[n].hint}`,
   }))
 
-  const packs = await multiselect('Which skill packs?', packOpts, { preselected: PACK_NAMES })
+  const packs = await chooseVideoStack(
+    await multiselect('Which skill packs?', packOpts, { preselected: PACK_NAMES }),
+  )
   console.log()
 
   // Say this BEFORE the confirm, not after the install. The whole point of asking is

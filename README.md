@@ -15,7 +15,7 @@ This setup has been tested in real work with **GPT-5.6 Sol**, **GPT-5.6 Terra**,
 
 ```text
 Claude Code ─┐
-Codex ───────┼── beast prompt ── 9 routers ── 27 active skills ── 92-module library
+Codex ───────┼── beast prompt ── 9 routers ── 31 active skills ── 95-module library
 Grok ────────|
 Kimi─────────┘
 ```
@@ -107,7 +107,7 @@ Re-run `beast install` after changing a subscription and the file updates.
 
 ## Quick start
 
-Node 22 or newer. The video pack installs by default and HyperFrames needs 22+, so a
+Node 22 or newer. A video pack installs by default and HyperFrames needs 22+, so a
 machine on Node 20 satisfies the installer and still cannot run what it installed.
 
 ```sh
@@ -125,12 +125,18 @@ command available globally. If you do not want that, replace any `beast` command
 links your home directory into this clone, so the clone has to stay put and stay
 writable — that is what makes `git diff` show your drift. An immutable copy under
 `node_modules` cannot do that job, and npm does not materialise symlinked directories:
-`npm pack` shipped 9 of the 27 active skills, silently. `package.json` is marked
+`npm pack` shipped 9 of the 31 active skills, silently. `package.json` is marked
 `private` so nobody can publish that tarball by accident.
 
 The installer asks which harnesses and skill packs you want. Installed harnesses are
 preselected, and every skill pack is selected by default. Press Enter to accept each
 list, then confirm the install.
+
+Because both video packs are selected by default, it also asks which video stack you
+want — **HyperFrames** (HTML + GSAP, rendered by the hyperframes CLI) or **Remotion**
+(React/TSX, rendered by the remotion CLI). Both is an option and so is neither. Passing
+`--packs=` skips the question entirely: `--packs=core,remotion` installs one stack,
+`--packs=core,video,remotion` installs both.
 
 To see every change before writing anything:
 
@@ -213,8 +219,8 @@ beast separates skills into three layers:
 | Layer              | Purpose                                            |
 |--------------------|----------------------------------------------------|
 | 9 routers          | Decide which kind of help the task needs           |
-| 27 active skills   | Small set visible to the harness by default        |
-| 92 library modules | Focused instructions that routers load when needed |
+| 31 active skills   | Small set visible to the harness by default        |
+| 95 library modules | Focused instructions that routers load when needed |
 
 ### What the active set costs
 
@@ -261,8 +267,9 @@ it contains the routing layer.
 | Pack          | Skills | Best for                                              |
 |---------------|--------|-------------------------------------------------------|
 | `core`        | 14     | Routing and compatibility aliases                     |
-| `design`      | 30     | Frontend, visual direction, UI copy, and polish       |
-| `video`       | 21     | HyperFrames, Lottie, captions, and media production   |
+| `design`      | 29     | Frontend, visual direction, UI copy, and polish       |
+| `video`       | 21     | HyperFrames video: HTML + GSAP, Lottie, captions      |
+| `remotion`    | 4      | Remotion video: React/TSX compositions                |
 | `prose`       | 7      | Documentation, copy, and outreach                     |
 | `product`     | 10     | Positioning, pricing, SEO, launch, and monetisation   |
 | `engineering` | 15     | Architecture, review, hardening, and investigation    |
@@ -271,6 +278,28 @@ it contains the routing layer.
 For a first install, use all packs. Partial installs are supported, but some router
 menus will point to modules you chose not to install. The installer reports those gaps
 before it changes anything.
+
+### Two video stacks
+
+`video` and `remotion` are alternatives. Both build video from web technology and each
+brings its own authoring model, CLI and render path:
+
+| | `video` (HyperFrames) | `remotion` |
+|---|---|---|
+| A composition is | an HTML file with `data-*` timing attributes | a React component reading `useCurrentFrame()` |
+| Animation | GSAP on one paused timeline, plus six other runtimes | `interpolate` and `spring`, pure functions of the frame |
+| Renders with | `npx hyperframes render` | `npx remotion render`, or AWS Lambda |
+| Licence | open | free under four people, paid company licence at four or more |
+| Skills | 21, including workflows for launch videos, captions and recuts | 4: router, composition contract, animation, CLI |
+
+Pick the one that matches the codebase you already have. A React product with designers
+who live in TSX is a Remotion project; a pipeline that assembles HTML and CSS is a
+HyperFrames one. Installing both is supported and costs both listings in every session,
+which is why the installer asks instead of assuming.
+
+The Remotion skills are written against 4.0.x from the public docs and a rendered probe
+project. Remotion's own agent skills (`npx remotion skills add`) install per-project and
+track upstream more closely; the two coexist.
 
 Examples:
 
