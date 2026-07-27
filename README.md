@@ -212,7 +212,7 @@ Add-Content -Path $PROFILE -Value '. "$HOME\.beast\beast.ps1"'
 
 ## Understanding the skills
 
-Installing all packs does **not** activate 101 skills at once.
+Installing all packs does **not** activate 104 skills at once.
 
 beast separates skills into three layers:
 
@@ -470,7 +470,7 @@ npm run scrub          # apply every text-rewrite rule to home/
 beast doctor
 ```
 
-Every one of these gates. `npm test` runs 52 checks including a clean-install-then-doctor
+Every one of these gates. `npm test` runs 74 checks including a clean-install-then-doctor
 pass for each harness scope. `npm run test:vendored` enumerates all 57 vendored test files
 in Node — an earlier shell glob matched one of them and then discarded the exit code — and
 fails on any failure not listed in `KNOWN_FAILURES` in `scripts/test-vendored.mjs`, *and*
