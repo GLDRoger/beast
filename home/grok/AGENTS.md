@@ -61,7 +61,7 @@ unsupervised. **Taste** covers UI/UX, code quality, API design, and copy.
 |sonnet-5     |5   |5           |7    |
 |opus-5       |4   |8           |8.5  |
 |fable-5      |2   |9           |9    |
-|grok-4.5     |7   |7           |8    |
+|grok-4.5     |9   |7           |8    |
 
 How to apply:
 
