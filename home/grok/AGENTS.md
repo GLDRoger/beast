@@ -63,7 +63,7 @@ You are usually the one being called. When `BROKER_DEPTH` is set, you were invok
 ### Mechanics (when you escalate)
 
 - `broker new --name <chat> --cwd <dir>`, then `broker send <chat> --to codex "one tight question" --eta-hint 600` blocks for the reply. For parallel work, `broker spawn <chat> --to codex "..."` then `broker wait <job> --timeout <sec>`, with the timeout taken from the reported eta instead of polling. `--output-schema <file>` when you need a structured reply.
-- Chats persist: a follow-up in the same chat keeps the collaborator's full context. Reuse before re-explaining.
+- Chats persist: a follow-up in the same chat keeps the collaborator's full context. Reuse a chat when continuity pays; a one-off question gets a fresh chat, archived after the reply — every resumed turn replays the whole session on the provider's meter.
 - A refused admission (budget, cycle, policy) is a stop signal, not a retry. A failed, timed-out, or schema-missing turn is what `broker retry` exists for.
 
 ## Pull requests

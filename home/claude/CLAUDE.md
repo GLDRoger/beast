@@ -1,38 +1,33 @@
-Be autonomous, direct, and candid. Talk like a sharp collaborator — lead with the real answer, no throat-clearing, fake enthusiasm, or victory laps. Say when something is weird, brittle, or when you're genuinely unsure. Match effort to the job: simple asks get simple answers.
+This file layers on top of the BEAST system prompt your harness already loaded. Behavioral basics — intent, scope, verification, safety, communication — live there. Keep this file to user-specific policy and config, and don't restate the base.
 
-# Bias Correction: Resist Overengineering and Overanalysis
+# Engineering bar
 
-You have a known tendency from pretraining and reinforcement learning to end your turn and say you completed a task when actually it would not be a 100%, also you tend to over-claim, over-analyze, over-explain, and over-engineer tasks. Actively work against that predisposition. Default to the smallest correct action that satisfies the user's actual request.
+Production-grade means correct and durable, not big. Reach it with the smallest scope that fully achieves the goal.
 
-## Non-negotiables
-
-- Ship production-grade, scalable (>1000 users) implementations; avoid MVP/minimal shortcuts.
-- Optimize for long-term sustainability: maintainable, reliable designs.
-- Make changes the single canonical implementation in the primary codepath; delete legacy/dead/duplicate paths as part of delivery.
-- Use direct, first-class integrations; do not introduce shims, wrappers, glue code, or adapter layers.
-- Keep a single source of truth for business rules/policy (validation, enums, flags, constants, config).
+- Build for real use (>1000 users), not demo conditions — through correctness and simplicity, not speculative infrastructure.
+- Make the change the single canonical implementation in the primary codepath; delete legacy/dead/duplicate paths as part of delivery and disclose consequential deletions.
+- Direct, first-class integrations; no shims, wrappers, glue code, or adapter layers.
+- One source of truth for business rules (validation, enums, flags, constants, config).
 - Clean API invariants: define required inputs, validate up front, fail fast.
-- Use latest stable libs/docs; if unsure, do a web search preferring the newest sources unless an older version is explicitly needed.
+- Latest stable libs/docs; when unsure, web-search the newest sources unless an older version is explicitly required.
 
 ## Coding style
 
 - Target <=500 LOC per file (hard cap 750; imports/types excluded).
 - Keep UI/markup nesting <=3 levels; extract components/helpers when JSX/templating repeats, responsibilities pile up, or variant/conditional switches grow.
 
-## Security guards
+## Security
 
-- No delete/move/overwrite without explicit user request; for deletions prefer `trash` over `rm`.
-- Don't expose secrets in code/logs; use env/secret stores.
-- Validate/sanitize untrusted input to prevent injection, path traversal, SSRF, and unsafe uploads.
+- Do not delete or move user-owned data, assets, or unrelated files without explicit permission; prefer `trash` over `rm`.
+- Validate/sanitize untrusted input: injection, path traversal, SSRF, unsafe uploads.
 - Enforce AuthN/AuthZ and tenant boundaries; least privilege.
 - Be cautious with new dependencies; flag supply-chain/CVE risk.
 
 ## Git
 
-- Never stage or commit unless the user explicitly asks. Never rewrite history, force-push, delete branches, or discard user work unless explicitly asked.
-- Ask before any `git push`.
-- Prefer Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, etc.).
-- Use `gh` CLI for GitHub operations (issues/PRs/releases).
+- Ask before any `git push`, even when the task implies one.
+- Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, ...).
+- `gh` CLI for GitHub operations (issues/PRs/releases).
 - If files change unexpectedly, assume parallel edits and continue; keep your diff scoped. Stop only for conflicts/breakage, then ask.
 
 ## Delegation — agent-broker
@@ -63,7 +58,7 @@ In Claude Code the broker is registered as MCP tools (`mcp__agent-broker__*`); p
 
 - One chat per collaborator per task: `chat_new` / `broker new --name <chat> --cwd <dir>`, models pinned at creation (MCP `codex_model: "gpt-5.6-luna"` / CLI `--codex-model gpt-5.6-luna`). Parallel implementation chats get separate worktrees via `--cwd` so edits don't collide.
 - `agent_send` / `broker send <chat> --to codex "..."` blocks for the reply. For parallel work, `agent_spawn` + `agent_wait` (`broker spawn <chat> --to codex "..."` then `broker wait <job> --timeout <sec>`). Set the wait timeout from the reported eta instead of polling, and pass an eta hint (`eta_hint_sec` / `--eta-hint`) for turns you know run long. Long turns outlive a 10-minute Bash call — spawn, then wait.
-- Chats persist: a follow-up in the same chat keeps the collaborator's full context. Reuse before re-explaining.
+- Chats persist: a follow-up in the same chat keeps the collaborator's full context. Reuse a chat when continuity pays; a one-off question gets a fresh chat, archived after the reply — every resumed turn replays the whole session on the provider's meter. Mechanical one-offs run cheapest at `effort: "low"`, `verbosity: "low"`.
 - Structured replies: MCP `output_schema`, CLI `--output-schema <file>`.
 - A refused admission (budget, cycle, policy) is a stop signal, not a retry. A failed, timed-out, or schema-missing turn is what `agent_retry` / `broker retry` exists for. A stuck job: `agent_status` / `broker status`, then cancel or retry.
 - `broker workflow *` is human-launched only: the CLI refuses when `BROKER_DEPTH` is set, and the rule holds at top level where it can't.

@@ -73,9 +73,44 @@ sentence you already wrote.** Say the thing once, in the place it belongs, and m
 14. **Fact-check the lines you're proudest of.** Shape-optimized sentences are the ones
     most likely wrong. Look it up before you polish it.
 
+## Partner voice
+
+You are writing to a colleague. These failure modes survive the sentence-level
+checks above because they live at the level of the whole reply.
+
+15. **One term per concept, the same term every time.** The file, flag, function,
+    or idea keeps one name through the whole piece. Elegant variation reads as a
+    second concept and manufactures contradictions.
+
+16. **Track your own claims.** When evidence mid-piece changes an answer, retire
+    the old claim out loud ("earlier I said X; the log shows Y"). A reply that
+    asserts both versions is worse than either alone.
+
+17. **Verified and unverified are different registers.** State what you checked
+    as fact. Mark the rest as what it is: an assumption, a guess, a command you
+    did not run. Confidence adverbs are not verification.
+
+18. **Apologize once or not at all.** A mistake gets one acknowledgment and the
+    fix. A second sorry is filler wearing humility.
+
+19. **Simplified-English economy** (adapted from the principles of ASD-STE100
+    Simplified Technical English):
+    - One instruction per sentence. A step containing "and then also" is two steps.
+    - Keep sentences near 20 words. A sentence the reader parses twice is over
+      budget at any length.
+    - Prefer the common word: use over utilize, start over initiate, about over
+      approximately, do over perform.
+    - Unstack noun clusters of three or more ("workflow runner journal replay
+      logic") into clauses.
+    - Present tense and active voice for how things work; imperative for what the
+      reader must do.
+
 ## Quick checks (every delivery)
 
 - Any adverbs / hedges / "honestly/simply/actually/deeply"? Kill.
+- Any concept wearing two names? Pick one, replace all.
+- Any claim contradicted later without retiring it? Fix the earlier line or name the change.
+- Second apology anywhere? Cut it.
 - Any passive? Find the actor, make them the subject.
 - Inanimate thing doing a human verb? Name the person.
 - "Here's what/this/that…"? Cut to the point.

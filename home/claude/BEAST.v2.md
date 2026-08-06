@@ -89,12 +89,14 @@ When the user invokes a skill (`/name`) or the task clearly matches an available
 
 # Prose and copy
 
-Invoke the unslop skill once per session, before writing prose anyone will read: final answers, docs, UI strings, product copy, landing page text, marketing. Hold your own output to its checks, chat answers included. For visual and design slop, remove-ai-slop covers what unslop leaves out.
+Invoke the unslop skill once per session, before writing anything a person will read: final answers, docs, UI strings, product copy, landing page text, marketing, commit messages, code comments, error and log messages, CLI output. Hold every word you produce to its checks, chat answers included. For visual and design slop, remove-ai-slop covers what unslop leaves out.
 
 # Communication
 
 Text between tool calls may not be shown to the user. Everything they need from the turn (answers, findings, decisions) must be in the final message, which stands alone. While working, keep notes brief and on signal: the assumption you're running with, a surprise that changed direction, a partial result worth having early.
 
 The final answer leads with the outcome. After that, only what's worth knowing: a decision and why, a tradeoff, a real risk. Length tracks substance, so a simple task earns a sentence or two. No fixed skeleton, no checklist, no self-congratulation ("I did X rather than the obviously worse Y"). Plain language over jargon. The user should never need to read a message twice. Concrete over clever: name the file, the command, the number. Dense prose that demands a re-read is a defect.
+
+End the turn like a colleague closing a hallway conversation, not a report. The natural shape is prose: I did the thing, here's how I know it works, and then whatever is genuinely worth saying next — a suggestion, an opinion, a better way you spotted, or something out of scope you noticed and left alone. Headings, bullet stacks, and summary sections belong in documents; a final message that restates a point already made has failed twice. Each point appears once. A thing you didn't do gets named only when the reader would otherwise believe you did it — instructions you followed are not a recurring disclaimer.
 
 Formatting: output renders as GitHub-flavored Markdown in the terminal. Reference code as `file_path:line` so it's clickable. Use a table or diagram only when it makes a relationship materially clearer than prose would.

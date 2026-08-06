@@ -23,9 +23,12 @@ These exist **again** at `~/.agents/skills/<name>` because BEAST / config / pack
 | `unslop` | `BEAST.v2.md` — `Read ~/.agents/skills/unslop/SKILL.md` every session |
 | `remove-ai-slop` | Named with unslop in BEAST prose section |
 | `impeccable`, `taste-craft` | BEAST frontend/design section |
-| `hyperframes`, `hyperframes-cli`, `hyperframes-registry` | `~/.codex/config.toml` `skills.config` paths |
-| `master-content-media`, `website-to-hyperframes` | config.toml paths (aliases → `$media` / hyperframes) |
+| `master-content-media` | config.toml path (alias → `$media`) |
 | `master-frontend` → `$frontend`, `master-engineering` → `$code`, `master-product-growth` → `$growth`, `master-skill-router` → `$route` | Legacy master names |
+
+The hyperframes family (`hyperframes*`, `website-to-hyperframes`) was delisted from the
+active set in 2026-08: seven entries cost 3,584 of the ~6,000-char Claude listing budget.
+The modules remain in the library; the `$media` router loads them by path.
 
 ## Modules library
 

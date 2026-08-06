@@ -15,7 +15,7 @@ This setup has been tested in real work with **GPT-5.6 Sol**, **GPT-5.6 Terra**,
 
 ```text
 Claude Code ─┐
-Codex ───────┼── beast prompt ── 9 routers ── 31 active skills ── 95-module library
+Codex ───────┼── beast prompt ── 9 routers ── 23 active skills ── 95-module library
 Grok ────────|
 Kimi─────────┘
 ```
@@ -228,7 +228,7 @@ beast separates skills into three layers:
 | Layer              | Purpose                                            |
 |--------------------|----------------------------------------------------|
 | 9 routers          | Decide which kind of help the task needs           |
-| 31 active skills   | Small set visible to the harness by default        |
+| 23 active skills   | Small set visible to the harness by default        |
 | 95 library modules | Focused instructions that routers load when needed |
 
 ### What the active set costs

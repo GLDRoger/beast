@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-06
+
+### Added Partner voice section
+
+- Five reply-level rules (15–19): one term per concept, claim tracking (retire a
+  changed answer out loud), verified-vs-unverified registers, single apology,
+  and Simplified-English economy adapted from the principles of ASD-STE100
+  (one instruction per sentence, ~20-word sentences, common-word preference,
+  noun-cluster unstacking, active voice / imperative split).
+- Three matching quick checks: two-named concepts, unretired contradictions,
+  second apologies.
+- Scope note: the BEAST prompts now hold every agent-written word to this skill
+  — answers, docs, commit messages, code comments, error and log messages.
+
 ## 2026-07-19
 
 ### Merged honest-prose into unslop

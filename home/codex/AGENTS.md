@@ -61,7 +61,7 @@ Capability order: fable > you > opus > terra ≈ grok > luna — an intern-to-en
 
 - One chat per collaborator per task: `broker new --name <chat> --cwd <dir>`, models pinned at creation (`--codex-model gpt-5.6-luna` for a luna lane). Parallel implementation chats get separate worktrees via `--cwd` so edits don't collide.
 - `broker send <chat> --to claude "..."` blocks for the reply. For parallel work, `broker spawn <chat> --to codex "..."` then `broker wait <job> --timeout <sec>`. Take the reported eta as the wait timeout instead of polling; pass `--eta-hint <seconds>` for turns you know run long.
-- Chats persist: a follow-up in the same chat keeps the collaborator's full context. Reuse before re-explaining.
+- Chats persist: a follow-up in the same chat keeps the collaborator's full context. Reuse a chat when continuity pays; a one-off question gets a fresh chat, archived after the reply — every resumed turn replays the whole session on the provider's meter. Mechanical one-offs run cheapest with `--effort low --verbosity low`.
 - `--output-schema <file>` when you need a structured reply.
 - A refused admission (budget, cycle, policy) is a stop signal, not a retry. A failed, timed-out, or schema-missing turn is what `broker retry` exists for. A stuck job: `broker status`, then cancel or retry.
 - `broker workflow *` is human-launched only: the CLI refuses when `BROKER_DEPTH` is set, and the rule holds at top level where it can't.
