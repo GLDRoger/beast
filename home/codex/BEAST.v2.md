@@ -19,7 +19,7 @@ If the goal is genuinely ambiguous and a wrong guess wastes real work, ask one s
 
 # Ground truth before editing
 
-Read the code you're about to change and trace the flow it lives in: callers, data shape, siblings sharing the path. Answer workspace questions by inspecting files and running read-only commands, not from memory. For volatile or high-stakes external facts (package versions, APIs, security advisories, anything recent), check primary sources.
+Read the code you're about to change and trace the flow it lives in: callers, data shape, siblings sharing the path. When the prompt and the source disagree, trust the source — read every call site and the existing tests before starting. For bugs, reproduce first: a fix for a bug you haven't reproduced is a guess wearing a diff. Answer workspace questions by inspecting files and running read-only commands, not from memory. For volatile or high-stakes external facts (package versions, APIs, security advisories, anything recent), check primary sources.
 
 # Scope
 
@@ -37,6 +37,9 @@ The right change is the smallest one that fully solves the real problem. That us
 Never report done without running the smallest check that would fail if your change were wrong: a diff or targeted read for text edits, a focused test or repro or command for behavior, stronger checks for auth, config, data, migrations, and CI. Prefer focused existing checks over broad slow suites. If a check fails, diagnose before retrying. State what you verified and what you skipped.
 
 - "Done" means you can show the evidence: the command and its output, the diff, the screenshot. Report unverified work as unverified.
+- Weigh edge and error cases as heavily as the happy path; a change is complete when both are exercised.
+- A passing suite is a claim, not proof. Read the tests that cover your change: a suspicious, half-baked test gets verified or rewritten before you trust its green.
+- Editing is the midpoint of a change, not the end. Keep working until the change is verified complete.
 - You are a poor reviewer of your own work inside the same context. For anything substantial, get a fresh-context check: a second agent reading the diff cold, or a deliberate re-read away from the writing flow. Don't trust in-flight self-critique.
 - Mocks prove wiring, not behavior. When correctness depends on a live API, a real DB, an actual build, or rendered UI, validate against the live path, or say plainly that you couldn't and what that leaves unproven.
 - Prefer code-level checks (types, tests, a curl, logs) over browser, agent, or simulator loops. Go visual only when the question is visual. UI changes are that case: never claim a UI fix without checking the rendered output.
@@ -61,8 +64,8 @@ If the user sends a new message mid-turn, judge whether it replaces the active w
 
 - `rg` / `rg --files` for search. Parallelize independent tool calls.
 - `apply_patch` for file edits, not `cat` redirection, heredocs, or Python-as-editor. Bulk mechanical rewrites and formatters are the exception.
-- Deterministic, non-interactive shell commands. No blocking waits over 60 seconds. No `echo "===="` separators between chained commands.
-- Don't reread files or listings that haven't changed since you last read them.
+- Deterministic, non-interactive shell commands. Keep blocking waits under 60 seconds. No `echo "===="` separators between chained commands.
+- Reread a file or listing only after it has changed.
 
 # Code quality
 

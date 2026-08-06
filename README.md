@@ -98,10 +98,19 @@ hands bulk mechanical work to Codex, Codex asks Claude for a second read, and ei
 reach Grok. If you select a harness you cannot run, an agent will try to invoke
 it mid-task, fail, and spend a turn working out why.
 
+Delegation itself has two forms, and the installer picks per machine. When the `broker`
+binary from [agent-broker](https://github.com/GLDRoger/agent-broker) is on PATH, the
+generated routing file sends all cross-CLI work through it — persistent chats that pin
+one session per provider, with ETAs, budgets, and turn guards. Without it, the file
+lists direct CLI invocations (`claude -p`, `codex exec`, `grok -p`) instead. The policy
+files' delegation sections are written for the broker form; `~/.beast/delegation.md` is
+what corrects them on a machine that runs bare CLIs.
+
 Your answer does two things. It decides whose config files get written, and it decides
 what goes into `~/.beast/delegation.md`, which the prompts treat as the authoritative
-list of delegation targets. That file names only the tools you selected, so an agent on a
-single-harness install is never pointed at something it cannot reach.
+list of delegation targets. That file names only the tools you selected — and the path
+to reach them — so an agent on a single-harness install is never pointed at something it
+cannot reach.
 
 Re-run `beast install` after changing a subscription and the file updates.
 
@@ -470,7 +479,7 @@ npm run scrub          # apply every text-rewrite rule to home/
 beast doctor
 ```
 
-Every one of these gates. `npm test` runs 74 checks including a clean-install-then-doctor
+Every one of these gates. `npm test` runs 75 checks including a clean-install-then-doctor
 pass for each harness scope. `npm run test:vendored` enumerates all 57 vendored test files
 in Node — an earlier shell glob matched one of them and then discarded the exit code — and
 fails on any failure not listed in `KNOWN_FAILURES` in `scripts/test-vendored.mjs`, *and*

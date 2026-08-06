@@ -18,7 +18,7 @@ Any other `$name` (e.g. `$impeccable`, `$unslop`) is a **module**. Load it by re
 
 `~/.agents/skill-modules/<name>/SKILL.md`
 
-Do not expect modules in the skills menu. If the file is missing, search `~/.agents/skill-modules/` and pick the closest match.
+The skills menu lists only the nine top-level skills; every module loads by that path. If the file is missing, search `~/.agents/skill-modules/` and pick the closest match.
 
 ## Phase 0 — Threat & scope
 
@@ -68,7 +68,7 @@ Do not expect modules in the skills menu. If the file is missing, search `~/.age
 | UI copy for security errors | `$writing` after controls land |
 ---
 
-## Modules (load by path, not slash menu)
+## Modules (load by path)
 
 Base: `~/.agents/skill-modules/`
 

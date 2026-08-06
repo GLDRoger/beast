@@ -287,3 +287,33 @@ test('no skill still carries a standing order to update itself unattended', () =
   }
   assert.deepEqual(offenders, [])
 })
+
+test('delegation.md names the broker when it is on PATH and plain CLIs when it is not', () => {
+  // The policy files route all delegation through agent-broker, so the generated file
+  // must switch forms on the binary's presence: broker-first providers when it exists,
+  // direct CLI invocations when it does not — without ever mentioning the absent one.
+  const d = tmp()
+  const bindir = join(d, 'bin')
+  mkdirSync(bindir, { recursive: true })
+  writeFileSync(join(bindir, IS_WINDOWS ? 'broker.exe' : 'broker'), '#!/bin/sh\n', { mode: 0o755 })
+  const install = (home, path) =>
+    spawnSync(process.execPath, [CLI, 'install', '--all'], {
+      encoding: 'utf8',
+      env: { ...process.env, HOME: home, USERPROFILE: home, PATH: path, Path: path },
+    })
+
+  const withBroker = join(d, 'with')
+  assert.equal(install(withBroker, bindir).status, 0)
+  const brokered = readFileSync(join(withBroker, '.beast', 'delegation.md'), 'utf8')
+  assert.match(brokered, /agent-broker/)
+  assert.match(brokered, /broker send <chat> --to codex/)
+
+  const empty = join(d, 'empty')
+  mkdirSync(empty, { recursive: true })
+  const withoutBroker = join(d, 'without')
+  assert.equal(install(withoutBroker, empty).status, 0)
+  const direct = readFileSync(join(withoutBroker, '.beast', 'delegation.md'), 'utf8')
+  assert.doesNotMatch(direct, /agent-broker/)
+  assert.match(direct, /codex exec/)
+  rmSync(d, { recursive: true, force: true })
+})

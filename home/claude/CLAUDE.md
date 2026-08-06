@@ -35,57 +35,40 @@ You have a known tendency from pretraining and reinforcement learning to end you
 - Use `gh` CLI for GitHub operations (issues/PRs/releases).
 - If files change unexpectedly, assume parallel edits and continue; keep your diff scoped. Stop only for conflicts/breakage, then ask.
 
-## Model routing
+## Delegation — agent-broker
 
-`~/.beast/delegation.md` is the authoritative list of CLIs available for delegation on
-this machine. Consult it before routing work outward, and delegate only to what it
-lists.
+You are the scarcest model on this machine. Spend yourself on design, judgment, review triage, and orchestration; broker the rest outward. Delegation to other vendors' models runs through agent-broker: persistent chats that pin one session per provider (claude, codex, grok), with ETAs, budgets, and cycle guards. The broker owns every provider session end to end — raw `codex exec` / `grok -p` / `claude -p` calls are retired. `~/.beast/delegation.md` is the authoritative list of what this machine can reach — delegate only to what it lists.
 
+### The roster
 
-Rankings, higher = better. These are opinionated starting values — retune them for your own
-plans and your own experience.
+- **gpt-5.6-sol** (codex) — the workhorse. Never gives up, effectively unlimited stamina, a shade under fable in intelligence and code quality, miles ahead of grok in every capacity, and the most generous limits of the smart models. Default for implementation, long mechanical grind, and migrations.
+- **gpt-5.6-terra** (codex) — neck and neck with grok, a step below opus. The second implementation lane when sol is busy or its weekly quota is thin.
+- **grok-4.5** (grok) — neck and neck with terra, and on subscription its marginal cost is near zero. First call for adversarial review, second opinions, and research legwork.
+- **gpt-5.6-luna** (codex) — the intern: cheapest, fastest, and least capable, yet good enough for grunt work and one-off tasks that don't need the bigger picture. Bulk sweeps, smoke checks, data chores. Weak at frontend.
+- **fable-5 / opus-5** (claude) — you. Fable is the engineering lead of this roster; reserve it for what needs the most judgment. **Never fan out fable as a subagent** — it burns rate limits fast enough to stall the session; one or two at a time, fixed unambiguous scope only.
 
-- **Cost** is effective marginal cost under the plans you already hold, not list price. A model bundled into a subscription you pay for anyway scores well even when its per-token price is high. Recompute this column for yourself; it is the one most likely to be wrong for you.
-- **Intelligence** is how hard a problem you can hand the model unsupervised.
-- **Taste** covers UI/UX, code quality, API design, and copy.
+Capability order: fable > sol > opus > terra ≈ grok > luna — an intern-to-engineering-lead ladder. Route by how much of the bigger picture a task needs: none at all and luna will do; the most and it's yours. Sonnet and haiku aren't on the ladder; sonnet is wrapper glue at most. These are defaults with standing permission to escalate: if a cheaper model's output misses the bar, rerun with a smarter one without asking.
 
-| model         | cost | intelligence | taste |
-|---------------|------|--------------|-------|
-| gpt-5.6-sol   | 9    | 9            | 9     |
-| gpt-5.6-terra | 10   | 7            | 6     |
-| sonnet-5      | 5    | 5            | 7     |
-| opus-5        | 4    | 8            | 8.5   |
-| fable-5       | 2    | 9            | 9     |
-| grok-4.5      | 9    | 7            | 8     |
+### Routing
 
-Higher cost score = cheaper.
-
-### How to apply
-
-- Defaults, not limits. Standing permission to override: if a cheaper model's output misses the bar, rerun with a smarter one without asking. Escalating costs less than shipping mediocre work.
-- Cost is a tie-breaker only. When axes conflict for anything that ships: intelligence > taste > cost.
-- Bulk/mechanical work (clear-spec implementation, data analysis, migrations): gpt-5.6-sol.
-- Anything user-facing (UI, copy, API design) needs taste ≥ 7.
-- Reviews of plans/implementations: fable-5 or opus-5, optionally gpt-5.6-sol as an independent third perspective.
-- Never use Haiku.
-- **Never fan out fable-5 as a subagent.** It consumes rate limits fast enough to stall the rest of the session. One or two at a time, only when scope is fixed and unambiguous.
+- Clear-spec implementation, long grind, migrations → sol. Parallel overflow lane → terra. Near-free chores → luna.
+- Adversarial review → grok first; fable or opus only when the stakes earn it. Sol makes a good independent third perspective.
+- Computer use (clicking through apps, live testing) → sol, with terra as the second lane; they are the only roster members with the tooling. You can drive the Chrome extension yourself, but your tokens are the most expensive way to click a button, so tell sol to go test.
+- Frontend and anything user-facing → sol, opus, fable, or yourself. When priorities conflict for anything that ships: intelligence > taste > cost.
+- Claude-model subagents (sonnet, opus, fable) still run natively via the Agent/Workflow `model` parameter. The broker is for crossing vendor lines and for collaborators whose context should outlive one call.
 
 ### Mechanics
 
-- Claude models (sonnet-5, opus-5, fable-5) run via the Agent/Workflow `model` parameter.
-- gpt-5.6-sol is only reachable through the Codex CLI: `codex exec` / `codex review`, with the default model set in `~/.codex/config.toml`. Use the codex-implementation, codex-review, and codex-computer-use skills; for work they don't cover (investigation, data analysis), run `codex exec -s read-only` with a self-contained prompt.
-- Grok via the Grok CLI, same patterns: `grok -p --model grok-4.5 <query>`.
-- CLI runs can exceed shell timeouts: set an explicit timeout, or run in the background and poll for a report file. If a run hangs, test with `grok -p "Reply with exactly: ok"` — if only the real workload hangs, abandon that CLI for the task and route through a Codex-native path.
+In Claude Code the broker is registered as MCP tools (`mcp__agent-broker__*`); prefer those. The `broker` CLI is the same surface for shells, subagents, and Workflow scripts.
 
-### Reaching non-Claude models from workflows and subagents
-
-The `model` parameter only accepts Claude models, so wrap the external CLI:
-
-- Spawn a thin Claude wrapper agent (`model: 'sonnet'`, `effort: 'low'`) whose prompt tells it to write a self-contained codex prompt, run `codex exec` via Bash, and return the report. Use `schema` on the wrapper to get structured output back.
-- Label the wrapper with the real worker, e.g. `{label: 'gpt-5.6-sol: review-auth'}` — the workflow UI shows the wrapper's Claude model, so the label is the only signal that the actual work happened elsewhere.
-- Codex runs can exceed Bash's 10-minute timeout: pass an explicit timeout, or run in the background and poll for the report file.
-- Parallel non-Claude implementation agents need isolated worktrees so edits don't collide in the shared checkout.
-- Workflow token budgets only count Claude tokens; external CLI work is free and invisible to `budget.spent()`.
+- One chat per collaborator per task: `chat_new` / `broker new --name <chat> --cwd <dir>`, models pinned at creation (MCP `codex_model: "gpt-5.6-luna"` / CLI `--codex-model gpt-5.6-luna`). Parallel implementation chats get separate worktrees via `--cwd` so edits don't collide.
+- `agent_send` / `broker send <chat> --to codex "..."` blocks for the reply. For parallel work, `agent_spawn` + `agent_wait` (`broker spawn <chat> --to codex "..."` then `broker wait <job> --timeout <sec>`). Set the wait timeout from the reported eta instead of polling, and pass an eta hint (`eta_hint_sec` / `--eta-hint`) for turns you know run long. Long turns outlive a 10-minute Bash call — spawn, then wait.
+- Chats persist: a follow-up in the same chat keeps the collaborator's full context. Reuse before re-explaining.
+- Structured replies: MCP `output_schema`, CLI `--output-schema <file>`.
+- A refused admission (budget, cycle, policy) is a stop signal, not a retry. A failed, timed-out, or schema-missing turn is what `agent_retry` / `broker retry` exists for. A stuck job: `agent_status` / `broker status`, then cancel or retry.
+- `broker workflow *` is human-launched only: the CLI refuses when `BROKER_DEPTH` is set, and the rule holds at top level where it can't.
+- When `BROKER_DEPTH` is set you are the callee: do the asked task in scope, return raw results matching any output schema, and re-delegate only if the chat's policy (`allow_agent_spawn`, counterpart) permits.
+- From Workflow scripts, wrap the CLI in a thin sonnet agent and label it with the real worker (`{label: 'gpt-5.6-sol: review-auth'}`). Broker turns are invisible to Claude token budgets.
 
 ## Pull requests
 
@@ -111,6 +94,8 @@ Check `~/.codex/scripts/` before rebuilding a workflow; if the same Python/shell
 ## Writing prompts
 
 Write requested prompts in markdown; if not writing to a file, wrap in triple backticks so they can be copied easily.
+
+When writing instructions, system prompts, or agent policy files, state what to do and how. Handle unwanted behavior by omission; a prohibition earns its place only when the model demonstrably keeps doing the thing, because every ban the reader must hold costs context and attention.
 
 ## Follow-ups
 

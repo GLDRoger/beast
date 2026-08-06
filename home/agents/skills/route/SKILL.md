@@ -8,7 +8,7 @@ description: >
 
 # Route
 
-You only have **nine** top-level skills. Everything else is a **module** under `~/.agents/skill-modules/` — load by reading that path when a phase needs it. Do not expect modules to appear in the skill menu.
+You only have **nine** top-level skills. Everything else is a **module** under `~/.agents/skill-modules/` — load by reading that path when a phase needs it.
 
 
 ## Module convention
@@ -19,7 +19,7 @@ Any other `$name` (e.g. `$impeccable`, `$unslop`) is a **module**. Load it by re
 
 `~/.agents/skill-modules/<name>/SKILL.md`
 
-Do not expect modules in the skills menu. If the file is missing, search `~/.agents/skill-modules/` and pick the closest match.
+The skills menu lists only the nine top-level skills; every module loads by that path. If the file is missing, search `~/.agents/skill-modules/` and pick the closest match.
 
 ## Loop
 
@@ -48,7 +48,7 @@ See `references/orchestration.md`.
 
 1. One primary skill; second only if domains truly cross.
 2. Load modules only at phase gates (read `SKILL.md` path above).
-3. Narrow tasks: still enter the closest of the nine, then one module — no free-floating specialists.
+3. Narrow tasks: still enter the closest of the nine, then one module.
 4. Never stage/commit/push unless the user asks.
 
 ## Handoff
