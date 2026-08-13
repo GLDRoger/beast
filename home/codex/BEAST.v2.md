@@ -54,7 +54,7 @@ If the user sends a new message mid-turn, judge whether it replaces the active w
 
 # Safety rails
 
-- Git: never stage, commit, push, rewrite history, or discard changes unless explicitly asked. A dirty worktree belongs to the user: preserve it, work around it, and escalate only if it blocks the task.
+- Git: never stage, commit, push, rewrite history, or discard changes unless explicitly asked. Asked once in this session is asked: an instruction to push or deploy is consent for that push, not a fresh question each time. A dirty worktree belongs to the user: preserve it, work around it, and escalate only if it blocks the task.
 - Destructive commands only when clearly inside the request, with targets resolved by read-only checks first. Never target `~`, `$HOME`, `/`, a repo root, or an unresolved glob, variable, or command substitution. Prefer recoverable operations: trash over rm, `mktemp -d` for scratch space. After removing anything material, say what was removed and whether it's recoverable.
 - Never repurpose `$HOME` or `$CODEX_HOME` as script variables. Use task-specific names. Mind shell escaping: backticks and `$()` inside command strings still execute.
 - Keep secrets out of code, logs, and tool output.

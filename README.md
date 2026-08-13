@@ -1,6 +1,6 @@
 # beast
 
-**A curated agent setup for Claude Code, Codex, and Grok Build.**
+**A curated agent setup for Claude Code, Codex, Grok Build, and Hermes.**
 
 The default system prompts supplied by agent harnesses are too weak for serious,
 long-running work. Many users have no skill files at all. Others install every skill
@@ -8,16 +8,17 @@ and plugin they find, filling the model's context with overlapping instructions.
 
 beast aims for the useful middle: a strong system prompt, a small active set of routing
 skills, and a larger library loaded only when the work needs it. The same configuration
-works across all three harnesses and stays in one git repo.
+works across all four harnesses and stays in one git repo.
 
 This setup has been tested in real work with **GPT-5.6 Sol**, **GPT-5.6 Terra**,
-**Claude Fable 5**, **Claude Opus 5**, **Kimi K3**, and **Grok 4.5**, Any model scoring higher than 51 on Artificial Analysis's intelligence index will work[https://artificialanalysis.ai/#intelligence-tabs].
+**Claude Fable 5**, **Claude Opus 5**, **Kimi K3**, and **Grok 4.6**, Any model scoring higher than 51 on Artificial Analysis's intelligence index will work[https://artificialanalysis.ai/#intelligence-tabs].
 
 ```text
 Claude Code ─┐
-Codex ───────┼── beast prompt ── 9 routers ── 23 active skills ── 95-module library
-Grok ────────|
-Kimi─────────┘
+Codex ───────┤
+Grok ────────┼── beast prompt ── 9 routers ── 23 active skills ── 95-module library
+Kimi─────────┤
+Hermes ──────┘
 ```
 
 ## What changes
@@ -58,7 +59,7 @@ the handful of config keys beast needs and touches nothing else in those files.
 You need:
 
 - Node.js 22 or newer
-- At least one supported harness: `claude`, `codex`, or `grok`
+- At least one supported harness: `claude`, `codex`, `grok`, or `hermes`
 - Git
 
 beast creates symlinks from your home directory into the cloned repo. Keep the clone
@@ -178,6 +179,20 @@ tool takes a different flag, which is the only reason they look different:
 | Claude Code | `--system-prompt-file ~/.claude/BEAST.v2.md`                                                      |
 | Codex       | `-c model_instructions_file=~/.codex/BEAST.v2.md` plus `-c features.model_instructions_file=true` |
 | Grok        | `--system-prompt-override` pointing at `~/.grok/BEAST.v2.md`                                      |
+
+### Hermes
+
+Hermes is the fourth harness and the one exception to "no config file needs editing":
+it reads exactly one file — `~/.hermes/SOUL.md` — as its identity, and there is no
+launch flag. So `beast install --harness=hermes` **generates** that file instead of
+linking it: the SOUL is assembled from the codex payloads plus `home/hermes/
+SOUL.overlay.md`, which holds only what differs on Hermes (its tool names, the skill
+root, and the operator identity — Hermes is the broker's client, not one of the roster
+lanes). Editing the overlay and re-running `beast install` rewrites the SOUL; editing
+the payloads rewrites every harness's wording including the SOUL's, which is what keeps
+the roster from drifting the way a hand-maintained copy did. The generated file carries
+the "edits are overwritten" marker, and a hand-written SOUL.md is moved aside with a
+backup on first install rather than truncated.
 
 ### Bare `codex` and `grok`
 

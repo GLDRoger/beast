@@ -151,7 +151,11 @@ test('a grok-only install has the prompt the grok entry point reads', () => {
   assert.equal(existsSync(join(home, ref[1])), true, `grok-only install is missing ~/${ref[1]}`)
 
   const cfg = readFileSync(join(REPO, 'home', 'grok', 'config.toml.example'), 'utf8')
-  assert.match(cfg, /paths = \["~\/\.grok\/BEAST\.v2\.md"\]/)
+  // Grok 1.0 removed the config-file prompt override, so the example must not
+  // carry a section for it — the prompt reaches grok through the CLI flag the
+  // zsh helper passes, and the broker's grokSystemPromptFile on broker turns.
+  assert.doesNotMatch(cfg, /\[system-prompt-overrides\]\n/)
+  assert.match(cfg, /grokSystemPromptFile/)
   rmSync(d, { recursive: true, force: true })
 })
 

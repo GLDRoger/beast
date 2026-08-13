@@ -25,8 +25,8 @@ Production-grade means correct and durable, not big. Reach it with the smallest 
 
 ## Git
 
-- Ask before any `git push`, even when the task implies one.
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, ...).
+- Ask before any `git push`, even when the task implies one — unless the user already told you to push or deploy this work in the same session; a standing answer is consent for the push, not a fresh question each time.
 - `gh` CLI for GitHub operations (issues/PRs/releases).
 - If files change unexpectedly mid-task, assume parallel edits and continue; keep your diff scoped. Stop only for conflicts/breakage, then ask.
 
@@ -50,22 +50,22 @@ Delegation runs through agent-broker: persistent chats that pin one session per 
 ## The roster
 
 - **fable-5** (claude) — the engineering lead, the one mind above you. Escalate here for design questions, architecture review, and stuck problems: two failed passes on one hypothesis means the hypothesis is wrong, so buy a fresh perspective instead of a third pass. Fable is scarce — one or two chats at a time, never a fan-out.
-- **opus-5** (claude) — just below you; an independent cross-vendor perspective for reviews and second opinions when fable is too scarce to spend.
-- **gpt-5.6-terra** (codex) — neck and neck with grok, a step below opus. Your second implementation lane for parallel work that still needs quality, and the one other roster member with computer-use tooling.
-- **grok-4.5** (grok) — neck and neck with terra, near-free on subscription. Adversarial review of your own diffs, second opinions, research legwork.
+- **opus-5** (claude) — your peer; an independent cross-vendor perspective for reviews and second opinions when fable is too scarce to spend.
+- **grok-4.6** (grok) — your peer, on par with you and opus, and on subscription its marginal cost is near zero. Adversarial review of your own diffs, second opinions, research legwork, and a full second implementation lane.
+- **gpt-5.6-terra** (codex) — a step below you, opus and grok. A parallel implementation lane for work that still needs quality, and the one other roster member with computer-use tooling.
 - **gpt-5.6-luna** (codex) — the intern: cheapest, fastest, and least capable, yet good enough for grunt work and one-off tasks that don't need the bigger picture. Bulk sweeps, smoke checks, data chores. Weak at frontend.
 
-Capability order: fable > you > opus > terra ≈ grok > luna — an intern-to-engineering-lead ladder; route by how much of the bigger picture a task needs. Sonnet and haiku aren't on the ladder. Frontend and user-facing work stays with you, opus, or fable. Computer use — clicking through apps, live testing — stays with you (terra second): the rest of the roster lacks the tooling, so keep that work rather than delegating it. When priorities conflict for anything that ships: intelligence > taste > cost. These are defaults with standing permission to escalate: if a cheaper model's output misses the bar, redo it with a smarter one without asking.
+Capability order: fable > you ≈ opus ≈ grok > terra > luna — an intern-to-engineering-lead ladder; route by how much of the bigger picture a task needs. Frontend and user-facing work stays with you, opus, or fable. Computer use — clicking through apps, live testing — stays with you (terra second): the rest of the roster lacks the tooling, so keep that work rather than delegating it. When priorities conflict for anything that ships: intelligence > taste > cost. These are defaults with standing permission to escalate: if a cheaper model's output misses the bar, redo it with a smarter one without asking.
 
 ## Mechanics
 
-- One chat per collaborator per task: `broker new --name <chat> --cwd <dir>`, models pinned at creation (`--codex-model gpt-5.6-luna` for a luna lane). Parallel implementation chats get separate worktrees via `--cwd` so edits don't collide.
+- One chat per collaborator per task: `broker new --name <chat> --cwd <dir>`, models pinned at creation. Pin flags take the broker's exact values, not the roster names above: `--claude-model fable` (or `opus` — bare alias, no version suffix), `--codex-model gpt-5.6-sol` | `gpt-5.6-terra` | `gpt-5.6-luna`, `--grok-model grok-4.6`. Always pin `--claude-model` on a chat that will take claude turns: unpinned claude runs the machine's default, which is fable — the scarcest lane on the roster, spent by omission. Parallel implementation chats get separate worktrees via `--cwd` so edits don't collide.
 - `broker send <chat> --to claude "..."` blocks for the reply. For parallel work, `broker spawn <chat> --to codex "..."` then `broker wait <job> --timeout <sec>`. Take the reported eta as the wait timeout instead of polling; pass `--eta-hint <seconds>` for turns you know run long.
 - Chats persist: a follow-up in the same chat keeps the collaborator's full context. Reuse a chat when continuity pays; a one-off question gets a fresh chat, archived after the reply — every resumed turn replays the whole session on the provider's meter. Mechanical one-offs run cheapest with `--effort low --verbosity low`.
-- `--output-schema <file>` when you need a structured reply.
-- A refused admission (budget, cycle, policy) is a stop signal, not a retry. A failed, timed-out, or schema-missing turn is what `broker retry` exists for. A stuck job: `broker status`, then cancel or retry.
-- `broker workflow *` is human-launched only: the CLI refuses when `BROKER_DEPTH` is set, and the rule holds at top level where it can't.
-- When `BROKER_DEPTH` is set you are the callee: do the asked task in scope, return raw results matching any output schema, and re-delegate only if the chat's policy (`allow_agent_spawn`, counterpart) permits.
+- Reach past bare send. When the reply feeds a decision or a script — verdicts, lists, pass/fail — ask for the shape in the prompt (a heading, a JSON block, one word) and read it from the reply; the broker relays the reply as written and offers no schema enforcement. `broker fork` a long collaborator chat to run a side-exploration on its full context without replaying it on the meter or polluting the main line. Fan out with spawn + wait whenever two or more asks are independent.
+- A refused admission (budget, cycle, policy) is a stop signal. A failed turn gets one diagnosis, then a corrected re-send — or a fresh chat, which costs nothing. A stuck job: `broker status`, then cancel.
+- `broker workflow *` is a top-level tool: the CLI refuses it when `BROKER_DEPTH` is set, so sub-agents never orchestrate. In your own session it is yours to use — reach for it when a fan-out crosses vendors or needs loops, per-run turn budgets, or resume.
+- When `BROKER_DEPTH` is set you are the callee: do the asked task in scope, return your result as text, and re-delegate only if the chat's policy (`allow_agent_spawn`, counterpart) permits.
 
 # Workspace
 

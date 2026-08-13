@@ -1,10 +1,11 @@
 #!/usr/bin/env node
+import { existsSync } from 'node:fs'
 import { install } from '../lib/install.mjs'
 import { doctor } from '../lib/doctor.mjs'
 import { scan } from '../lib/scan.mjs'
 import { list, add, rm } from '../lib/skills.mjs'
 import { c } from '../lib/fsutil.mjs'
-import { HARNESSES, HARNESS_NAMES } from '../lib/manifest.mjs'
+import { HARNESSES, HARNESS_NAMES, inHome } from '../lib/manifest.mjs'
 import { PACKS, PACK_NAMES, REQUIRED_PACKS } from '../lib/packs.mjs'
 import { whichBinary } from '../lib/platform.mjs'
 import { isInteractive, multiselect, select, confirm } from '../lib/prompt.mjs'
@@ -91,14 +92,17 @@ async function chooseInteractively() {
   console.log(`\n${c.bold('beast install')}\n`)
 
   const harnessOpts = HARNESS_NAMES.map((n) => {
-    const found = whichBinary(HARNESSES[n].bin)
+    // hermes has no binary to probe; its marker is the home directory itself.
+    const found = HARNESSES[n].bin
+      ? Boolean(whichBinary(HARNESSES[n].bin))
+      : existsSync(inHome('.hermes'))
     return {
       value: n,
       label: HARNESSES[n].label,
       // Preselecting only what is installed avoids linking config for a CLI the
       // user does not have — the commonest way to end up with dead config.
       hint: found ? `${HARNESSES[n].hint}  ${c.green('· found')}` : `${HARNESSES[n].hint}  ${c.dim('· not on PATH')}`,
-      present: Boolean(found),
+      present: found,
     }
   })
   const present = harnessOpts.filter((o) => o.present).map((o) => o.value)
