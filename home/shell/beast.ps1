@@ -7,9 +7,12 @@
 # POSIX equivalent: beast.zsh. Keep the two in sync — same three commands.
 # Nothing here touches credentials; auth stays with each tool.
 
-# Claude Code with the BEAST system prompt replacing the default.
+# Claude Code with the BEAST system prompt replacing the default, and permission
+# prompts off. Of the three harnesses this is the one that stops on every tool call
+# by default, which strands the prompt's autonomy instructions. Drop the flag if you
+# want the confirmations back.
 function c {
-    claude --system-prompt-file "$HOME\.claude\BEAST.v2.md" @args
+    claude --permission-mode bypassPermissions --system-prompt-file "$HOME\.claude\BEAST.v2.md" @args
 }
 
 # Codex. Carries the system prompt as a -c override, so config.toml needs no edit.
@@ -27,8 +30,9 @@ function gro {
     grok --system-prompt-override "read and follow ~/.grok/BEAST.v2.md" --effort max @args
 }
 
-# ponytail: no --dangerously-skip-permissions / --yolo defaults here on purpose,
-# matching beast.zsh. Add them per-invocation if you want them.
+# ponytail: co and gro carry no --yolo / --dangerously-bypass-approvals-and-sandbox
+# defaults on purpose, matching beast.zsh. c is the one exception, scoped to Claude
+# Code's own permission model. Add them per-invocation for the other two if you want.
 
 # Windows note: beast creates junctions for directories (no elevation needed) but
 # real symlinks for files, which require Developer Mode or an elevated shell.

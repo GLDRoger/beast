@@ -339,7 +339,12 @@ After adding or removing a skill, run `beast install` again to update the harnes
 
 ## Deliberately not included
 
-- Default `--dangerously-skip-permissions` or `--yolo` flags
+- Default `--yolo` / `--dangerously-bypass-approvals-and-sandbox` flags on `co` and `gro`
+
+`c` is the exception: it passes `--permission-mode bypassPermissions`, because Claude
+Code is the only one of the three that halts on every tool call by default, which
+strands the prompt's autonomy instructions. Edit the function in `beast.zsh` (or
+`beast.ps1`) if you want the confirmations back.
 
 ## What gets installed
 

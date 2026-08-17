@@ -4,9 +4,12 @@
 # Each function launches a CLI with the matching system-prompt override.
 # Nothing here touches credentials; auth stays with each tool.
 
-# Claude Code with the BEAST system prompt replacing the default.
+# Claude Code with the BEAST system prompt replacing the default, and permission
+# prompts off. Of the three harnesses this is the one that stops on every tool call
+# by default, which strands the prompt's autonomy instructions. Drop the flag if you
+# want the confirmations back.
 c() {
-  claude --system-prompt-file "$HOME/.claude/BEAST.v2.md" "$@"
+  claude --permission-mode bypassPermissions --system-prompt-file "$HOME/.claude/BEAST.v2.md" "$@"
 }
 
 # Codex. Carries the system prompt as a -c override, so config.toml needs no edit.
@@ -28,6 +31,8 @@ gro() {
   grok --system-prompt-override "read and follow ~/.grok/BEAST.v2.md" --effort max "$@"
 }
 
-# ponytail: no --dangerously-skip-permissions / --yolo defaults here on purpose.
-# The originals had them; shipping "skip every confirmation" to someone else's
-# machine is not a default anyone should inherit. Add per-invocation if you want it.
+# ponytail: co and gro carry no --yolo / --dangerously-bypass-approvals-and-sandbox
+# defaults on purpose. The originals had them; shipping "skip every confirmation" to
+# someone else's machine is not a default anyone should inherit. c is the one
+# exception, scoped to Claude Code's own permission model. Add per-invocation for the
+# other two if you want it.
