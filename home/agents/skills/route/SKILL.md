@@ -1,56 +1,25 @@
 ---
 name: route
-description: >
-  Choose which skill owns the work and run its phase loop. Use when the ask is broad,
-  multi-step, or you don't know whether this is frontend, code, writing, motion,
-  performance, security, growth, or media work.
+description: Choose the primary workflow for broad or cross-domain work. Keep the requested outcome intact across follow-ups and specialist handoffs.
 ---
 
 # Route
 
-You only have **nine** top-level skills. Everything else is a **module** under `~/.agents/skill-modules/` — load by reading that path when a phase needs it.
+Pick the workflow that owns the unresolved user outcome, not the first noun in the latest message. Ordinary self-contained work can proceed directly.
 
+| Outcome | Primary workflow |
+|---|---|
+| Product UI, visual direction, responsive implementation | `~/.agents/skills/frontend/SKILL.md` |
+| Application logic, bugs, APIs, refactors, verification | `~/.agents/skills/code/SKILL.md` |
+| Prose, documentation, UI copy, outreach | `~/.agents/skills/writing/SKILL.md` |
+| Interaction motion and animation craft | `~/.agents/skills/motion/SKILL.md` |
+| Speed, jank, stability, error resilience | `~/.agents/skills/performance/SKILL.md` |
+| Authentication, authorization, secrets, defensive controls | `~/.agents/skills/security/SKILL.md` |
+| Ideas, product decisions, pricing, distribution | `~/.agents/skills/growth/SKILL.md` |
+| Video, images, audio, captions, media deliverables | `~/.agents/skills/media/SKILL.md` |
 
-## Module convention
+Use [orchestration.md](references/orchestration.md) when coordinating a multi-step or cross-domain task. One workflow owns completion. A specialist contributes a method or finding; it does not replace the user's scope or turn a build into a review.
 
-Top-level skills are only: `$route` `$frontend` `$code` `$writing` `$motion` `$performance` `$security` `$growth` `$media`.
+Specialist entrypoints live at `~/.agents/skill-modules/<name>/SKILL.md`. Load only those whose procedure matters now, then only the relevant references. If a module is unavailable, use the primary workflow and available tools rather than treating an optional module as a blocker.
 
-Any other `$name` (e.g. `$impeccable`, `$unslop`) is a **module**. Load it by reading:
-
-`~/.agents/skill-modules/<name>/SKILL.md`
-
-The skills menu lists only the nine top-level skills; every module loads by that path. If the file is missing, search `~/.agents/skill-modules/` and pick the closest match.
-
-## Loop
-
-See `references/orchestration.md`.
-
-## Pick one
-
-| Outcome | Skill |
-|---------|--------|
-| UI / design / build / visual QA | `$frontend` |
-| TypeScript, APIs, refactors, bugs, verify | `$code` |
-| Prose, UI copy, docs, outreach | `$writing` |
-| Motion, craft feel, animation polish | `$motion` |
-| Perf, jank, stability, edge resilience | `$performance` |
-| AuthZ, secrets, CASA, rate limits, audits | `$security` |
-| Product strategy, pricing, SEO/AEO, launch | `$growth` |
-| Video, Lottie, images, HyperFrames media | `$media` |
-
-## Project memory (modules, not skills)
-
-| Context | Read |
-|---------|------|
-| Mac/Codex tooling | `~/.agents/skill-modules/mac-codex-tooling-repair/SKILL.md` |
-
-## Rules
-
-1. One primary skill; second only if domains truly cross.
-2. Load modules only at phase gates (read `SKILL.md` path above).
-3. Narrow tasks: still enter the closest of the nine, then one module.
-4. Never stage/commit/push unless the user asks.
-
-## Handoff
-
-Name the skill used, modules loaded, files/artifacts, verification, residual risk.
+Keep routing and acceptance-criteria tracking internal. Report the outcome, evidence, and material limits, not phase labels.

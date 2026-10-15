@@ -12,23 +12,16 @@ c() {
   claude --permission-mode bypassPermissions --system-prompt-file "$HOME/.claude/BEAST.v2.md" "$@"
 }
 
-# Codex. Carries the system prompt as a -c override, so config.toml needs no edit.
-# Verified load-bearing: pointing model_instructions_file at a missing file fails with
-# "failed to read model instructions file", so codex genuinely reads it rather than
-# accepting the key and ignoring it.
+# Codex. model_instructions_file makes Beast its base prompt. config.toml normally sets it
+# too (every launcher, including T3 Code, reads that); the -c keeps `co` correct without it.
 co() {
-  codex "$@" \
-    -c features.model_instructions_file=true \
-    -c model_instructions_file="$HOME/.codex/BEAST.v2.md" \
-    -c model_reasoning_summary_format=experimental
+  codex -c model_instructions_file="$HOME/.codex/BEAST.v2.md" "$@"
 }
 
-# Grok. It has no --system-prompt-file equivalent, so it reads the prompt from a path.
-# ~/.grok/BEAST.v2.md, not ~/.codex/BEAST.v2.md: the same real file, but under Grok's own
-# namespace so a grok-only install still has it. Pointing at the Codex path meant the one
-# supported single-harness setup started Grok with no system policy at all.
+# Grok. It has no prompt-file flag; it appends ~/.grok/AGENT.md (Beast) and AGENTS.md to its
+# native prompt on every launch, T3 Code included, so this only sets effort.
 gro() {
-  grok --system-prompt-override "read and follow ~/.grok/BEAST.v2.md" --effort max "$@"
+  grok --effort max "$@"
 }
 
 # ponytail: co and gro carry no --yolo / --dangerously-bypass-approvals-and-sandbox
@@ -36,3 +29,20 @@ gro() {
 # someone else's machine is not a default anyone should inherit. c is the one
 # exception, scoped to Claude Code's own permission model. Add per-invocation for the
 # other two if you want it.
+
+# Muse Code. It takes its system prompt as text in settings.json (run.system_prompt), not as a
+# file, so mu copies Beast in before each launch; T3 Code's `muse serve` reads the same settings.
+# Approvals and sandboxing follow Muse's own permissions.default_profile; mu only trusts the
+# workspace so its rules, skills, and delegation load.
+typeset -g _BEAST_PROMPT="${${(%):-%x}:A:h:h}/shared/BEAST.md"
+beast_muse_sync() {
+  local s="$HOME/.config/muse/settings.json" t
+  [[ -f $s && -f $_BEAST_PROMPT ]] || return 0
+  [[ "$(jq -r '.run.system_prompt // ""' "$s")" == "$(<"$_BEAST_PROMPT")" ]] && return 0
+  t="$s.beast-tmp"
+  jq --rawfile sp "$_BEAST_PROMPT" '.run.system_prompt = $sp' "$s" > "$t" && mv "$t" "$s"
+}
+mu() {
+  beast_muse_sync
+  muse --trust-workspace "$@"
+}

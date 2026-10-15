@@ -12,4 +12,4 @@ This skill is merged into `$unslop` (prose anti-slop + honest-prose craft rules)
 
 1. Invoke `$unslop` and follow it end-to-end.
 2. Do not maintain a separate prose workflow here.
-3. For visual/design slop, use `$remove-ai-slop` instead.
+3. For visual/design slop, use the visual mode in `$unslop`.

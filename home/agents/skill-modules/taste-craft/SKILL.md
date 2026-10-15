@@ -61,12 +61,12 @@ Before writing any animation code, answer these questions in order:
 
 | Frequency                                                   | Decision                     |
 | ----------------------------------------------------------- | ---------------------------- |
-| 100+ times/day (keyboard shortcuts, command palette toggle) | No animation. Ever.          |
+| 100+ times/day (keyboard shortcuts, command palette toggle) | Immediate response; at most fast, restrained continuity. |
 | Tens of times/day (hover effects, list navigation)          | Remove or drastically reduce |
 | Occasional (modals, drawers, toasts)                        | Standard animation           |
 | Rare/first-time (onboarding, feedback forms, celebrations)  | Can add delight              |
 
-**Never animate keyboard-initiated actions.** These actions are repeated hundreds of times daily. Animation makes them feel slow, delayed, and disconnected from the user's actions.
+**Keep keyboard-initiated actions immediate.** Avoid decorative delay on repeated actions. Fast, interruptible feedback or continuity can help when it does not delay focus, input, or the next action.
 
 Raycast has no open/close animation. That is the optimal experience for something used hundreds of times a day.
 
@@ -669,4 +669,3 @@ When reviewing UI code, check for:
 | Framer Motion `x`/`y` props under load     | Use `transform: "translateX()"` for hardware acceleration        |
 | Same enter/exit transition speed           | Make exit faster than enter (e.g., enter 2s, exit 200ms)         |
 | Elements all appear at once                | Add stagger delay (30-80ms between items)                        |
-

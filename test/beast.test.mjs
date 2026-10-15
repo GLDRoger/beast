@@ -12,6 +12,27 @@ import {
 
 const tmp = () => mkdtempSync(join(tmpdir(), 'beast-'))
 
+test('every harness reads one shared Beast prompt and one shared user file', () => {
+  const read = (rel) => readFileSync(join(REPO, 'home', rel), 'utf8')
+  const beast = read('shared/BEAST.md')
+  const user = read('shared/USER.md')
+  for (const h of ['claude', 'codex', 'grok']) assert.equal(read(`${h}/BEAST.v2.md`), beast, `${h} Beast drifted`)
+  for (const f of ['claude/CLAUDE.md', 'codex/AGENTS.md', 'grok/AGENTS.md']) assert.equal(read(f), user, `${f} drifted`)
+
+  // Grok truncates each rules file at 10,000 characters; Beast reaches it as ~/.grok/AGENT.md.
+  assert.ok([...beast].length <= 10_000, `Beast is ${[...beast].length} chars; Grok truncates past 10,000`)
+  assert.ok([...user].length <= 10_000, `user file is ${[...user].length} chars; Grok truncates past 10,000`)
+  assert.match(user, /^## Model routing$/m)
+  assert.doesNotMatch(user, /delegation\.md/, 'the user file is self-contained')
+  assert.match(beast, /^## Delegation$/m)
+  for (const principle of [
+    'First principles', 'KISS (Keep It Simple)', "YAGNI (You Aren't Gonna Need It)",
+    'Falsification', 'Reversibility', "Chesterton's fence", 'Systems thinking',
+  ]) {
+    assert.match(beast, new RegExp(principle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  }
+})
+
 test('linkFile creates a link and is idempotent', () => {
   const d = tmp()
   const target = join(d, 'src.md'); writeFileSync(target, 'x')

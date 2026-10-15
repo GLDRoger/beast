@@ -15,19 +15,14 @@ function c {
     claude --permission-mode bypassPermissions --system-prompt-file "$HOME\.claude\BEAST.v2.md" @args
 }
 
-# Codex. Carries the system prompt as a -c override, so config.toml needs no edit.
+# Codex. model_instructions_file makes Beast its base prompt; config.toml normally sets it too.
 function co {
-    codex @args `
-      -c features.model_instructions_file=true `
-      -c "model_instructions_file=$HOME\.codex\BEAST.v2.md" `
-      -c model_reasoning_summary_format=experimental
+    codex -c "model_instructions_file=$HOME\.codex\BEAST.v2.md" @args
 }
 
-# Grok. It has no --system-prompt-file equivalent, so it reads the prompt from a path.
-# ~/.grok/BEAST.v2.md is the same real file as the Codex prompt, under Grok's own
-# namespace, so a grok-only install has it.
+# Grok appends ~/.grok/AGENT.md (Beast) and AGENTS.md to its native prompt on every launch.
 function gro {
-    grok --system-prompt-override "read and follow ~/.grok/BEAST.v2.md" --effort max @args
+    grok --effort max @args
 }
 
 # ponytail: co and gro carry no --yolo / --dangerously-bypass-approvals-and-sandbox
@@ -37,3 +32,9 @@ function gro {
 # Windows note: beast creates junctions for directories (no elevation needed) but
 # real symlinks for files, which require Developer Mode or an elevated shell.
 # Enable Developer Mode: Settings > System > For developers > Developer Mode.
+
+# Muse Code in a trusted workspace; approvals follow Muse's permissions.default_profile.
+# beast.zsh's mu also copies Beast into ~/.config/muse/settings.json (run.system_prompt) first.
+function mu {
+    muse --trust-workspace @args
+}

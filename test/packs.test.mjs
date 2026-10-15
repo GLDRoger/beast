@@ -48,11 +48,11 @@ test('core is the only required pack', () => {
     assert.notEqual(PACKS[n].required, true, `${n} must be optional`)
 })
 
-test('core is the nine routers plus the five master-* aliases', () => {
-  assert.equal(PACKS.core.skills.length, 14)
+test('core is exactly the nine primary workflows', () => {
+  assert.equal(PACKS.core.skills.length, 9)
   for (const s of ['route', 'code', 'frontend', 'writing', 'motion', 'performance', 'security', 'growth', 'media'])
     assert.equal(packOf(s), 'core', s)
-  assert.equal(PACKS.core.skills.filter((s) => s.startsWith('master-')).length, 5)
+  assert.equal(PACKS.core.skills.filter((s) => s.startsWith('master-')).length, 0)
 })
 
 test('packSkills returns exactly what the named packs claim', () => {
@@ -65,9 +65,9 @@ test('packSkills returns exactly what the named packs claim', () => {
 test('packOf round-trips a sample and returns null for a non-skill', () => {
   for (const [skill, pack] of [
     ['route', 'core'],
-    ['impeccable', 'design'],
-    ['clarify', 'design'],              // impeccable wrapper, not product
-    ['hyperframes', 'video'],
+    ['taste-craft', 'design'],
+    ['text-to-lottie', 'design'],       // animation asset helper
+    ['remotion', 'remotion'],
     ['unslop', 'prose'],
     ['ship-email', 'product'],          // scaffolds email infra, not copy
     ['web-shader-extractor', 'engineering'],

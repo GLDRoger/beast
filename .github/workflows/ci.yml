@@ -1,8 +1,8 @@
 name: ci
 
 # Nothing enforced these before, so every check below had at least one way to be
-# quietly wrong: the vendored suite masked its own exit code, NOTICE.md drifted from the
-# payload it is generated from, and a clean install failed `beast doctor` on every
+# quietly wrong: NOTICE.md drifted from the payload it is generated from, and a
+# clean install failed `beast doctor` on every
 # platform while passing on the author's machine because of leftover local state.
 #
 # There are no dependencies to install. Every job is `checkout` + `setup-node` + a script.
@@ -92,18 +92,6 @@ jobs:
           $env:USERPROFILE = $scratch   # os.homedir() reads this on Windows
           node bin/beast.mjs install --all
           node bin/beast.mjs doctor
-
-  vendored:
-    name: vendored skill suites
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      # Gates on any failure not in KNOWN_FAILURES, and on any known failure that
-      # starts passing. The old command globbed in /bin/sh and ran 1 of 57 files.
-      - run: npm run test:vendored
 
   generated:
     name: generated files are current

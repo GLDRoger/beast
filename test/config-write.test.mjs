@@ -27,6 +27,8 @@ function parse(text) {
 }
 
 const CODEX_KEYS = EDITS.codex.additions
+// Codex needs only a root key now, so the table-insertion mechanics use a synthetic table key.
+const TABLE_KEY = { path: ['features', 'example_flag'], value: true, why: 'test fixture for a table key' }
 
 test('a root key lands in the root table even when the file ends inside another one', { skip: NO_TOML && 'no python3 with tomllib' }, () => {
   // The hazard this whole module exists for. Appending
@@ -44,9 +46,9 @@ test('a root key lands in the root table even when the file ends inside another 
   assert.equal(p.value.features.shell_tool, true, 'existing keys survive')
 })
 
-test('a table key goes into its table, and both codex keys coexist', { skip: NO_TOML && 'no python3 with tomllib' }, () => {
+test('a table key goes into its table, beside a root key', { skip: NO_TOML && 'no python3 with tomllib' }, () => {
   let text = '[features]\nshell_tool = true\n\n[tui]\ntheme = "dracula"\n'
-  for (const add of CODEX_KEYS) {
+  for (const add of [CODEX_KEYS[0], TABLE_KEY]) {
     const r = insertKey(text, add)
     assert.equal(r.ok, true)
     text = r.text
@@ -54,28 +56,28 @@ test('a table key goes into its table, and both codex keys coexist', { skip: NO_
   const p = parse(text)
   assert.equal(p.ok, true)
   assert.equal(p.value.model_instructions_file, '~/.codex/BEAST.v2.md')
-  assert.equal(p.value.features.model_instructions_file, true)
+  assert.equal(p.value.features.example_flag, true)
   assert.equal(p.value.features.shell_tool, true)
   assert.equal(p.value.tui.theme, 'dracula', 'the key must not leak into the next table')
 })
 
 test('a missing table is appended, not assumed', { skip: NO_TOML && 'no python3 with tomllib' }, () => {
-  const r = insertKey('model = "x"\n', CODEX_KEYS[1])
+  const r = insertKey('model = "x"\n', TABLE_KEY)
   const p = parse(r.text)
-  assert.equal(p.value.features.model_instructions_file, true)
+  assert.equal(p.value.features.example_flag, true)
   assert.equal(p.value.model, 'x')
 })
 
 test('an inline table is refused rather than duplicated', () => {
   // `features = { shell_tool = true }` plus an appended `[features]` header is a
   // duplicate key, which makes the entire file unparseable and takes codex down.
-  const r = insertKey('features = { shell_tool = true }\n', CODEX_KEYS[1])
+  const r = insertKey('features = { shell_tool = true }\n', TABLE_KEY)
   assert.equal(r.ok, false)
   assert.match(r.reason, /inline table|dotted key/)
 })
 
 test('a dotted key is refused too', () => {
-  const r = insertKey('features.shell_tool = true\n', CODEX_KEYS[1])
+  const r = insertKey('features.shell_tool = true\n', TABLE_KEY)
   assert.equal(r.ok, false)
 })
 
@@ -91,14 +93,14 @@ test('a CRLF config keeps its line endings and its table match', { skip: NO_TOML
   // Without \r tolerance the header never matches, so the key gets appended under a
   // SECOND [features] header — a duplicate key that stops codex loading at all.
   const before = '[features]\r\nshell_tool = true\r\n'
-  const r = insertKey(before, CODEX_KEYS[1])
+  const r = insertKey(before, TABLE_KEY)
   assert.equal(r.ok, true)
   assert.equal((r.text.match(/\[features\]/g) ?? []).length, 1, 'exactly one [features] header')
   assert.equal(r.text.includes('\n\n'), false, 'no bare LF introduced into a CRLF file')
 
   const p = parse(r.text)
   assert.equal(p.ok, true)
-  assert.equal(p.value.features.model_instructions_file, true)
+  assert.equal(p.value.features.example_flag, true)
   assert.equal(p.value.features.shell_tool, true)
 })
 
@@ -127,7 +129,6 @@ test('applyPlan writes, backs nothing up it cannot, and is idempotent in effect'
 
   const p = parseTomlFile(file)
   assert.equal(p.value.model_instructions_file, '~/.codex/BEAST.v2.md')
-  assert.equal(p.value.features.model_instructions_file, true)
   assert.equal(p.value.features.shell_tool, true)
   assert.equal(existsSync(`${file}.beast-tmp`), false, 'no temp file left behind')
   rmSync(d, { recursive: true, force: true })
@@ -157,7 +158,8 @@ test('applyPlan creates a config file when there is none', { skip: NO_TOML && 'n
   assert.equal(r.wrote, true)
   const p = parseTomlFile(file)
   assert.deepEqual(p.value.skills.ignore, ['~/.claude/skills'])
-  assert.deepEqual(p.value['system-prompt-overrides'].paths, ['~/.grok/BEAST.v2.md'])
+  assert.deepEqual(p.value.skills.paths, ['~/.agents/skills'])
+  assert.equal(p.value['system-prompt-overrides'], undefined, 'not a Grok config key')
   rmSync(d, { recursive: true, force: true })
 })
 
@@ -180,15 +182,15 @@ test('the question names every key it is about to write, with a reason', () => {
   assert.equal(lines.filter((l) => l.file).length, 1)
   assert.deepEqual(
     lines.filter((l) => l.key).map((l) => l.key),
-    ['model_instructions_file', 'features.model_instructions_file'],
+    ['model_instructions_file'],
   )
   assert.ok(lines.filter((l) => l.key).every((l) => l.why?.length > 10), 'every key states why')
   assert.deepEqual(configQuestion([{ file: '/h/x', additions: [] }]), [], 'nothing to add, nothing to say')
 })
 
 test('every edit beast writes is one the doctor check knows how to validate', () => {
-  // Drift guard. checks/config.mjs validates model_instructions_file, [skills] paths,
-  // and [system-prompt-overrides] paths; a new addition here without a matching check
+  // Drift guard. checks/config.mjs validates model_instructions_file and [skills] paths;
+  // a new addition here without a matching check
   // is a key nothing verifies after the fact.
   const validated = readFileSync(new URL('../lib/checks/config.mjs', import.meta.url), 'utf8')
   for (const spec of Object.values(EDITS)) {

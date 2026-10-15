@@ -1,6 +1,6 @@
 # Startup Pressure Test Playbooks
 
-Use these playbooks when the user requests a specific mode or a deep/full evaluation.
+Use the relevant sections when the user requests a specific mode or a deep/full business evaluation. Role descriptions are analytical lenses, not claims of personal experience. Question counts, schedules, and output templates are examples; adapt them to known context and the requested deliverable without a mandatory interview.
 
 ## Pressure-Test
 

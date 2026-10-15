@@ -8,7 +8,7 @@
   },
   "//private": [
     "Not publishable, and not by accident. beast installs symlinks that point INTO the",
-    "clone, so the clone is the source of truth and `git diff` is how you see drift — an",
+    "clone, so the clone is the source of truth and `git diff` is how you see drift \u2014 an",
     "immutable copy under node_modules cannot fill that role. npm also refuses to",
     "materialise the 18 symlinked skill directories in the active set: `npm pack` shipped",
     "9 of 27 active skills, silently, which is worse than not publishing at all.",
@@ -16,9 +16,7 @@
   ],
   "private": true,
   "//engines": [
-    "22, not 20. The video pack installs by default and HyperFrames requires Node 22+,",
-    "so a machine that satisfied >=20 could still get default functionality that cannot",
-    "run. Several vendored media scripts also use import.meta.dirname (Node 20.11+)."
+    "Node 22 is the maintained installer/test baseline. Keep the supported runtime in sync with CI."
   ],
   "engines": {
     "node": ">=22"
@@ -37,8 +35,7 @@
     "bootstrap": "node scripts/bootstrap.mjs",
     "scrub": "node scripts/scrub.mjs",
     "notice": "node scripts/gen-notice.mjs",
-    "test": "node --test test/*.test.mjs",
-    "test:vendored": "node scripts/test-vendored.mjs"
+    "test": "node --test test/*.test.mjs"
   },
   "license": "SEE LICENSE IN LICENSE",
   "os": [

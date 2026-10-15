@@ -1,5 +1,6 @@
 # Essay & long-form craft
 
+Use these as diagnostic examples, not blanket bans or required passes. Preserve meaning, warranted uncertainty, quotations, and the user's intentional voice. Apply only the patterns that weaken the current piece.
 Absorbed from honest-prose. Use fully for essays and posts; selectively for docs.
 
 ## 1. Never announce the insight before delivering it

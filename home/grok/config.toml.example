@@ -15,12 +15,9 @@ permission_mode = "ask"          # the source used "always-approve"; opt into th
 paths = ["~/.agents/skills"]
 ignore = ["~/.claude/skills"]
 
-# Grok 1.0 removed the [system-prompt-overrides] config key: the only remaining
-# override is the --system-prompt-override CLI flag (text, not a path). Broker
-# turns get the BEAST prompt via agent-broker — set in ~/.agent-broker/config.json:
-#   "grokSystemPromptFile": "~/.grok/BEAST.v2.md"  (absolute path)
-# Interactive sessions need the flag spelled out:
-#   grok --system-prompt "$(cat ~/.grok/BEAST.v2.md)"
+# Grok has no prompt-file flag or config key. Beast reaches every launch (TUI,
+# T3 Code's `grok agent stdio`, agent-broker turns) as the ~/.grok/AGENT.md rules
+# file, appended to Grok's native prompt. Rules files truncate at 10,000 characters.
 
 # The agent-broker MCP surface, same registration codex carries. The command is
 # the pnpm-linked broker binary; adjust the path if pnpm's bin dir differs.

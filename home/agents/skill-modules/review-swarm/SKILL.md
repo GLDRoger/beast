@@ -5,10 +5,7 @@ description: "Run a multi-model PR/diff review panel and sort findings into acti
 
 # Review Swarm
 
-Review exactly one change target. For PRs, own the complete loop: review,
-triage, fix, verify, push, wait for required CI, refetch feedback, and repeat.
-Finish only when all current findings and review items are resolved except
-genuine ambiguities surfaced for the user.
+Review the selected change with independent judgment when the task and runtime permit delegation. Match completion to the user's authorization: a review ends with verified findings; a fix request includes scoped implementation and checks; an explicitly authorized PR shepherding request can include commit, push, CI, and feedback follow-through. The presence of a PR URL alone does not authorize any mutation.
 
 ## Invariants
 
@@ -20,7 +17,7 @@ genuine ambiguities surfaced for the user.
 - Reviewers propose findings; the arbiter alone accepts and classifies them.
 - Never post raw reviewer output to GitHub.
 - Every accepted item ends as `actionable`, `nit`, or `ambiguous`.
-- Fix actionable items regardless of severity. Severity does not determine truth.
+- Classify actionable items by demonstrated impact. Fix them when the user requested fixes; severity does not determine whether a claim is true.
 - Do not pause for ambiguous items while independent work remains.
 - Never touch unrelated user work. A correct root-cause fix may edit files that
   were not in the original diff.
@@ -43,13 +40,9 @@ Accept one of:
 5. A commit SHA.
 6. A branch or Git revision range.
 
-Reject multiple targets, closed/merged PRs, ambiguous repository context, and
-fork PRs without head-branch push permission. Explain the blocker; do not guess.
+Resolve the requested target and repository context before acting. A closed/merged PR or missing push permission does not prevent a read-only review. Verify write permissions only when an authorized action needs them; do not guess past a genuinely ambiguous target.
 
-PR-only behavior: GitHub posting, review-thread mutation, automatic commits and
-pushes, required-CI waiting, and the iterative shepherd loop. For non-PR
-targets, report locally and may edit the current working tree, but never commit
-or push unless the user explicitly requests it.
+GitHub posting, review-thread mutation, commits, pushes, and iterative PR shepherding require explicit authorization for that work. Non-PR reviews report locally; editing still requires a change request. A child review within an authorized build returns its findings to the primary workflow rather than creating a new approval gate.
 
 ## Phase 1: Resolve and isolate the target
 
@@ -78,30 +71,16 @@ or sensitive generated artifacts into prompts.
 
 ## Phase 2: Launch the independent panel
 
-Run all four reviewers concurrently. Tell each it is the sole reviewer, give it
-the target diff and repository path, allow repo-aware read-only inspection, and
-require the output contract below.
+Select independent lenses that add value for this diff, preserving any panel size or roles the user explicitly requested:
 
-1. **Correctness and architecture — `gpt-5.6-sol`**
-   Trace invariants, callers, data flow, concurrency, failure modes, duplication,
-   maintainability, API contracts, and root-cause placement.
-2. **Adversarial product and design — `fable-5`**
-   Challenge product behavior, UX, accessibility, copy, API taste, hidden scope,
-   and brittle assumptions. For non-user-facing changes, focus on adversarial
-   code judgment instead of inventing design commentary.
-3. **Security and boundaries — `gpt-5.6-terra`**
-   Review authentication, authorization, tenancy, validation, injection, SSRF,
-   unsafe files/uploads, secrets, privacy, dependencies, and compliance impact.
-4. **Tests and operations — `gpt-5.6-terra`**
-   Review regression coverage, error handling, migrations, observability,
-   performance, deploy/runtime risk, provider parity, and rollback behavior.
+- **Correctness and architecture:** invariants, callers, concurrency, failure modes, duplication, and contracts.
+- **Product and design:** actual workflow, accessibility, copy, hidden scope, and brittle assumptions; omit invented UI commentary on non-UI changes.
+- **Security and boundaries:** authentication, authorization, tenancy, input/files, privacy, and dependencies.
+- **Tests and operations:** regression coverage, migrations, observability, performance, and rollback.
 
-Use native Codex agents for GPT models. For Claude models, spawn a thin Codex
-wrapper agent labelled with a `claude:` prefix. The wrapper writes a
-self-contained prompt, runs `claude -p --model fable --tools "Read,Grep,Glob"
---add-dir <repo>`, and returns the report. Give long Claude runs a real timeout;
-if Fable is unavailable, use `opus-4.8`. If Claude itself is unavailable, use
-`gpt-5.6-sol` and disclose the substitution.
+Read `~/.beast/delegation.md` and use current runtime capabilities. Prefer native subagents for suitable same-task review. Use agent-broker for intentional cross-provider work; discover actual provider/model availability before dispatch. When agent-broker is unavailable, call Codex or Claude Code headless as that runbook shows. Do not require a saved model roster or a wrapper CLI when native tools fit. If delegation is unavailable or disallowed, review directly and disclose the lack of independence.
+
+Give reviewers the minimum relevant diff/context and read-only access. They must not see one another's findings or mutate the target. The primary owner integrates the results.
 
 Each reviewer returns only:
 
@@ -138,13 +117,11 @@ stale bot summaries tied to an older SHA. Trim large bodies during the initial
 fetch and refetch the full item before acting. If a participant cannot be
 classified confidently, treat the item as human-authored.
 
-Human-authored actionable items are eligible for auto-fixing. Human authorship
-does not make a clear finding ambiguous.
+Human authorship does not make a clear finding ambiguous. Fix eligibility still depends on the user's requested scope; fetching review comments alone is read-only.
 
 ## Phase 4: Arbitrate every item
 
-Launch a separate `gpt-5.6-sol` arbiter. Give it the panel findings, existing
-PR review items, current target diff, and read-only repository access. It must:
+The primary owner verifies the panel findings against the current target. Use a separate available arbiter only when independent arbitration adds value and delegation is permitted. The arbiter remains read-only and must:
 
 1. Verify every claim against current code and the actual target.
 2. Reject false, stale, already-fixed, duplicate, or out-of-scope claims.
@@ -165,7 +142,7 @@ confidence but is not proof.
 
 ## Phase 5: Publish the accepted PR review
 
-PR targets only. Post accepted, deduplicated findings as one GitHub review with
+Only when posting a PR review is authorized: post accepted, deduplicated findings as one GitHub review with
 inline comments where valid diff positions exist. Use a top-level review item
 for general findings. Every automated body begins with:
 
@@ -191,7 +168,7 @@ the marker, path, line, and normalized finding title before creating a comment.
 
 ## Phase 6: Fix, verify, commit, and triage
 
-Process actionable items by shared root cause, not one comment at a time.
+Only when fixes are authorized: process actionable items by shared root cause, not one comment at a time. Commit, push, post, and resolve threads only when those external actions are also authorized. Otherwise finish with the local diff and evidence.
 
 1. Inspect every caller of the shared function or primitive being changed.
 2. Apply the smallest canonical fix. Delete obsolete duplicate paths only when
@@ -201,7 +178,7 @@ Process actionable items by shared root cause, not one comment at a time.
    formatting, copy-only edits, or trivial corrections.
 4. Discover verification from applicable `AGENTS.md`, changed files, package
    scripts, CI workflows, and repository tooling. Prefer
-   `~/.codex/scripts/verification_router.py` when available.
+   the actual repository scripts and `~/.agents/skills/code/references/verification.md` when choosing checks.
 5. Run targeted checks before each push. Before declaring clean, run the
    strongest practical repository handoff gate.
 6. If the fix caused a failure, keep working and do not push. If a failure is
@@ -245,7 +222,7 @@ protected safety boundary.
 
 ## Completion contract
 
-A PR run is complete only when:
+A read-only run is complete when the requested findings are verified and reported. An authorized local fix is complete when the scoped implementation and relevant checks are done. For an explicitly authorized PR shepherding run, completion additionally requires:
 
 - required checks pass, or an exact pre-existing/environmental blocker is
   proven and reported;

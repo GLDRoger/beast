@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Untitled film</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0c0a09; overflow: hidden; }
+  body { display: grid; place-items: center; }
+  canvas { width: min(100vw, 177.78vh); height: auto; display: block; }
+  #play { position: fixed; inset: 0; border: 0; background: transparent; cursor: pointer; color: #f2e9da;
+    font: 500 15px Menlo, monospace; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5vh; }
+  #play:focus-visible { outline: 2px solid #de7a58; outline-offset: -6px; }
+  #play[hidden] { display: none; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080" aria-label="Untitled film"></canvas>
+<button id="play" hidden>&#9654; click to play with sound</button>
+<script id="film">
+// Starter film. Contract with scripts/render.mjs:
+//   window.FILM = { W, H, FPS, N, canvas, draw(f), sheet(frames), renderAudio(), wavBase64(buf), lines, ready }
+//   draw(f) must depend only on f and SEED. ?render=1 disables the preview player.
+'use strict';
+
+const W = 1920, H = 1080, FPS = 24, DUR = 8, N = FPS * DUR;
+const Q = new URLSearchParams(location.search);
+const SEED = Q.has('s') ? (+Q.get('s') | 0) : 7;
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+const MONO = 'Menlo, "SF Mono", "DejaVu Sans Mono", monospace';
+
+// ---------------------------------------------------------------- timeline (shared by picture and sound)
+const T = { typeAt: 0.6, cps: 16, burst: 3.2, title: 4.4, fadeOut: 7.2 };
+const LINE = 'hello, world';
+
+// ---------------------------------------------------------------- math
+const clamp = (x, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
+const lerp = (a, b, t) => a + (b - a) * t;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const eIO = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const eOut = (t) => 1 - Math.pow(1 - t, 3);
+const eBack = (t) => { const c = 1.9; return t <= 0 ? 0 : 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const mod = (a, n) => ((a % n) + n) % n;
+function rng(a) { // seeded sequence, for things generated once at load
+  return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function hash(a, b = 0, c = 0) { // stateless per-element randomness, safe inside draw(f)
+  let h = (Math.imul(a | 0, 0x27d4eb2d) ^ Math.imul(b | 0, 0x165667b1) ^ Math.imul(c | 0, 0x3c6ef372) ^ Math.imul(SEED + 101, 0x85ebca6b)) | 0;
+  h = Math.imul(h ^ (h >>> 15), 0x2c1b3c6d); h = Math.imul(h ^ (h >>> 12), 0x297a2d39); h ^= h >>> 15;
+  return (h >>> 0) / 4294967296;
+}
+
+// ---------------------------------------------------------------- ink: quantized palette, mixed into the background
+const BG = [12, 10, 9], BGS = `rgb(${BG})`;
+const INK = { cream: [242, 233, 218], clay: [222, 122, 88], gold: [240, 196, 130], white: [255, 250, 242] };
+const CREAM = 0, CLAY = 1, GOLD = 2, WHITE = 3, HUE = Object.keys(INK), LV = 64;
+const PAL = HUE.map((k) => Array.from({ length: LV }, (_, i) => `rgb(${BG.map((b, n) => Math.round(b + (INK[k][n] - b) * (i / (LV - 1)))).join(',')})`));
+const col = (h, v) => PAL[h][Math.round(clamp(v) * (LV - 1))];
+ctx.font = `100px ${MONO}`;
+const ADV = ctx.measureText('M').width / 100;
+
+// ---------------------------------------------------------------- glyph grid: scenes write, one flush draws
+const CW = 10, CH = 18, COLS = (W / CW) | 0, ROWS = (H / CH) | 0;
+const gCh = new Array(COLS * ROWS).fill(''), gHue = new Uint8Array(COLS * ROWS), gV = new Float32Array(COLS * ROWS), gZ = new Int8Array(COLS * ROWS);
+function gClear() { gCh.fill(''); gV.fill(0); gZ.fill(-1); }
+function gPut(i, j, ch, hue, v, z = 0) {
+  if (i < 0 || j < 0 || i >= COLS || j >= ROWS || v <= 0.02 || !ch || ch === ' ') return;
+  const k = j * COLS + i;
+  if (z > gZ[k] || (z === gZ[k] && v > gV[k])) { gCh[k] = ch; gHue[k] = hue; gV[k] = v; gZ[k] = z; }
+}
+function gFlush() {
+  ctx.save(); ctx.font = `bold 15px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let k = 0; k < gCh.length; k++) if (gCh[k]) { ctx.fillStyle = col(gHue[k], gV[k]); ctx.fillText(gCh[k], (k % COLS) * CW + CW / 2, ((k / COLS) | 0) * CH + CH / 2 + 1); }
+  ctx.restore();
+}
+function glow(x, y, r, a, rgb = INK.clay) {
+  if (a <= 0) return;
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, `rgba(${rgb},${a})`); g.addColorStop(0.4, `rgba(${rgb},${a * 0.35})`); g.addColorStop(1, `rgba(${rgb},0)`);
+  ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2); ctx.restore();
+}
+
+// ---------------------------------------------------------------- scenes (replace these)
+function typedLine(t) {
+  const fs = 44, adv = fs * ADV, x0 = W / 2 - ((LINE.length + 2) * adv) / 2, y = H / 2;
+  const n = Math.min(LINE.length, Math.floor((t - T.typeAt) * T.cps));
+  const a = 1 - seg(t, T.burst - 0.2, T.burst);
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a; ctx.font = `500 ${fs}px ${MONO}`; ctx.textBaseline = 'middle';
+  ctx.fillStyle = col(CLAY, 1); ctx.fillText('>', x0, y);
+  ctx.fillStyle = col(CREAM, 0.92); if (n > 0) ctx.fillText(LINE.slice(0, n), x0 + 2 * adv, y);
+  if (n < LINE.length || (t * 1.9) % 1 < 0.55) { ctx.fillStyle = col(CLAY, 1); ctx.fillRect(x0 + (2 + Math.max(0, n)) * adv + 3, y - fs * 0.52, adv * 0.62, fs * 1.02); }
+  ctx.restore();
+}
+
+const RAYS = (() => { const r = rng(SEED * 13 + 3); return Array.from({ length: 12 }, (_, i) => ({ a: (i / 12) * Math.PI * 2 + (r() - 0.5) * 0.18, len: 0.6 + r() * 0.4, w: 0.07 + r() * 0.03, d: r() * 0.14 })); })();
+function burst(t) {
+  const age = t - T.burst, R = 380, vs = lerp(1, 0.22, seg(t, T.title - 0.3, T.title + 0.8)) * (1 - seg(t, T.fadeOut, DUR));
+  const rays = RAYS.map((ry) => ({ dx: Math.cos(ry.a + age * 0.05), dy: Math.sin(ry.a + age * 0.05), L: ry.len * eBack(seg(age, ry.d, ry.d + 0.6)), w: ry.w }));
+  for (let j = 0; j < ROWS; j++) for (let i = 0; i < COLS; i++) {
+    const x = ((i + 0.5) * CW - W / 2) / R, y = ((j + 0.5) * CH - H / 2) / R, r = Math.hypot(x, y);
+    if (r > 1.1) continue;
+    let best = 9;
+    for (const ry of rays) { if (ry.L <= 0) continue; const pc = clamp(x * ry.dx + y * ry.dy, 0, ry.L); best = Math.min(best, Math.hypot(x - pc * ry.dx, y - pc * ry.dy) - ry.w); }
+    if (best < 0) gPut(i, j, LINE[mod(Math.floor((r * R) / 11 - age * 17), LINE.length)], r < 0.3 ? GOLD : CLAY, vs * (0.6 + 0.4 * clamp(-best / 0.08)), 2);
+  }
+  glow(W / 2, H / 2, R, 0.25 * vs);
+}
+
+function titleCard(t) {
+  const a = seg(t, T.title, T.title + 0.6) * (1 - seg(t, T.fadeOut, DUR));
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a; ctx.font = `bold 120px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.shadowColor = BGS; ctx.shadowBlur = 30; ctx.fillStyle = col(CREAM, 1); ctx.fillText('TITLE', W / 2, H / 2 + lerp(20, 0, eOut(seg(t, T.title, T.title + 0.8))));
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------- finishing
+const BW = W / 4, BH = H / 4, bc = document.createElement('canvas'); bc.width = BW; bc.height = BH; const bx = bc.getContext('2d');
+const VIG = (() => { const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  const g = x.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.62); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.55)');
+  x.fillStyle = g; x.fillRect(0, 0, W, H); return c; })();
+const GRAIN = [0, 1, 2].map((k) => { const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'), id = x.createImageData(256, 256), r = rng(SEED * 17 + k);
+  for (let p = 0; p < id.data.length; p += 4) { id.data[p] = id.data[p + 1] = id.data[p + 2] = 128 + (r() - 0.5) * 255; id.data[p + 3] = 255; }
+  x.putImageData(id, 0, 0); return ctx.createPattern(c, 'repeat'); });
+function post(bloom, f) {
+  bx.clearRect(0, 0, BW, BH); bx.filter = 'blur(5px)'; bx.drawImage(cv, 0, 0, BW, BH); bx.filter = 'none';
+  ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = bloom; ctx.drawImage(bc, 0, 0, W, H); ctx.restore();
+  ctx.drawImage(VIG, 0, 0);
+  ctx.save(); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.06; ctx.translate(-Math.floor(hash(f, 1) * 256), -Math.floor(hash(f, 2) * 256));
+  ctx.fillStyle = GRAIN[f % 3]; ctx.fillRect(0, 0, W + 256, H + 256); ctx.restore();
+}
+
+// ---------------------------------------------------------------- one frame
+function draw(f) {
+  const t = f / FPS;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
+  ctx.fillStyle = BGS; ctx.fillRect(0, 0, W, H);
+  gClear();
+  if (t >= T.burst) burst(t);
+  gFlush();
+  typedLine(t);
+  titleCard(t);
+  if (t >= T.burst && t < T.burst + 1) glow(W / 2, H / 2, 1100, 0.42 * Math.exp(-(t - T.burst) * 7), INK.gold);
+  post(t >= T.burst ? 0.8 : 0.42, f);
+}
+
+// ---------------------------------------------------------------- sound, scheduled from the same timeline
+const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+async function renderAudio(SR = 48000) {
+  const ac = new OfflineAudioContext(2, SR * DUR, SR), r = rng(SEED * 101 + 9);
+  const out = ac.createGain(); out.gain.value = 0.9;
+  const comp = ac.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 3; out.connect(comp); comp.connect(ac.destination);
+  const ir = ac.createBuffer(2, SR * 3, SR);
+  for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < d.length; i++) d[i] = (r() * 2 - 1) * Math.pow(1 - i / d.length, 2.6); }
+  const rev = ac.createConvolver(); rev.buffer = ir; const revG = ac.createGain(); revG.gain.value = 0.5; rev.connect(revG); revG.connect(out);
+  const noise = ac.createBuffer(1, SR * 2, SR); { const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = r() * 2 - 1; }
+  const bus = (level, wet) => { const g = ac.createGain(); g.gain.value = level; g.connect(out); const w = ac.createGain(); w.gain.value = wet; g.connect(w); w.connect(rev); return g; };
+  const ad = (p, t, a, peak, d) => { p.setValueAtTime(0.0001, t); p.exponentialRampToValueAtTime(peak, t + a); p.exponentialRampToValueAtTime(0.0001, t + a + d); };
+
+  const keys = bus(1, 0.18);
+  for (let k = 0; k < LINE.length; k++) {
+    if (LINE[k] === ' ') continue;
+    const t = T.typeAt + (k + 1) / T.cps, s = ac.createBufferSource(); s.buffer = noise;
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1800 + r() * 2600;
+    const g = ac.createGain(); s.connect(bp); bp.connect(g); g.connect(keys); ad(g.gain, t, 0.0015, 0.18, 0.035); s.start(t, r(), 0.06);
+  }
+  const hit = bus(1, 0.5);
+  const o = ac.createOscillator(); o.frequency.setValueAtTime(110, T.burst); o.frequency.exponentialRampToValueAtTime(36, T.burst + 0.6);
+  const og = ac.createGain(); o.connect(og); og.connect(hit); ad(og.gain, T.burst, 0.004, 0.85, 2.2); o.start(T.burst); o.stop(T.burst + 2.4);
+  const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(3000, T.burst); f.frequency.linearRampToValueAtTime(700, DUR);
+  const pg = ac.createGain(); pg.gain.setValueAtTime(0, T.burst); pg.gain.linearRampToValueAtTime(0.14, T.burst + 0.05); pg.gain.setValueAtTime(0.14, T.fadeOut); pg.gain.linearRampToValueAtTime(0, DUR);
+  f.connect(pg); pg.connect(bus(1, 0.35));
+  for (const m of [38, 45, 50, 54, 57, 64, 69]) for (const det of [-7, 6]) {
+    const v = ac.createOscillator(); v.type = 'sawtooth'; v.frequency.value = mtof(m); v.detune.value = det;
+    const vg = ac.createGain(); vg.gain.value = 1 / 14; v.connect(vg); vg.connect(f); v.start(T.burst); v.stop(DUR);
+  }
+  return ac.startRendering();
+}
+
+function wavBase64(buf) {
+  const n = buf.length, L = buf.getChannelData(0), Rt = buf.getChannelData(1), ab = new ArrayBuffer(44 + n * 4), v = new DataView(ab);
+  const str = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  str(0, 'RIFF'); v.setUint32(4, 36 + n * 4, true); str(8, 'WAVE'); str(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 2, true);
+  v.setUint32(24, buf.sampleRate, true); v.setUint32(28, buf.sampleRate * 4, true); v.setUint16(32, 4, true); v.setUint16(34, 16, true); str(36, 'data'); v.setUint32(40, n * 4, true);
+  for (let i = 0; i < n; i++) { v.setInt16(44 + i * 4, clamp(L[i], -1, 1) * 32767, true); v.setInt16(46 + i * 4, clamp(Rt[i], -1, 1) * 32767, true); }
+  const bytes = new Uint8Array(ab); let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+
+// ---------------------------------------------------------------- harness
+function sheet(frames, cols = 6, tw = 480) {
+  const th = Math.round((tw * H) / W), s = document.createElement('canvas'); s.width = cols * tw; s.height = Math.ceil(frames.length / cols) * th;
+  const x = s.getContext('2d');
+  frames.forEach((fr, k) => { draw(fr); const ox = (k % cols) * tw, oy = Math.floor(k / cols) * th; x.drawImage(cv, ox, oy, tw, th);
+    x.fillStyle = 'rgba(0,0,0,.65)'; x.fillRect(ox, oy, 118, 20); x.fillStyle = '#fff'; x.font = '12px Menlo'; x.fillText(`f${fr}  ${(fr / FPS).toFixed(2)}s`, ox + 6, oy + 14); });
+  return s.toDataURL('image/png');
+}
+const lines = document.getElementById('film').textContent.trim().split('\n').length;
+window.FILM = { W, H, FPS, N, DUR, SEED, canvas: cv, draw, sheet, renderAudio, wavBase64, lines, ready: true };
+
+if (!Q.has('render')) {
+  const btn = document.getElementById('play');
+  draw(Q.has('f') ? clamp(+Q.get('f') | 0, 0, N - 1) : N - 1 - 2 * FPS);
+  if (!Q.has('f')) {
+    btn.hidden = false;
+    btn.onclick = async () => {
+      btn.hidden = true;
+      const buf = await renderAudio(44100), ac = new AudioContext(), src = ac.createBufferSource();
+      src.buffer = buf; src.connect(ac.destination); const t0 = ac.currentTime + 0.15; src.start(t0);
+      const loop = () => { const f = Math.floor((ac.currentTime - t0) * FPS); if (f >= N) { btn.textContent = '↻ play again'; btn.hidden = false; return; }
+        if (f >= 0) draw(f); requestAnimationFrame(loop); };
+      loop();
+    };
+  }
+}
+</script>
+</body>
+</html>

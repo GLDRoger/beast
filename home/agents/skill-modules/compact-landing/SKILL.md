@@ -8,19 +8,11 @@ description: "Shape narrow, dense, tactile product pages — precise, quiet, pre
 Use this skill to build compact, tactile, premium landing pages with precision UI density.
 It is portable across models and stacks: treat it as a visual-system recipe, not a dependency on one repo.
 
-## Preflight
+## Context
 
-Before implementing, ask the user these questions unless they already answered them or explicitly told you to choose defaults:
+Use this recipe when the user requests this compact aesthetic. Infer the product, primary action, density, theme, corners, motion, and content from the brief and existing interface. Ask only when a missing decision materially changes the result; routine button-size and spacing choices do not need an interview.
 
-1. What product is the page for, and what is the primary CTA?
-2. What button size should set the interface tone: compact, medium, or large?
-3. Based on the CTA and button size, ask one better follow-up about layout density and choose a lead layout: Instrument, Console, Ledger, Workbench, or Manual.
-4. Based on the product category, ask one better follow-up about theme direction: neutral-light, soft-dark, editorial-white, or product-tinted.
-5. Should corners feel sharp, balanced, or softly rounded?
-6. Should the page use load transitions: none, subtle fade-in/out, or staggered fade/slide?
-7. How much content is needed: CTA-only, concise proof, or compact product walkthrough?
-
-If the user wants you to proceed without answering, use these defaults: Instrument layout, neutral-light theme, balanced small radii, subtle staggered fade on load, one clear CTA, one proof row group, one install/action block, and one compact detail/code section.
+Where the request leaves aesthetic details open, choose a coherent compact direction and proceed. The examples below describe a style, not mandatory dimensions or effects. Accessible text, hit areas, focus states, and the actual device/workflow take priority over density. Add entrance motion only when it has a job.
 
 ## Style Model
 
@@ -83,7 +75,7 @@ If the target stack lacks CSS anchor positioning, use a simple active-tab backgr
 
 ## Review Checklist
 
-- Preflight questions were asked or the user explicitly accepted defaults.
+- Product intent and the primary action are grounded in available context; only material missing decisions required questions.
 - Primary CTA is clear in the first viewport and repeated only if useful.
 - Column remains compact at desktop and mobile widths.
 - The first screen clearly uses one chosen variation rather than the default sample structure.

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Master Frontend"
-  short_description: "End-to-end frontend build and QA workflow"
-  default_prompt: "Use $master-frontend to design, build, polish, and verify this frontend task."

@@ -27,7 +27,7 @@
 
 ### Notes
 
-- Design/visual tells remain in `remove-ai-slop` (not this skill).
+- Earlier versions kept design/visual tells in a separate module. The current entrypoint routes visual cleanup to `references/visual.md`.
 - Detection is density + co-occurrence, not single-token bans.
 
 ## 2026-01-13

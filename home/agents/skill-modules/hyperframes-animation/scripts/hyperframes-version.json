@@ -1,4 +1,0 @@
-{
-  "_comment": "beast: the HyperFrames version the vendored skills bootstrap against. Without this, package-loader.mjs falls back to @latest and installs whatever shipped today. Bump deliberately: check the changelog, run npm run test:vendored, and update both copies together.",
-  "hyperframes": "0.7.72"
-}

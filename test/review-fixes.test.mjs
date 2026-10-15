@@ -145,17 +145,15 @@ test('a grok-only install has the prompt the grok entry point reads', () => {
   const home = join(d, 'home')
   assert.equal(beast(['install', '--harness=grok'], home).status, 0)
 
-  const zsh = readFileSync(join(REPO, 'home', 'shell', 'beast.zsh'), 'utf8')
-  const ref = zsh.match(/grok --system-prompt-override "read and follow ~\/([^"]+)"/)
-  assert.ok(ref, 'beast.zsh must name the prompt path it points grok at')
-  assert.equal(existsSync(join(home, ref[1])), true, `grok-only install is missing ~/${ref[1]}`)
+  // Grok appends ~/.grok/AGENT.md to its native prompt on every launch, T3 Code included.
+  const agent = join(home, '.grok', 'AGENT.md')
+  assert.equal(existsSync(agent), true, 'grok-only install is missing ~/.grok/AGENT.md')
+  assert.equal(readFileSync(agent, 'utf8'), readFileSync(join(REPO, 'home', 'shared', 'BEAST.md'), 'utf8'))
 
+  const zsh = readFileSync(join(REPO, 'home', 'shell', 'beast.zsh'), 'utf8')
+  assert.doesNotMatch(zsh, /--system-prompt-override/, 'an override would replace Grok\'s native prompt')
   const cfg = readFileSync(join(REPO, 'home', 'grok', 'config.toml.example'), 'utf8')
-  // Grok 1.0 removed the config-file prompt override, so the example must not
-  // carry a section for it — the prompt reaches grok through the CLI flag the
-  // zsh helper passes, and the broker's grokSystemPromptFile on broker turns.
   assert.doesNotMatch(cfg, /\[system-prompt-overrides\]\n/)
-  assert.match(cfg, /grokSystemPromptFile/)
   rmSync(d, { recursive: true, force: true })
 })
 
@@ -218,7 +216,7 @@ test('the scanner does not fire on ordinary payload prose', () => {
     'mongodb://user:password@localhost/db',           // placeholder password
     'see https://example.com/AIza-not-a-key',
     'the.dotted.words.in.a.sentence',
-    'run `npm install --save-dev @hyperframes/producer`',
+    'run `npm install --save-dev @example/package`',
   ]
   for (const line of benign) assert.deepEqual(scanText(line), [], `false positive on: ${line}`)
 })
@@ -263,25 +261,9 @@ test('every payload file listed in the manifest maps to a shipped file', () => {
 
 // --- vendored supply chain --------------------------------------------------
 
-test('the two vendored package loaders are byte-identical and pin a version', () => {
-  const read = (skill, f) =>
-    readFileSync(join(REPO, 'home/agents/skill-modules', skill, 'scripts', f), 'utf8')
-
-  assert.equal(
-    read('hyperframes-animation', 'package-loader.mjs'),
-    read('hyperframes-creative', 'package-loader.mjs'),
-    'the loaders state a byte-identical contract; one carried the security patch and the other did not',
-  )
-
-  const pins = ['hyperframes-animation', 'hyperframes-creative']
-    .map((s) => JSON.parse(read(s, 'hyperframes-version.json')).hyperframes)
-  assert.match(pins[0], /^\d+\.\d+\.\d+$/, 'the pin must be an exact version, never a dist-tag')
-  assert.equal(pins[0], pins[1], 'both copies must pin the same version')
-})
-
 test('no skill still carries a standing order to update itself unattended', () => {
   // These directories are symlinks into a git checkout here, so an unattended
-  // `hyperframes skills update` rewrites tracked files and drops the loader patch.
+  // an unattended upstream updater can rewrite tracked files and discard local fixes.
   const offenders = []
   for (const [abs, rel] of walk(join(REPO, 'home/agents/skill-modules'))) {
     if (!rel.endsWith('.md')) continue
@@ -292,32 +274,60 @@ test('no skill still carries a standing order to update itself unattended', () =
   assert.deepEqual(offenders, [])
 })
 
-test('delegation.md names the broker when it is on PATH and plain CLIs when it is not', () => {
-  // The policy files route all delegation through agent-broker, so the generated file
-  // must switch forms on the binary's presence: broker-first providers when it exists,
-  // direct CLI invocations when it does not — without ever mentioning the absent one.
+test('delegation distinguishes runtime tools, detected CLIs, unverified broker access, and cross-harness calls', () => {
   const d = tmp()
-  const bindir = join(d, 'bin')
-  mkdirSync(bindir, { recursive: true })
-  writeFileSync(join(bindir, IS_WINDOWS ? 'broker.exe' : 'broker'), '#!/bin/sh\n', { mode: 0o755 })
-  const install = (home, path) =>
-    spawnSync(process.execPath, [CLI, 'install', '--all'], {
+  const brokerBin = join(d, 'broker-bin')
+  const bothBin = join(d, 'both-bin')
+  const codexBin = join(d, 'codex-bin')
+  const empty = join(d, 'empty')
+  for (const p of [brokerBin, bothBin, codexBin, empty]) mkdirSync(p, { recursive: true })
+  writeFileSync(join(brokerBin, IS_WINDOWS ? 'broker.exe' : 'broker'), '#!/bin/sh\n', { mode: 0o755 })
+  for (const name of ['claude', 'codex']) writeFileSync(join(bothBin, IS_WINDOWS ? `${name}.exe` : name), '#!/bin/sh\n', { mode: 0o755 })
+  writeFileSync(join(codexBin, IS_WINDOWS ? 'codex.exe' : 'codex'), '#!/bin/sh\n', { mode: 0o755 })
+  const install = (home, path, selection = '--all') =>
+    spawnSync(process.execPath, [CLI, 'install', selection], {
       encoding: 'utf8',
       env: { ...process.env, HOME: home, USERPROFILE: home, PATH: path, Path: path },
     })
 
-  const withBroker = join(d, 'with')
-  assert.equal(install(withBroker, bindir).status, 0)
-  const brokered = readFileSync(join(withBroker, '.beast', 'delegation.md'), 'utf8')
-  assert.match(brokered, /agent-broker/)
-  assert.match(brokered, /broker send <chat> --to codex/)
+  for (const selection of ['--all', '--harness=hermes']) {
+    const home = join(d, selection === '--all' ? 'all' : 'hermes')
+    assert.equal(install(home, brokerBin, selection).status, 0)
+    const text = readFileSync(join(home, '.beast', 'delegation.md'), 'utf8')
+    assert.match(text, /agent-broker executable is present/)
+    assert.match(text, /discover its current providers, authentication, models/)
+    assert.match(text, /native subagents/)
+    assert.doesNotMatch(text, /Fable|Opus|grok-4\.|gpt-5\.|Providers reachable/)
+    assert.doesNotMatch(text, /## Direct CLIs detected|## Calling the other harness/)
+  }
 
-  const empty = join(d, 'empty')
-  mkdirSync(empty, { recursive: true })
-  const withoutBroker = join(d, 'without')
-  assert.equal(install(withoutBroker, empty).status, 0)
-  const direct = readFileSync(join(withoutBroker, '.beast', 'delegation.md'), 'utf8')
-  assert.doesNotMatch(direct, /agent-broker/)
+  // Codex and Claude Code both present: each gets the headless fallback for calling the other.
+  for (const selection of ['--all', '--harness=hermes']) {
+    const home = join(d, selection === '--all' ? 'both-all' : 'both-hermes')
+    assert.equal(install(home, bothBin, selection).status, 0)
+    const text = readFileSync(join(home, '.beast', 'delegation.md'), 'utf8')
+    assert.match(text, /## Calling the other harness/)
+    assert.match(text, /AGENT_CALL_DEPTH=1 claude -p .*--output-format json < brief\.md/)
+    assert.match(text, /AGENT_CALL_DEPTH=1 codex exec .*--json -o result\.md - < brief\.md/)
+    assert.match(text, /codex exec resume --skip-git-repo-check <thread_id>/)
+    assert.match(text, /native subagents/)
+    assert.match(text, /when agent-broker is unavailable/)
+    assert.doesNotMatch(text, /agent-broker executable is present|Fable|Opus|grok-4\.|gpt-5\.|Providers reachable/)
+  }
+
+  const directHome = join(d, 'direct')
+  assert.equal(install(directHome, codexBin, '--harness=hermes').status, 0)
+  const direct = readFileSync(join(directHome, '.beast', 'delegation.md'), 'utf8')
+  assert.match(direct, /Configured Beast harnesses: Hermes/)
+  assert.match(direct, /## Direct CLIs detected on PATH/)
   assert.match(direct, /codex exec/)
+  assert.doesNotMatch(direct, /claude -p|grok -p|agent-broker executable|## Calling the other harness/)
+  assert.match(direct, /executable-presence checks only/)
+
+  const emptyHome = join(d, 'no-clis')
+  assert.equal(install(emptyHome, empty).status, 0)
+  const none = readFileSync(join(emptyHome, '.beast', 'delegation.md'), 'utf8')
+  assert.match(none, /No external harness CLI was detected/)
+  assert.doesNotMatch(none, /codex exec|claude -p|grok -p/)
   rmSync(d, { recursive: true, force: true })
 })

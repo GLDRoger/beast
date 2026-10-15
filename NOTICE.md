@@ -7,7 +7,7 @@ beast's own code (`bin/`, `lib/`, `scripts/`) is MIT — see LICENSE.
 The skills below are **other people's work, vendored into this repository**, and
 each retains its own upstream license.
 
-Original to this project: `route`, `frontend`, `code`, `writing`, `motion`, `performance`, `security`, `growth`, `media`, `codex-session-miner`, `honest-prose`, `mac-codex-tooling-repair`, `next-runtime-triage`, `review-swarm`, `ruthless-release-qa`, `scroll-scenes`, `master-content-media`, `master-engineering`, `master-frontend`, `master-product-growth`, `master-skill-router`, `remotion`, `remotion-core`, `remotion-animation`, `remotion-cli`.
+Original to this project: `route`, `frontend`, `code`, `writing`, `motion`, `performance`, `security`, `growth`, `media`, `codex-session-miner`, `honest-prose`, `mac-codex-tooling-repair`, `next-runtime-triage`, `review-swarm`, `ruthless-release-qa`, `scroll-scenes`, `remotion`, `remotion-core`, `remotion-animation`, `remotion-cli`.
 
 **Attribution is recorded here, not inside the skill files.** These skills are being
 rewritten and will diverge from what their original authors published, so stamping a
@@ -79,33 +79,6 @@ License: MIT — © Hardik Pandya
 
 - unslop (substantially rewritten)
 
-### heygen-com/hyperframes
-
-<https://github.com/heygen-com/hyperframes.git>
-
-License: Apache-2.0
-
-- embedded-captions
-- faceless-explainer
-- figma
-- general-video
-- hyperframes
-- hyperframes-animation
-- hyperframes-cli
-- hyperframes-core
-- hyperframes-creative
-- hyperframes-keyframes
-- hyperframes-registry
-- media-use
-- motion-graphics
-- music-to-video
-- pr-to-video
-- product-launch-video
-- remotion-to-hyperframes
-- slideshow
-- talking-head-recut
-- website-to-hyperframes (substantially rewritten)
-
 ### jakubantalik/transitions.dev
 
 <https://github.com/jakubantalik/transitions.dev.git>
@@ -131,34 +104,6 @@ License: MIT — © Matt Pocock
 - handoff
 - improve-codebase-architecture
 - wayfinder (substantially rewritten)
-
-### pbakaus/impeccable
-
-<https://github.com/pbakaus/impeccable.git>
-
-License: Apache-2.0
-
-- adapt
-- animate
-- arrange
-- audit
-- bolder
-- clarify
-- colorize
-- critique
-- delight
-- distill
-- extract
-- harden
-- impeccable
-- normalize
-- onboard
-- optimize
-- overdrive
-- polish
-- quieter
-- shape (substantially rewritten)
-- typeset
 
 ### shadcn/improve
 
@@ -187,12 +132,9 @@ License: MIT — © Tushar Mehta
 - cold-email
 - cold-outreach-sequence
 - debug-perf
-- decision-doc
 - pricing-page
-- product-brief
 - rate-limit
 - readme
-- remove-ai-slop
 - segment-users
 - seo-ready
 - ship-credits
@@ -207,7 +149,6 @@ of the license to travel with any redistribution, so the texts live in the repos
 
 - [`home/agents/skill-modules/tushar-design/LICENSE.txt`](home/agents/skill-modules/tushar-design/LICENSE.txt)
 - [`home/agents/skill-modules/unslop/LICENSE`](home/agents/skill-modules/unslop/LICENSE)
-- [`licenses/Apache-2.0.txt`](licenses/Apache-2.0.txt)
 - [`licenses/lixiaolin94-skills-grant.md`](licenses/lixiaolin94-skills-grant.md)
 
 See [`licenses/README.md`](licenses/README.md) for which upstream each one covers.

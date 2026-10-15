@@ -1,97 +1,21 @@
 ---
 name: writing
-description: >
-  Writing and copy: UI microcopy, docs, essays, marketing, outreach. Use when words are the product.
+description: Draft and edit UI copy, documentation, essays, marketing, and outreach. Use when words are the requested deliverable.
 ---
 
 # Writing
 
-Own language from draft to verified clarity. Orchestration loop: follow `$route` → `references/orchestration.md`.
+Infer the reader, channel, purpose, and voice from supplied material and product context. Ask a focused question only when a missing fact changes the words materially.
 
+Draft the requested piece, not an explanation of how it could be written. Preserve the user's voice and established terminology. Make corrections change the next draft; do not merely acknowledge them. Keep factual corrections distinct from stylistic preferences.
 
-## Module convention
+Choose specific, honest language. Errors should explain what happened and what the user can do without blame or leaking sensitive details. Avoid unsupported personalization, claims, and invented evidence.
 
-Top-level skills are only: `$route` `$frontend` `$code` `$writing` `$motion` `$performance` `$security` `$growth` `$media`.
+Optional specialists:
 
-Any other `$name` (e.g. `$impeccable`, `$unslop`) is a **module**. Load it by reading:
+- Synthetic prose or design/copy tells: `~/.agents/skill-modules/unslop/SKILL.md`; use only the relevant mode.
+- UI labels and states: `~/.agents/skill-modules/app-copy/SKILL.md`
+- Documentation forms: `~/.agents/skill-modules/readme/SKILL.md`, `~/.agents/skill-modules/changelog/SKILL.md`
+- Outreach: `~/.agents/skill-modules/cold-email/SKILL.md`, `~/.agents/skill-modules/cold-outreach-sequence/SKILL.md`
 
-`~/.agents/skill-modules/<name>/SKILL.md`
-
-The skills menu lists only the nine top-level skills; every module loads by that path. If the file is missing, search `~/.agents/skill-modules/` and pick the closest match.
-
-## Phase 0 — Brief
-
-**Goal:** Audience, channel, job-to-be-done, tone constraints.
-
-- Infer from product context; ask one question only if a missing fact changes the words
-- UI work: know the screen state (empty/error/success/loading)
-- Long-form: know thesis and reader
-
-**Green:** You can name who reads this and what they must do or believe next.
-
-## Phase 1 — Draft / rewrite
-
-| Job | Skill |
-|-----|--------|
-| Kill AI prose habits (essays, docs, chat, marketing) | `$unslop` (`$honest-prose` aliases here) |
-| UI labels, empty/error/success, tooltips | `$app-copy`, `$clarify` |
-| Design-system / visual AI-slop audit of copy+UI tells | `$remove-ai-slop` |
-| README | `$readme` |
-| Changelog card | `$changelog` |
-| Cold email / sequence | `$cold-email`, `$cold-outreach-sequence` |
-| Product onboarding copy | `$onboard` (with `$frontend` if UI structure changes) |
-
-**Green:** Specific, audience-aware, no placeholder voice.
-
-## Phase 2 — Consistency pass
-
-**Goal:** One term per concept; voice matches product.
-
-- Align with existing in-app strings before inventing new vocabulary
-- Cut redundant headers that restate body copy
-- Errors: what happened + how to fix + no blame
-
-**Green:** Glossary holds; no competing names for the same thing.
-
-## Phase 3 — Verify
-
-**Goal:** Words work in context.
-
-- UI: read strings on the real screen/state if available
-- Docs: open the rendered page; links resolve
-- Outbound: length, CTA, personalization claims are honest
-
-**Green:** Next action is obvious to a cold reader.
-
-## Hand off when
-
-| Signal | Switch to |
-|--------|-----------|
-| Layout/hierarchy is the real problem | `$frontend` |
-| Full product/launch strategy | `$growth` |
-| Video/script for HyperFrames | `$media` |
----
-
-## Modules (load by path)
-
-Base: `~/.agents/skill-modules/`
-
-When a phase names a former skill like impeccable or unslop, **read**:
-
-`~/.agents/skill-modules/<module-name>/SKILL.md`
-
-| Module | Path |
-|--------|------|
-| `unslop` | `~/.agents/skill-modules/unslop/SKILL.md` |
-| `honest-prose` | `~/.agents/skill-modules/honest-prose/SKILL.md` |
-| `app-copy` | `~/.agents/skill-modules/app-copy/SKILL.md` |
-| `clarify` | `~/.agents/skill-modules/clarify/SKILL.md` |
-| `remove-ai-slop` | `~/.agents/skill-modules/remove-ai-slop/SKILL.md` |
-| `readme` | `~/.agents/skill-modules/readme/SKILL.md` |
-| `changelog` | `~/.agents/skill-modules/changelog/SKILL.md` |
-| `cold-email` | `~/.agents/skill-modules/cold-email/SKILL.md` |
-| `cold-outreach-sequence` | `~/.agents/skill-modules/cold-outreach-sequence/SKILL.md` |
-| `onboard` | `~/.agents/skill-modules/onboard/SKILL.md` |
-
-If a needed module is missing from the table, list `~/.agents/skill-modules/` and open the closest match.
-
+Read the final text in context. Verify consequential facts and working links. Inspect UI strings in the rendered state when the task changes the interface. Keep sending, publishing, and other external actions separate from drafting unless already authorized.

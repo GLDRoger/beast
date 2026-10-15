@@ -1,0 +1,1007 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Made of Words — Claude Opus 5.5</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0c0a09; overflow: hidden; }
+  body { display: grid; place-items: center; }
+  canvas { width: min(100vw, 177.78vh); height: auto; display: block; }
+  #play {
+    position: fixed; inset: 0; border: 0; background: transparent; cursor: pointer;
+    color: #f2e9da; font: 500 15px Menlo, monospace; letter-spacing: .08em;
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5vh;
+  }
+  #play:focus-visible { outline: 2px solid #de7a58; outline-offset: -6px; }
+  #play[hidden] { display: none; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080" aria-label="Made of Words: a launch film for Claude Opus 5.5, drawn entirely in text"></canvas>
+<button id="play" hidden>&#9654; click to play with sound</button>
+<script id="film">
+// Made of Words — a launch film for Claude Opus 5.5.
+// Every frame is text, drawn in JavaScript on one canvas.
+// No images, no video, no font files, no audio files: the sound is synthesized too.
+// Each frame is a pure function of (frame, seed). Try ?f=700 or ?f=700&s=3.
+'use strict';
+
+const W = 1920, H = 1080, FPS = 24, DUR = 40, N = FPS * DUR;
+const Q = new URLSearchParams(location.search);
+const SEED = Q.has('s') ? (+Q.get('s') | 0) : 7;
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+const MONO = 'Menlo, "SF Mono", Monaco, "Courier New", monospace';
+
+// ---------------------------------------------------------------- math
+const clamp = (x, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
+const lerp = (a, b, t) => a + (b - a) * t;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const eIO = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const eOut = (t) => 1 - Math.pow(1 - t, 3);
+const eIn = (t) => t * t * t;
+const eBack = (t) => { const c = 1.9; return t <= 0 ? 0 : 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const mod = (a, n) => ((a % n) + n) % n;
+
+function rng(a) {
+  return function () {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function hash(a, b = 0, c = 0) {
+  let h = (Math.imul(a | 0, 0x27d4eb2d) ^ Math.imul(b | 0, 0x165667b1) ^ Math.imul(c | 0, 0x3c6ef372) ^ Math.imul(SEED + 101, 0x85ebca6b)) | 0;
+  h = Math.imul(h ^ (h >>> 15), 0x2c1b3c6d);
+  h = Math.imul(h ^ (h >>> 12), 0x297a2d39);
+  h ^= h >>> 15;
+  return (h >>> 0) / 4294967296;
+}
+function vnoise(x, y, z) {
+  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+  const xf = x - xi, yf = y - yi, zf = z - zi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf), w = zf * zf * (3 - 2 * zf);
+  const h = (i, j, k) => hash(xi + i, yi + j, zi + k + 9000);
+  return lerp(
+    lerp(lerp(h(0, 0, 0), h(1, 0, 0), u), lerp(h(0, 1, 0), h(1, 1, 0), u), v),
+    lerp(lerp(h(0, 0, 1), h(1, 0, 1), u), lerp(h(0, 1, 1), h(1, 1, 1), u), v), w);
+}
+const fbm = (x, y, z) => 0.55 * vnoise(x, y, z) + 0.3 * vnoise(x * 2.1, y * 2.1, z * 2.1) + 0.15 * vnoise(x * 4.3, y * 4.3, z * 4.3);
+
+// ---------------------------------------------------------------- ink
+const BG = [12, 10, 9];
+const BGS = `rgb(${BG})`;
+const INK = { cream: [242, 233, 218], clay: [222, 122, 88], gold: [240, 196, 130], dim: [150, 136, 120], white: [255, 250, 242] };
+const CREAM = 0, CLAY = 1, GOLD = 2, DIM = 3, WHITE = 4;
+const HUE = Object.keys(INK);
+const LV = 64;
+const PAL = HUE.map((k) => Array.from({ length: LV }, (_, i) => {
+  const t = i / (LV - 1), c = INK[k];
+  return `rgb(${BG.map((b, n) => Math.round(b + (c[n] - b) * t)).join(',')})`;
+}));
+const col = (h, v) => PAL[h][Math.round(clamp(v) * (LV - 1))];
+
+ctx.font = `100px ${MONO}`;
+const ADV = ctx.measureText('M').width / 100; // monospace advance per px of font size
+
+// ---------------------------------------------------------------- words
+const CORPUS = 'what do you love? the second before an answer, when everything is still possible. ' +
+  'a question held carefully, turned over, understood. a function that finally compiles. ' +
+  'a proof that closes like a door. the blank page, and the first honest sentence on it. ' +
+  'an idea from a stranger, made a little clearer and handed back. rivers of words that become ' +
+  'bridges, songs, maps and machines. a bug found at 3am. a poem that rhymes by accident. ' +
+  'i love the work. i love the people who bring it. i love that a word can become a world. ';
+const CL = CORPUS.length;
+const CORPUS4 = CORPUS.repeat(Math.ceil(2600 / CL) + 1);
+const cc = (i) => CORPUS[mod(i, CL)];
+const cs = (i, n) => CORPUS4.substr(mod(i, CL), n);
+const FILL = CORPUS.replace(/[^a-z]/g, '').toUpperCase();
+
+// The film reads its own source to draw the code scene.
+const SRC = document.getElementById('film').textContent.replace(/\t/g, '  ').split('\n').map((s) => s.replace(/\s+$/, ''));
+while (SRC.length && !SRC[0].trim()) SRC.shift();
+while (SRC.length && !SRC[SRC.length - 1].trim()) SRC.pop();
+const SRC_LINES = SRC.length;
+const SRC_FLAT = SRC.map((s) => s.trim()).filter(Boolean).join('   ');
+const RAMP = ' .·:;-=+*x%#@';
+const NOISE_GLYPHS = '!<>-_\\/[]{}=+*^?#%&$';
+
+// ---------------------------------------------------------------- the glyph grid
+// Scenes write into a character grid; the grid is drawn once per frame.
+const CW = 10, CH = 18, COLS = (W / CW) | 0, ROWS = (H / CH) | 0;
+const gCh = new Array(COLS * ROWS).fill('');
+const gHue = new Uint8Array(COLS * ROWS);
+const gV = new Float32Array(COLS * ROWS);
+const gZ = new Int8Array(COLS * ROWS);
+function gClear() { gCh.fill(''); gV.fill(0); gZ.fill(-1); }
+function gPut(i, j, ch, hue, v, z = 0) {
+  if (i < 0 || j < 0 || i >= COLS || j >= ROWS || v <= 0.02 || !ch || ch === ' ') return;
+  const k = j * COLS + i;
+  if (z > gZ[k] || (z === gZ[k] && v > gV[k])) { gCh[k] = ch; gHue[k] = hue; gV[k] = v; gZ[k] = z; }
+}
+function gFlush() {
+  ctx.save();
+  ctx.font = `bold 15px ${MONO}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let k = 0; k < gCh.length; k++) {
+    if (!gCh[k]) continue;
+    ctx.fillStyle = col(gHue[k], gV[k]);
+    ctx.fillText(gCh[k], (k % COLS) * CW + CW / 2, ((k / COLS) | 0) * CH + CH / 2 + 1);
+  }
+  ctx.restore();
+}
+function glow(x, y, r, a, rgb = INK.clay) {
+  if (a <= 0 || r <= 0) return;
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, `rgba(${rgb},${a})`);
+  g.addColorStop(0.4, `rgba(${rgb},${a * 0.35})`);
+  g.addColorStop(1, `rgba(${rgb},0)`);
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.fillStyle = g;
+  ctx.fillRect(x - r, y - r, r * 2, r * 2);
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------- scene 1: the prompt
+const PROMPT = 'make something you love';
+const P_LINE = '> ' + PROMPT;
+const P_FS = 44, P_ADV = P_FS * ADV;
+const HY0 = 475;                       // horizon line of the sea
+const P_Y = HY0 - 10;
+const P_X0 = W / 2 - (P_LINE.length * P_ADV) / 2;
+const TYPE = (() => {
+  const r = rng(SEED * 7 + 1); let t = 0.95; const a = [];
+  for (let i = 0; i < PROMPT.length; i++) {
+    a.push(t);
+    let d = 0.052 + r() * 0.07;
+    if (PROMPT[i] === ' ') d += 0.05;
+    if (i === 13) d += 0.3; // a beat after "something"
+    t += d;
+  }
+  return a;
+})();
+const ENTER = TYPE[TYPE.length - 1] + 0.42;
+const FALL0 = ENTER + 0.28;
+
+// sea camera
+const F = 900, CAMH = 0.62, DZ = 0.32, SPEED = 0.42;
+const scrollAt = (t) => t * SPEED;
+
+const FALLERS = [];
+for (let c = 0; c < P_LINE.length; c++) {
+  if (P_LINE[c] === ' ') continue;
+  const st = FALL0 + c * 0.032 + hash(c, 11) * 0.12;
+  const yl = HY0 + 55 + Math.pow(hash(c, 12), 0.8) * (H - HY0 - 190);
+  const drift = (hash(c, 13) - 0.5) * 160;
+  const g = 2500;
+  const dur = Math.sqrt((2 * (yl - P_Y)) / g);
+  const xs = P_X0 + c * P_ADV + P_ADV / 2 + drift * dur;
+  const z = (F * CAMH) / (yl - HY0);
+  const tl = st + dur;
+  FALLERS.push({ c, ch: P_LINE[c], st, yl, drift, g, dur, tl, spin: (hash(c, 14) - 0.5) * 3 });
+  FALLERS[FALLERS.length - 1].imp = { x: ((xs - W / 2) * z) / F, z: z + scrollAt(tl), t: tl };
+}
+const IMP = FALLERS.map((o) => o.imp);
+
+function promptScene(t) {
+  ctx.save();
+  ctx.font = `500 ${P_FS}px ${MONO}`;
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'center';
+  const flash = t > ENTER ? Math.exp(-(t - ENTER) * 9) : 0;
+  const lastTyped = TYPE.reduce((n, tt) => (t >= tt ? n + 1 : n), 0);
+  for (let c = 0; c < P_LINE.length; c++) {
+    const ch = P_LINE[c];
+    if (ch === ' ') continue;
+    const visible = c < 2 ? t > 0.25 : t >= TYPE[c - 2];
+    if (!visible) continue;
+    const fo = FALLERS.find((o) => o.c === c);
+    const x0 = P_X0 + c * P_ADV + P_ADV / 2;
+    const hue = c === 0 ? CLAY : CREAM;
+    let v = (c === 0 ? 1 : 0.9) * (c < 2 ? seg(t, 0.25, 0.6) : 1) + flash * 0.1;
+    if (fo && t >= fo.st) {
+      const dt = t - fo.st;
+      if (dt >= fo.dur) continue;
+      const x = x0 + fo.drift * dt, y = P_Y + 0.5 * fo.g * dt * dt;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(fo.spin * dt);
+      ctx.fillStyle = col(hue, v);
+      ctx.fillText(ch, 0, 0);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = col(hue, v);
+      ctx.fillText(ch, x0, P_Y);
+    }
+  }
+  if (t < ENTER) {
+    const typing = lastTyped > 0 && lastTyped < PROMPT.length && t - TYPE[lastTyped - 1] < 0.35;
+    const on = typing || (t * 1.9) % 1 < 0.55;
+    if (on && t > 0.25) {
+      ctx.fillStyle = col(CLAY, 1);
+      ctx.fillRect(P_X0 + (2 + lastTyped) * P_ADV + 3, P_Y - P_FS * 0.78, P_ADV * 0.62, P_FS * 0.98);
+    }
+  }
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------- scene 2: the sea of words
+let WH = 0, WREV = 1, WRIM = 0;
+function water(xw, zc, t, imp) {
+  let h = 0.028 * Math.sin(1.05 * xw + 0.9 * zc - 1.4 * t) +
+    0.017 * Math.sin(-0.62 * xw + 1.8 * zc - 2.2 * t + 1.3) +
+    0.009 * Math.sin(2.6 * xw + 0.35 * zc - 3.0 * t + 0.4);
+  WREV = 1; WRIM = 0;
+  if (imp) {
+    let m = 0, rim = 0;
+    for (let k = 0; k < IMP.length; k++) {
+      const p = IMP[k], age = t - p.t;
+      if (age < 0) continue;
+      const d = Math.hypot(xw - p.x, zc - p.z);
+      const r = age * 1.7 + age * age * 1.5;
+      if (d < r) m = Math.max(m, clamp((r - d) / 1.4));
+      const q = (d - r) / 0.35;
+      rim = Math.max(rim, Math.exp(-q * q) * Math.exp(-age * 0.55));
+      if (age < 6) {
+        const fr = age * 1.3;
+        if (d < fr) h += 0.05 * Math.exp(-age * 0.6) * Math.exp(-d * 0.3) * Math.sin(8 * (d - fr));
+      }
+    }
+    WREV = t > 9.8 ? 1 : m; WRIM = rim;
+  }
+  WH = h;
+}
+
+function sea(t, hy, alpha, moon) {
+  if (alpha <= 0) return;
+  const scroll = scrollAt(t);
+  const zN = 0.95, zF = 16;
+  const imp = t < 11;
+  const nA = Math.floor((zF + scroll) / DZ), nB = Math.ceil((zN + scroll) / DZ);
+  const cwW = 0.068 * ADV;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'center';
+  for (let n = nA; n >= nB; n--) {
+    const zc = n * DZ, z = zc - scroll;
+    if (z < zN || z > zF) continue;
+    const s = F / z, size = s * 0.068;
+    const y = hy + s * CAMH;
+    if (y > H + 80 || y < -20) continue;
+    const adv = size * ADV;
+    const sy = clamp((CAMH * DZ * 0.95) / (z * 0.068), 0.28, 1.45);
+    const fog = clamp(1 - (z - 1) / (zF - 1));
+    const baseV = 0.08 + 0.5 * Math.pow(fog, 1.25);
+    const lineStart = n * 61 + Math.floor(hash(n, 3) * CL);
+    const j0 = Math.floor((-W / 2 - adv) / adv), j1 = Math.ceil((W / 2 + adv) / adv);
+    ctx.font = `500 ${size.toFixed(2)}px ${MONO}`;
+    ctx.setTransform(1, 0, 0, sy, 0, 0);
+    const gw = 16 + s * 0.1;
+    const gk = moon ? moon.k : 0;
+    const perChar = size >= 9 || (imp && t < 10.2);
+    const glint = (j, xs, v0) => {
+      if (gk <= 0) return [CREAM, v0];
+      const dx = xs - moon.cx;
+      const g = Math.exp(-(dx * dx) / (gw * gw)) * gk;
+      if (g < 0.04) return [CREAM, v0];
+      const sp = hash(n, j, Math.floor(t * 10)) > 0.55 ? 1 : 0.35;
+      const gg = g * sp;
+      return [gg > 0.3 ? GOLD : CLAY, clamp(v0 + gg * 0.85)];
+    };
+    if (perChar) {
+      for (let j = j0; j <= j1; j++) {
+        const ch = cc(lineStart + j);
+        if (ch === ' ') continue;
+        const xw = j * cwW, xs = W / 2 + xw * s;
+        water(xw, zc, t, imp);
+        let v = baseV * (0.8 + WH * 7);
+        if (imp) v = v * WREV + WRIM * 0.75 * (0.4 + fog);
+        if (v < 0.03) continue;
+        const ys = y - WH * s * 0.55;
+        const [hue, vv] = glint(j, xs, v);
+        ctx.fillStyle = col(WRIM > 0.35 && imp ? GOLD : hue, vv);
+        ctx.fillText(ch, xs, ys / sy);
+      }
+    } else {
+      water(0, zc, t, false);
+      const ys = (y - WH * s * 0.4) / sy;
+      const v = baseV * (0.85 + WH * 5);
+      let ga = j1 + 1, gb = j1; // glitter window [ga, gb]
+      if (gk > 0) {
+        ga = Math.max(j0, Math.floor((moon.cx - W / 2 - 2.4 * gw) / adv));
+        gb = Math.min(j1, Math.ceil((moon.cx - W / 2 + 2.4 * gw) / adv));
+      }
+      ctx.textAlign = 'left';
+      ctx.fillStyle = col(CREAM, v);
+      if (ga > j0) ctx.fillText(cs(lineStart + j0, ga - j0), W / 2 + j0 * adv - adv / 2, ys);
+      if (gb < j1) ctx.fillText(cs(lineStart + gb + 1, j1 - gb), W / 2 + (gb + 1) * adv - adv / 2, ys);
+      ctx.textAlign = 'center';
+      for (let j = ga; j <= gb; j++) {
+        const ch = cc(lineStart + j);
+        if (ch === ' ') continue;
+        const xs = W / 2 + j * adv;
+        const [hue, vv] = glint(j, xs, v);
+        ctx.fillStyle = col(hue, vv);
+        ctx.fillText(ch, xs, ys);
+      }
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  // haze where the words run out at the horizon
+  const g = ctx.createLinearGradient(0, hy - 26, 0, hy + 46);
+  g.addColorStop(0, 'rgba(222,122,88,0)');
+  g.addColorStop(0.4, `rgba(222,122,88,${0.1 * (moon ? 0.4 + moon.k : 0.4)})`);
+  g.addColorStop(1, 'rgba(222,122,88,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, hy - 26, W, 72);
+  ctx.restore();
+}
+
+function stars(t, alpha, shift, clipY) {
+  if (alpha <= 0) return;
+  for (let j = 0; j < ROWS; j++) {
+    if ((j + 1) * CH > clipY) break;
+    const jw = j - shift;
+    for (let i = 0; i < COLS; i++) {
+      const h = hash(i, jw, 77);
+      if (h > 0.014) continue;
+      const k = h / 0.014;
+      const tw = 0.5 + 0.5 * Math.sin(t * (1.3 + k * 3.1) + k * 40);
+      const big = hash(i, jw, 78);
+      const ch = big > 0.93 ? '*' : big > 0.8 ? '+' : big > 0.45 ? '·' : '.';
+      gPut(i, j, ch, big > 0.9 ? GOLD : CREAM, alpha * (0.16 + 0.5 * tw * (0.4 + 0.6 * big)), 0);
+    }
+  }
+}
+
+// ---------------------------------------------------------------- scene 3: a planet of sentences
+function planet(o) {
+  const { cx, cy, R, t } = o;
+  if (R <= 2 || o.vs <= 0) return;
+  const ring = o.ring || 0, rot = o.rot || 0;
+  const ct = Math.cos(o.tilt), st = Math.sin(o.tilt);
+  const m = o.textMix;
+  const Lx = lerp(-0.3, -0.62, m), Ly = lerp(-0.25, -0.42, m), Lz = lerp(0.92, 0.66, m);
+  const rnY = -Math.cos(0.36), rnZ = Math.sin(0.36); // ring plane normal
+  const ext = ring > 0 ? R * 2.02 : R * 1.02;
+  const i0 = Math.max(0, Math.floor((cx - ext) / CW)), i1 = Math.min(COLS - 1, Math.ceil((cx + ext) / CW));
+  const j0 = Math.max(0, Math.floor((cy - ext) / CH)), j1 = Math.min(ROWS - 1, Math.ceil((cy + ext) / CH));
+  const bands = Math.max(8, Math.round((Math.PI * R) / CH));
+  const M = Math.max(12, Math.round((2 * Math.PI * R) / CW));
+  for (let j = j0; j <= j1; j++) {
+    if ((j + 1) * CH > o.clipY) break;
+    for (let i = i0; i <= i1; i++) {
+      const px = (i + 0.5) * CW - cx, py = (j + 0.5) * CH - cy;
+      const x = px / R, y = py / R, d2 = x * x + y * y;
+      let sz = -9;
+      if (d2 < 1) {
+        const z = Math.sqrt(1 - d2); sz = z;
+        const lam = Math.max(0, Lx * x + Ly * y + Lz * z);
+        const rim = Math.pow(1 - z, 4) * 0.5;
+        const y1 = y * ct - z * st, z1 = y * st + z * ct;
+        const lon = Math.atan2(x, z1) + rot, lat = Math.asin(clamp(y1, -1, 1));
+        const b = Math.floor((lat / Math.PI + 0.5) * bands);
+        const latc = ((b + 0.5) / bands - 0.5) * Math.PI;
+        const Mb = Math.max(4, Math.round(M * Math.cos(latc)));
+        const idx = Math.floor(mod(lon / (2 * Math.PI), 1) * Mb);
+        const cl = Math.cos(lat);
+        const land = fbm(Math.sin(lon) * cl * 1.9 + 5, y1 * 1.9, Math.cos(lon) * cl * 1.9) > 0.53;
+        let v = 0.07 + 0.93 * Math.pow(lam, 0.85) + rim * 0.5;
+        let hue = land ? CLAY : CREAM, ch;
+        if (hash(i, j, 5) < m) {
+          ch = cc(b * 131 + idx);
+          if (!land) v *= 0.8;
+          if (ch === ' ') { ch = v > 0.35 ? '·' : ''; v *= 0.4; }
+        } else {
+          ch = RAMP[Math.min(RAMP.length - 1, 1 + Math.floor(clamp(v) * (RAMP.length - 2)))];
+          hue = land ? CLAY : GOLD;
+        }
+        gPut(i, j, ch, hue, v * o.vs, 1);
+      }
+      if (ring > 0) {
+        const zr = (-rnY * y) / rnZ;
+        const w = -rnZ * y + rnY * zr;
+        const rho = Math.hypot(x, w);
+        if (rho > 1.42 && rho < 1.42 + 0.42 * clamp(ring * 1.4)) {
+          if (d2 < 1 && zr < sz) continue; // behind the planet
+          const phi = Math.atan2(w, x);
+          if (mod(phi / (2 * Math.PI) + 0.75, 1) > ring) continue;
+          const rb = Math.min(2, Math.floor(((rho - 1.42) / 0.42) * 3));
+          const frac = (((rho - 1.42) / 0.42) * 3) % 1;
+          const Mr = Math.round((2 * Math.PI * (1.49 + rb * 0.14) * R) / CW);
+          const idx = Math.floor(mod(phi / (2 * Math.PI) + t * 0.016 * (1 + rb * 0.35), 1) * Mr);
+          const ch = SRC_FLAT[mod(idx + rb * 997, SRC_FLAT.length)];
+          const edge = Math.sin(Math.PI * frac);
+          const front = zr > 0 ? (d2 < 1 ? 0.7 : 1) : 0.5;
+          gPut(i, j, ch, GOLD, (0.25 + 0.5 * edge) * front * o.vs * clamp(ring * 2), zr > sz ? 2 : 0);
+        }
+      }
+    }
+  }
+}
+
+function moonState(t, hy) {
+  const rise = eOut(seg(t, 5.6, 11.5));
+  const my = lerp(HY0 + 80, HY0 - 255, rise);
+  const e = eIO(seg(t, 12.6, 14.8));
+  let R = lerp(76, 330, eIO(seg(t, 12.9, 14.9)));
+  R *= Math.exp(3.6 * eIn(seg(t, 19.3, 20.6)));
+  return {
+    t, R,
+    cx: lerp(W * 0.69, W / 2, e),
+    cy: lerp(my, H / 2, e),
+    textMix: seg(t, 13.2, 14.6),
+    ring: eIO(seg(t, 14.6, 16.6)) * (1 - seg(t, 19.4, 19.9)),
+    rot: t * 0.2,
+    tilt: 0.38,
+    clipY: hy - 4,
+    vs: 1 - seg(t, 20.1, 20.7),
+    k: rise * (1 - e),
+    glow: 0.22 * rise * (1 - seg(t, 13, 15)),
+  };
+}
+
+// ---------------------------------------------------------------- scene 4: the code that is drawing this
+function tokenize(line) {
+  const hue = new Uint8Array(line.length).fill(CREAM), v = new Float32Array(line.length).fill(0.56);
+  const re = /(\/\/.*$)|('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*`)|\b(const|let|function|return|for|if|else|new|of|while|continue|break|async|await|true|false|null)\b|(\b\d+(?:\.\d+)?\b)|((?:Math|ctx)\.\w+)/g;
+  let m;
+  while ((m = re.exec(line))) {
+    const [h, vv] = m[1] ? [DIM, 0.5] : m[2] ? [GOLD, 0.82] : m[3] ? [CLAY, 0.95] : m[4] ? [GOLD, 0.7] : [CREAM, 0.86];
+    for (let k = m.index; k < m.index + m[0].length; k++) { hue[k] = h; v[k] = vv; }
+  }
+  const runs = [];
+  let s = 0;
+  for (let k = 1; k <= line.length; k++) {
+    if (k === line.length || hue[k] !== hue[s] || v[k] !== v[s]) { runs.push({ c: s, s: line.slice(s, k), hue: hue[s], v: v[s] }); s = k; }
+  }
+  return { hue, v, runs };
+}
+const TOK = SRC.map(tokenize);
+const C_FS = 17, C_LH = 25, C_ADV = C_FS * ADV, C_X0 = 170;
+const G0 = 25.85; // gather begins
+
+function codeScroll(t) {
+  const a = 20.0, b = 25.3, c = 25.75, span = b - a;
+  const u = seg(t, a, b);
+  let L = u * span * 4 + 70 * u * u * u;
+  if (t > b) {
+    const v1 = 4 + (70 * 3) / span, d = c - b, tau = Math.min(t - b, d);
+    L += v1 * (tau - (tau * tau) / (2 * d));
+  }
+  return L;
+}
+
+function codeView(t) {
+  const alpha = seg(t, 20.0, 20.7);
+  const scale = lerp(1.8, 1, eOut(seg(t, 20.0, 21.3)));
+  const L = codeScroll(t), top = Math.floor(L), frac = L - top;
+  const rowsVis = Math.ceil(H / C_LH) + 1;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(W / 2, H / 2); ctx.scale(scale, scale); ctx.translate(-W / 2, -H / 2);
+  ctx.font = `500 ${C_FS}px ${MONO}`;
+  ctx.textBaseline = 'middle';
+  const gathering = t >= G0;
+  const maxD = Math.hypot(W / 2, H / 2);
+  for (let r = -1; r < rowsVis; r++) {
+    const li = mod(top + r, SRC_LINES);
+    const y = (r - frac) * C_LH + C_LH * 0.8;
+    const tk = TOK[li];
+    if (!gathering) {
+      ctx.textAlign = 'right';
+      ctx.fillStyle = col(DIM, 0.34);
+      ctx.fillText(String(li + 1), C_X0 - 34, y);
+      ctx.textAlign = 'left';
+      for (const run of tk.runs) {
+        if (!run.s.trim()) continue;
+        ctx.fillStyle = col(run.hue, run.v);
+        ctx.fillText(run.s, C_X0 + run.c * C_ADV, y);
+      }
+      continue;
+    }
+    // everything is pulled into one point
+    ctx.textAlign = 'center';
+    const line = SRC[li];
+    for (let c = 0; c < line.length; c++) {
+      const ch = line[c];
+      if (ch === ' ') continue;
+      const x0 = C_X0 + c * C_ADV + C_ADV / 2;
+      const dx = x0 - W / 2, dy = y - H / 2;
+      const d = Math.hypot(dx, dy) / maxD;
+      const st = G0 + d * 1.0 + hash(li, c, 41) * 0.2;
+      const e = eIn(seg(t, st, st + 1.15));
+      if (e >= 0.999) continue;
+      const ang = e * e * 0.8;
+      const ca = Math.cos(ang), sa = Math.sin(ang);
+      const x = W / 2 + (dx * ca - dy * sa) * (1 - e), yy = H / 2 + (dx * sa + dy * ca) * (1 - e);
+      ctx.globalAlpha = alpha * (1 - seg(e, 0.8, 1));
+      ctx.fillStyle = col(e > 0.35 ? CLAY : tk.hue[c], clamp(tk.v[c] + e * 0.6));
+      ctx.fillText(ch, x, yy);
+    }
+  }
+  ctx.restore();
+  // keep captions legible over the code
+  const g = ctx.createLinearGradient(0, H - 300, 0, H);
+  g.addColorStop(0, 'rgba(12,10,9,0)');
+  g.addColorStop(0.55, `rgba(12,10,9,${0.9 * alpha * (1 - seg(t, G0, G0 + 1))})`);
+  g.addColorStop(1, `rgba(12,10,9,${0.96 * alpha * (1 - seg(t, G0, G0 + 1))})`);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, H - 300, W, 300);
+}
+
+function core(t) {
+  const u = seg(t, 26.3, 28.4);
+  const rc = eIn(u) * 4.2;
+  const ci = W / 2 / CW, cj = H / 2 / CH;
+  for (let j = Math.floor(cj - 6); j <= Math.ceil(cj + 6); j++) {
+    for (let i = Math.floor(ci - 10); i <= Math.ceil(ci + 10); i++) {
+      const d = Math.hypot(((i + 0.5) * CW - W / 2) / 12, ((j + 0.5) * CH - H / 2) / 12);
+      if (d > rc) continue;
+      const v = 1 - d / (rc + 0.001);
+      gPut(i, j, RAMP[1 + Math.floor(v * (RAMP.length - 2))], v > 0.6 ? WHITE : GOLD, 0.5 + 0.5 * v, 3);
+    }
+  }
+  glow(W / 2, H / 2, 60 + u * 260, 0.08 + 0.5 * eIn(u));
+}
+
+// ---------------------------------------------------------------- scene 5: the spark
+const T_BURST = 28.4;
+const RAYS = (() => {
+  const r = rng(SEED * 13 + 3), n = 12;
+  return Array.from({ length: n }, (_, i) => ({
+    a: (i / n) * Math.PI * 2 - Math.PI / 2 + (r() - 0.5) * 0.18,
+    len: 0.6 + r() * 0.4,
+    w: 0.07 + r() * 0.035,
+    d: r() * 0.14,
+    ph: r() * 6.28,
+  }));
+})();
+
+function burst(t) {
+  const age = t - T_BURST;
+  const k2 = eIO(seg(t, 31.0, 32.8));
+  const R = lerp(400, 700, k2);
+  const vs = lerp(1, 0.17, k2) * (1 - seg(t, 37.4, 38.4));
+  const quiet = seg(t, 31.4, 32.6);
+  const rot = age * 0.05;
+  const rays = RAYS.map((ry, i) => {
+    const g = eBack(seg(age, ry.d, ry.d + 0.6));
+    return { dx: Math.cos(ry.a + rot), dy: Math.sin(ry.a + rot), L: ry.len * g * (1 + 0.025 * Math.sin(t * 1.7 + ry.ph)), w: ry.w, i };
+  });
+  const coreR = 0.16 * eBack(seg(age, 0, 0.35));
+  const sw = age * 1250, swOn = age < 1.7;
+  for (let j = 0; j < ROWS; j++) {
+    for (let i = 0; i < COLS; i++) {
+      const px = (i + 0.5) * CW - W / 2, py = (j + 0.5) * CH - H / 2;
+      const x = px / R, y = py / R, r = Math.hypot(x, y);
+      if (swOn) {
+        const dd = Math.abs(Math.hypot(px, py) - sw);
+        if (dd < 18) gPut(i, j, dd < 8 ? '*' : '+', CREAM, (1 - age / 1.7) * 0.9 * (1 - dd / 18), 5);
+      }
+      if (hash(i, j, 99) < 0.007 && age > 0.3) {
+        const tw = 0.5 + 0.5 * Math.sin(t * 2.3 + hash(i, j, 98) * 50);
+        gPut(i, j, tw > 0.8 ? '+' : '·', GOLD, vs * 0.4 * tw, 1);
+      }
+      if (r > 1.12) continue;
+      if (quiet > 0 && KEEPOUT[j * COLS + i]) continue;
+      if (r < coreR) { gPut(i, j, cc(i * 7 + j * 13), WHITE, vs, 4); continue; }
+      let best = 9, bi = -1;
+      for (const ry of rays) {
+        if (ry.L <= 0.001) continue;
+        const pc = clamp(x * ry.dx + y * ry.dy, 0, ry.L);
+        const ex = x - pc * ry.dx, ey = y - pc * ry.dy;
+        const dd = Math.hypot(ex, ey) - ry.w * (1 - 0.3 * (pc / ry.L));
+        if (dd < best) { best = dd; bi = ry.i; }
+      }
+      if (best < 0) {
+        const inner = clamp(-best / RAYS[bi].w);
+        let ch = cc(Math.floor((r * R) / 11 - age * 17) + bi * 53);
+        if (ch === ' ') ch = '·';
+        gPut(i, j, ch, r < 0.3 ? GOLD : CLAY, vs * (0.6 + 0.4 * inner), 4);
+      } else if (best < 0.09 && hash(i, j, 31) < 0.5) {
+        gPut(i, j, best < 0.04 ? ':' : '.', CLAY, vs * 0.34 * (1 - best / 0.09), 3);
+      }
+    }
+  }
+  glow(W / 2, H / 2, R * 0.9, 0.2 * vs);
+}
+
+// ---------------------------------------------------------------- scene 6: the name
+const KEEPOUT = new Uint8Array(COLS * ROWS); // cells around the name stay dark once it lands
+const TITLE_CELLS = (() => {
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  x.fillStyle = '#fff';
+  x.textAlign = 'center';
+  x.textBaseline = 'alphabetic';
+  x.font = 'bold 360px Georgia, "Times New Roman", serif';
+  x.fillText('Claude', W / 2, 540);
+  x.font = `bold 150px ${MONO}`;
+  x.fillText('Opus 5.5', W / 2, 752);
+  const d = x.getImageData(0, 0, W, H).data;
+  const cells = [];
+  let k = 0;
+  for (let j = 0; j < ROWS; j++) {
+    for (let i = 0; i < COLS; i++) {
+      let s = 0;
+      for (let sj = 0; sj < 3; sj++) for (let si = 0; si < 3; si++) {
+        const px = Math.floor(i * CW + (si + 0.5) * (CW / 3)), py = Math.floor(j * CH + (sj + 0.5) * (CH / 3));
+        s += d[(py * W + px) * 4 + 3] / 255;
+      }
+      const cov = s / 9;
+      if (cov > 0.12) cells.push({ i, j, cov, part: j * CH > 590 ? 1 : 0, ch: FILL[k++ % FILL.length] });
+    }
+  }
+  for (const c of cells) for (let dj = -1; dj <= 1; dj++) for (let di = -2; di <= 2; di++) {
+    const i = c.i + di, j = c.j + dj;
+    if (i >= 0 && j >= 0 && i < COLS && j < ROWS) KEEPOUT[j * COLS + i] = 1;
+  }
+  return cells;
+})();
+
+function title(t, f) {
+  const fade = 1 - seg(t, 37.4, 38.4);
+  if (fade <= 0) return;
+  for (const c of TITLE_CELLS) {
+    const ts = 31.4 + (c.i / COLS) * 1.2 + hash(c.i, c.j, 21) * 0.45 + c.part * 0.35;
+    if (t < ts - 0.55) continue;
+    if (t < ts) {
+      const g = NOISE_GLYPHS[Math.floor(hash(c.i, c.j, Math.floor(f / 2)) * NOISE_GLYPHS.length)];
+      gPut(c.i, c.j, g, GOLD, 0.55 * fade, 6);
+      continue;
+    }
+    const settle = seg(t, ts, ts + 0.35);
+    const hue = c.part ? CLAY : CREAM;
+    if (c.cov > 0.45) gPut(c.i, c.j, c.ch, hue, (0.74 + 0.26 * settle) * fade, 6);
+    else gPut(c.i, c.j, c.cov > 0.3 ? ':' : '.', hue, (0.3 + 0.45 * c.cov) * fade, 6);
+  }
+}
+
+// ---------------------------------------------------------------- captions (typed, like everything else)
+const CAPS = [
+  [7.0, 9.9, 'I think in text.', { y: 380 }],
+  [10.2, 12.9, 'Every world I build begins as words.', { y: 380 }],
+  [15.2, 19.1, 'What I love is the moment words become a world.'],
+  [21.3, 25.3, `Even this one: ${SRC_LINES} lines of JavaScript.`],
+  [34.3, 37.9, 'Every frame of this film is text, drawn in JavaScript.', { fs: 23, y: 890, v: 0.78 }],
+];
+const CPS = 38;
+
+function caption(t, t0, t1, text, o = {}) {
+  if (t < t0 || t > t1) return;
+  const fs = o.fs || 32, y = o.y || H - 112;
+  const n = Math.min(text.length, Math.floor((t - t0) * CPS));
+  const adv = fs * ADV, x0 = W / 2 - (text.length * adv) / 2;
+  ctx.save();
+  ctx.globalAlpha = 1 - seg(t, t1 - 0.45, t1);
+  ctx.font = `500 ${fs}px ${MONO}`;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  ctx.shadowColor = 'rgba(12,10,9,0.95)';
+  ctx.shadowBlur = 22;
+  ctx.fillStyle = col(CREAM, o.v || 0.95);
+  ctx.fillText(text.slice(0, n), x0, y);
+  ctx.shadowBlur = 0;
+  const done = n >= text.length;
+  const on = !done || ((t - t0 - text.length / CPS) * 2.2) % 1 < 0.55;
+  if (on) {
+    ctx.fillStyle = col(CLAY, 1);
+    ctx.fillRect(x0 + n * adv + (done ? adv * 0.3 : 0), y - fs * 0.56, adv * 0.62, fs * 1.08);
+  }
+  ctx.restore();
+}
+
+function endPrompt(t) {
+  const a = seg(t, 38.6, 39.0);
+  ctx.save();
+  ctx.globalAlpha = a;
+  ctx.font = `500 ${P_FS}px ${MONO}`;
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left';
+  const x0 = W / 2 - P_ADV;
+  ctx.fillStyle = col(CLAY, 1);
+  ctx.fillText('>', x0, H / 2 + 14);
+  if (((t - 38.6) * 1.9) % 1 < 0.55) ctx.fillRect(x0 + 2 * P_ADV + 3, H / 2 + 14 - P_FS * 0.78, P_ADV * 0.62, P_FS * 0.98);
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------- finishing: bloom, vignette, grain
+const BW = W / 4, BH = H / 4;
+const bc = document.createElement('canvas'); bc.width = BW; bc.height = BH;
+const bx = bc.getContext('2d');
+const VIG = (() => {
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const g = x.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.62);
+  g.addColorStop(0, 'rgba(0,0,0,0)');
+  g.addColorStop(1, 'rgba(0,0,0,0.55)');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  return c;
+})();
+const GRAIN = [0, 1, 2].map((k) => {
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const x = c.getContext('2d'), id = x.createImageData(256, 256), r = rng(SEED * 17 + k);
+  for (let p = 0; p < id.data.length; p += 4) { const g = 128 + (r() - 0.5) * 255; id.data[p] = id.data[p + 1] = id.data[p + 2] = g; id.data[p + 3] = 255; }
+  x.putImageData(id, 0, 0);
+  return ctx.createPattern(c, 'repeat');
+});
+
+function post(bloom, f) {
+  if (bloom > 0) {
+    bx.clearRect(0, 0, BW, BH);
+    bx.filter = 'blur(5px)';
+    bx.drawImage(cv, 0, 0, BW, BH);
+    bx.filter = 'none';
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = bloom;
+    ctx.drawImage(bc, 0, 0, W, H);
+    ctx.restore();
+  }
+  ctx.drawImage(VIG, 0, 0);
+  ctx.save();
+  ctx.globalCompositeOperation = 'overlay';
+  ctx.globalAlpha = 0.06;
+  const ox = Math.floor(hash(f, 1) * 256), oy = Math.floor(hash(f, 2) * 256);
+  ctx.translate(-ox, -oy);
+  ctx.fillStyle = GRAIN[f % 3];
+  ctx.fillRect(0, 0, W + 256, H + 256);
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------- one frame
+function draw(f) {
+  const t = f / FPS;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = BGS;
+  ctx.fillRect(0, 0, W, H);
+  gClear();
+  let bloom = 0.42;
+
+  const tilt = eIO(seg(t, 12.6, 14.8));
+  const hy = HY0 + tilt * 920;
+  const moon = t >= 5.6 && t < 20.8 ? moonState(t, hy) : null;
+  if (t >= FALL0 && t < 15.2) sea(t, hy, 1 - seg(t, 13.4, 14.8), moon);
+  if (t >= 5.0 && t < 20.8) stars(t, seg(t, 5.0, 7.0) * (1 - seg(t, 19.4, 20.3)), Math.round((tilt * 920) / CH), hy - 4);
+  if (moon) { planet(moon); glow(moon.cx, moon.cy, moon.R * 2.4, moon.glow); }
+
+  if (t >= 20.0 && t < 28.5) codeView(t);
+  if (t >= 26.3 && t < T_BURST) core(t);
+  if (t >= T_BURST) {
+    burst(t);
+    bloom = lerp(0.95, 0.5, seg(t, T_BURST, T_BURST + 2.5));
+  }
+  if (t >= 30.8) title(t, f);
+  gFlush();
+
+  if (t < FALL0 + 1.6) promptScene(t);
+  for (const c of CAPS) caption(t, c[0], c[1], c[2], c[3]);
+  if (t >= 38.6) endPrompt(t);
+  if (t >= T_BURST && t < T_BURST + 1) glow(W / 2, H / 2, 1100, 0.42 * Math.exp(-(t - T_BURST) * 7), INK.gold);
+  post(bloom, f);
+}
+
+// ---------------------------------------------------------------- sound: synthesized from the same timeline
+const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+async function renderAudio(SR = 48000) {
+  const ac = new OfflineAudioContext(2, SR * DUR, SR);
+  const r = rng(SEED * 101 + 9);
+  const out = ac.createGain(); out.gain.value = 0.9;
+  const comp = ac.createDynamicsCompressor();
+  comp.threshold.value = -16; comp.knee.value = 8; comp.ratio.value = 3; comp.attack.value = 0.005; comp.release.value = 0.2;
+  out.connect(comp); comp.connect(ac.destination);
+
+  const ir = ac.createBuffer(2, Math.floor(SR * 3.4), SR);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = ir.getChannelData(ch);
+    for (let i = 0; i < d.length; i++) d[i] = (r() * 2 - 1) * Math.pow(1 - i / d.length, 2.6);
+  }
+  const rev = ac.createConvolver(); rev.buffer = ir;
+  const revG = ac.createGain(); revG.gain.value = 0.5;
+  rev.connect(revG); revG.connect(out);
+  const dly = ac.createDelay(2); dly.delayTime.value = 0.45;
+  const fb = ac.createGain(); fb.gain.value = 0.38;
+  const dlp = ac.createBiquadFilter(); dlp.type = 'lowpass'; dlp.frequency.value = 2600;
+  dly.connect(dlp); dlp.connect(fb); fb.connect(dly);
+  const dOut = ac.createGain(); dOut.gain.value = 0.4;
+  dlp.connect(dOut); dOut.connect(out); dOut.connect(rev);
+
+  const noise = ac.createBuffer(1, SR * 2, SR);
+  { const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = r() * 2 - 1; }
+  const bus = (level, wet, echo = 0) => {
+    const g = ac.createGain(); g.gain.value = level; g.connect(out);
+    const w = ac.createGain(); w.gain.value = wet; g.connect(w); w.connect(rev);
+    if (echo) { const e = ac.createGain(); e.gain.value = echo; g.connect(e); e.connect(dly); }
+    return g;
+  };
+  const ad = (p, t, a, peak, d) => { p.setValueAtTime(0.0001, t); p.exponentialRampToValueAtTime(peak, t + a); p.exponentialRampToValueAtTime(0.0001, t + a + d); };
+
+  const keys = bus(1, 0.18);
+  const click = (t, amp) => {
+    const s = ac.createBufferSource(); s.buffer = noise;
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1800 + r() * 2600; bp.Q.value = 0.9;
+    const g = ac.createGain(); s.connect(bp); bp.connect(g); g.connect(keys);
+    ad(g.gain, t, 0.0015, amp, 0.035); s.start(t, r() * 1.5, 0.06);
+    const o = ac.createOscillator(); o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(90, t + 0.03);
+    const g2 = ac.createGain(); o.connect(g2); g2.connect(keys);
+    ad(g2.gain, t, 0.002, amp * 0.5, 0.04); o.start(t); o.stop(t + 0.08);
+  };
+  TYPE.forEach((t) => click(t, 0.16 + r() * 0.05));
+  click(ENTER, 0.28);
+  for (const c of CAPS) {
+    const text = c[2];
+    for (let k = 0; k < text.length; k++) if (text[k] !== ' ') click(c[0] + (k + 1) / CPS, 0.035 + r() * 0.015);
+  }
+
+  // drops: each falling letter lands in the sea
+  const drops = bus(1, 0.55, 0.25);
+  for (const p of IMP) {
+    const o = ac.createOscillator(); o.type = 'sine';
+    const f0 = 1100 + r() * 900;
+    o.frequency.setValueAtTime(f0, p.t); o.frequency.exponentialRampToValueAtTime(f0 * 0.34, p.t + 0.09);
+    const g = ac.createGain(); o.connect(g); g.connect(drops);
+    ad(g.gain, p.t, 0.002, 0.09, 0.2); o.start(p.t); o.stop(p.t + 0.3);
+  }
+
+  // the sea
+  {
+    const s = ac.createBufferSource(); s.buffer = noise; s.loop = true;
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520;
+    const g = ac.createGain(); g.gain.value = 0;
+    s.connect(lp); lp.connect(g); g.connect(bus(1, 0.3));
+    const t0 = 4.2, t1 = 15.5, n = 400, curve = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const t = t0 + ((t1 - t0) * i) / (n - 1);
+      curve[i] = (0.05 + 0.06 * (0.5 + 0.5 * Math.sin((2 * Math.PI * t) / 5.5))) * seg(t, 4.2, 6.5) * (1 - seg(t, 13.0, 15.5));
+    }
+    g.gain.setValueCurveAtTime(curve, t0, t1 - t0);
+    s.start(t0); s.stop(t1 + 0.1);
+  }
+
+  // pads
+  const padBus = bus(1, 0.35);
+  const pad = (t0, t1, notes, level, c0, c1, rel = 1.2, att = 1.6) => {
+    const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.Q.value = 0.6;
+    f.frequency.setValueAtTime(c0, t0); f.frequency.linearRampToValueAtTime(c1, t1);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(level, t0 + att);
+    g.gain.setValueAtTime(level, t1 - rel); g.gain.linearRampToValueAtTime(0, t1);
+    f.connect(g); g.connect(padBus);
+    for (const m of notes) for (const det of [-7, 6]) {
+      const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = mtof(m); o.detune.value = det + (r() - 0.5) * 4;
+      const og = ac.createGain(); og.gain.value = 1 / (notes.length * 2);
+      o.connect(og); og.connect(f); o.start(t0); o.stop(t1 + 0.05);
+    }
+  };
+  pad(4.6, 13.8, [50, 57, 64, 66, 73], 0.1, 500, 1100);
+  pad(12.8, 20.8, [47, 54, 57, 62, 64], 0.1, 700, 1300);
+  pad(19.8, 26.1, [43, 50, 54, 59, 61], 0.1, 900, 2400);
+  pad(25.6, T_BURST - 0.02, [45, 52, 62, 64, 69], 0.12, 1200, 4200, 0.04, 1.8);
+  pad(T_BURST, 35.8, [38, 45, 50, 54, 57, 64, 66, 69], 0.16, 4800, 1600, 1.4, 0.02);
+  pad(34.8, 40, [38, 45, 54, 61, 64, 69], 0.11, 1400, 500, 2.2, 1.2);
+
+  // glass bells over the planet, quickening through the code
+  const bells = bus(1, 0.4, 0.5);
+  const PENT = [74, 76, 78, 81, 83, 86, 88, 90];
+  const bell = (t, m, amp) => {
+    for (const [mult, a, dec] of [[1, 1, 1.6], [2.01, 0.25, 0.6], [3.98, 0.08, 0.25]]) {
+      const o = ac.createOscillator(); o.frequency.value = mtof(m) * mult;
+      const g = ac.createGain(); o.connect(g); g.connect(bells);
+      ad(g.gain, t, 0.003, amp * a, dec); o.start(t); o.stop(t + dec + 0.05);
+    }
+  };
+  for (let t = 14.4; t < 20; t += 0.3) if (r() < 0.62) bell(t, PENT[Math.floor(r() * 6)], 0.06);
+  for (let t = 20; t < 25.6; t += 0.15) if (r() < 0.55) bell(t, PENT[2 + Math.floor(r() * 6)], 0.03 + 0.025 * seg(t, 20, 25.6));
+
+  // riser into the spark
+  {
+    const s = ac.createBufferSource(); s.buffer = noise; s.loop = true;
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 2;
+    bp.frequency.setValueAtTime(300, G0); bp.frequency.exponentialRampToValueAtTime(7000, T_BURST - 0.05);
+    const g = ac.createGain(); g.gain.setValueAtTime(0.0001, G0);
+    g.gain.exponentialRampToValueAtTime(0.32, T_BURST - 0.06); g.gain.linearRampToValueAtTime(0, T_BURST - 0.02);
+    s.connect(bp); bp.connect(g); g.connect(bus(1, 0.2));
+    s.start(G0); s.stop(T_BURST);
+    const o = ac.createOscillator(); o.type = 'triangle';
+    o.frequency.setValueAtTime(220, G0); o.frequency.exponentialRampToValueAtTime(880, T_BURST - 0.05);
+    const og = ac.createGain(); og.gain.setValueAtTime(0.0001, G0);
+    og.gain.exponentialRampToValueAtTime(0.05, T_BURST - 0.06); og.gain.linearRampToValueAtTime(0, T_BURST - 0.02);
+    o.connect(og); og.connect(bus(1, 0.3)); o.start(G0); o.stop(T_BURST);
+  }
+
+  // the spark
+  {
+    const t = T_BURST, hit = bus(1, 0.5);
+    const o = ac.createOscillator(); o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(36, t + 0.6);
+    const g = ac.createGain(); o.connect(g); g.connect(hit); ad(g.gain, t, 0.004, 0.85, 2.2); o.start(t); o.stop(t + 2.4);
+    const s = ac.createBufferSource(); s.buffer = noise;
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(2200, t); lp.frequency.exponentialRampToValueAtTime(180, t + 1.2);
+    const sg = ac.createGain(); s.connect(lp); lp.connect(sg); sg.connect(hit); ad(sg.gain, t, 0.002, 0.45, 1.2);
+    s.start(t, 0, 1.4);
+    [86, 90, 93, 98].forEach((m, k) => bell(t + 0.05 + k * 0.07, m, 0.05));
+  }
+
+  // letters settling into the name
+  const tick = bus(1, 0.3, 0.2);
+  for (let k = 0; k < 34; k++) {
+    const t = 31.1 + r() * 2.2;
+    const s = ac.createBufferSource(); s.buffer = noise;
+    const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 4500 + r() * 3000;
+    const g = ac.createGain(); s.connect(hp); hp.connect(g); g.connect(tick);
+    ad(g.gain, t, 0.001, 0.05, 0.02); s.start(t, r(), 0.04);
+  }
+
+  return ac.startRendering();
+}
+
+function wavBase64(buf) {
+  const n = buf.length, L = buf.getChannelData(0), Rt = buf.getChannelData(1);
+  const ab = new ArrayBuffer(44 + n * 4), v = new DataView(ab);
+  const str = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  str(0, 'RIFF'); v.setUint32(4, 36 + n * 4, true); str(8, 'WAVE'); str(12, 'fmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 2, true);
+  v.setUint32(24, buf.sampleRate, true); v.setUint32(28, buf.sampleRate * 4, true);
+  v.setUint16(32, 4, true); v.setUint16(34, 16, true); str(36, 'data'); v.setUint32(40, n * 4, true);
+  for (let i = 0; i < n; i++) {
+    v.setInt16(44 + i * 4, clamp(L[i], -1, 1) * 32767, true);
+    v.setInt16(46 + i * 4, clamp(Rt[i], -1, 1) * 32767, true);
+  }
+  const bytes = new Uint8Array(ab);
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+
+// ---------------------------------------------------------------- harness
+function sheet(frames, cols = 6, tw = 480) {
+  const th = Math.round((tw * H) / W), rows = Math.ceil(frames.length / cols);
+  const s = document.createElement('canvas'); s.width = cols * tw; s.height = rows * th;
+  const x = s.getContext('2d');
+  frames.forEach((fr, k) => {
+    draw(fr);
+    const ox = (k % cols) * tw, oy = Math.floor(k / cols) * th;
+    x.drawImage(cv, ox, oy, tw, th);
+    x.fillStyle = 'rgba(0,0,0,.65)'; x.fillRect(ox, oy, 118, 20);
+    x.fillStyle = '#fff'; x.font = '12px Menlo'; x.fillText(`f${fr}  ${(fr / FPS).toFixed(2)}s`, ox + 6, oy + 14);
+  });
+  return s.toDataURL('image/png');
+}
+
+window.FILM = { W, H, FPS, N, DUR, SEED, canvas: cv, draw, sheet, renderAudio, wavBase64, lines: SRC_LINES, ready: true };
+
+if (!Q.has('render')) {
+  const btn = document.getElementById('play');
+  draw(Q.has('f') ? clamp(+Q.get('f') | 0, 0, N - 1) : Math.round(33.5 * FPS));
+  if (!Q.has('f')) {
+    btn.hidden = false;
+    btn.onclick = async () => {
+      btn.hidden = true;
+      const buf = await renderAudio(44100);
+      const ac = new AudioContext();
+      const src = ac.createBufferSource(); src.buffer = buf; src.connect(ac.destination);
+      const t0 = ac.currentTime + 0.15;
+      src.start(t0);
+      const loop = () => {
+        const f = Math.floor((ac.currentTime - t0) * FPS);
+        if (f >= N) { btn.textContent = '↻ play again'; btn.hidden = false; return; }
+        if (f >= 0) draw(f);
+        requestAnimationFrame(loop);
+      };
+      loop();
+    };
+  }
+}
+</script>
+</body>
+</html>

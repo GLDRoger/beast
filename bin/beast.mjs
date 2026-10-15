@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { existsSync } from 'node:fs'
 import { install } from '../lib/install.mjs'
+import { refreshDelegation } from '../lib/delegation.mjs'
 import { doctor } from '../lib/doctor.mjs'
 import { scan } from '../lib/scan.mjs'
 import { list, add, rm } from '../lib/skills.mjs'
@@ -8,7 +9,7 @@ import { c } from '../lib/fsutil.mjs'
 import { HARNESSES, HARNESS_NAMES, inHome } from '../lib/manifest.mjs'
 import { PACKS, PACK_NAMES, REQUIRED_PACKS } from '../lib/packs.mjs'
 import { whichBinary } from '../lib/platform.mjs'
-import { isInteractive, multiselect, select, confirm } from '../lib/prompt.mjs'
+import { isInteractive, multiselect, confirm } from '../lib/prompt.mjs'
 import { coverageWarning } from '../lib/coverage.mjs'
 import { planConfigEdits, hasPendingEdits, configQuestion, EDITABLE } from '../lib/config-write.mjs'
 
@@ -22,6 +23,7 @@ const USAGE = `${c.bold('beast')} — install one agent config across Claude Cod
   beast install --no-write-config   never touch harness config
   beast scan                   list every skill source and how to retire each
   beast doctor                 verify links, config, skill budget, secrets
+  beast delegation             refresh capability guidance without reinstalling
   beast skills                 list the active set
   beast skills add <name>      activate a module from the library
   beast skills rm <name>       deactivate a skill
@@ -61,32 +63,6 @@ function unknownOptions(allowed) {
   return bad
 }
 
-/** The two video stacks. Alternatives, not complements — see the comment in packs.mjs. */
-const VIDEO_PACKS = ['video', 'remotion']
-
-/**
- * Narrow both video packs down to the stack the user actually wants.
- *
- * Only asked when the pack answer contains both, which the default preselection does.
- * Installing both is allowed and sometimes right; it is just never right by accident,
- * because each stack's skills sit in the harness's listing budget whether or not the
- * project uses that stack. Flags skip this entirely: `--packs=video,remotion` means both.
- */
-async function chooseVideoStack(packs) {
-  if (VIDEO_PACKS.filter((p) => packs.includes(p)).length < 2) return packs
-
-  const cost = (p) => `${PACKS[p].skills.length} skills`
-  console.log()
-  const keep = await select('Two video stacks are available. Which do you want?', [
-    { value: ['video'], label: 'HyperFrames', hint: `${cost('video')} · HTML + GSAP, hyperframes CLI` },
-    { value: ['remotion'], label: 'Remotion', hint: `${cost('remotion')} · React/TSX, remotion CLI` },
-    { value: VIDEO_PACKS, label: 'Both', hint: 'every video skill loads, in every session' },
-    { value: [], label: 'Neither', hint: 'skip video skills' },
-  ])
-  const rest = packs.filter((p) => !VIDEO_PACKS.includes(p))
-  return PACK_NAMES.filter((p) => rest.includes(p) || keep.includes(p))
-}
-
 /** Ask which harnesses and packs, preselecting what looks already present. */
 async function chooseInteractively() {
   console.log(`\n${c.bold('beast install')}\n`)
@@ -107,13 +83,8 @@ async function chooseInteractively() {
   })
   const present = harnessOpts.filter((o) => o.present).map((o) => o.value)
 
-  console.log(`  ${c.yellow('Plan tiers matter.')} beast runs long sessions with sub-agents and a`)
-  console.log('  large skill context, so it burns quota fast. On $20/month tiers,')
-  console.log('  Anthropic Pro especially, expect to hit limits quickly. Higher tiers')
-  console.log('  are strongly recommended.')
-  console.log(c.dim('  Reference setup: $200 Codex, $100 Anthropic, $20 Grok (free with X Premium).\n'))
-  console.log(c.dim('  Only the tools you select are configured, and only those are offered'))
-  console.log(c.dim('  as delegation targets in the prompts.\n'))
+  console.log(c.dim('  Select the harnesses to configure. This does not grant provider access.'))
+  console.log(c.dim('  Delegation checks current runtime capabilities; installed CLIs alone do not prove authentication.\n'))
   const targets = await multiselect('Which of these do you have access to?', harnessOpts, {
     preselected: present.length ? present : HARNESS_NAMES,
   })
@@ -125,9 +96,7 @@ async function chooseInteractively() {
     hint: `${PACKS[n].skills.length} skills · ${PACKS[n].hint}`,
   }))
 
-  const packs = await chooseVideoStack(
-    await multiselect('Which skill packs?', packOpts, { preselected: PACK_NAMES }),
-  )
+  const packs = await multiselect('Which skill packs?', packOpts, { preselected: PACK_NAMES })
   console.log()
 
   // Say this BEFORE the confirm, not after the install. The whole point of asking is
@@ -244,6 +213,14 @@ async function run() {
       return noOptions() ?? scan()
     case 'doctor':
       return noOptions() ?? doctor()
+    case 'delegation': {
+      const invalid = noOptions()
+      if (invalid !== null) return invalid
+      const result = refreshDelegation()
+      if (!result.ok) return fail(result.reason)
+      console.log(`Updated ${result.path}`)
+      return 0
+    }
     case 'skills': {
       const [sub, name, ...extra] = rest
       if (extra.length) return fail(`beast skills ${sub ?? ''} takes one name (got ${extra.length} extra)`)

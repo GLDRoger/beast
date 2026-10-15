@@ -1,84 +1,18 @@
 ---
 name: security
-description: >
-  Security and defensive controls: AuthN/AuthZ, tenants, secrets, CASA gates, rate limits, dependency audits.
+description: Inspect and implement defensive controls for authentication, authorization, tenant isolation, secrets, abuse, and dependencies.
 ---
 
 # Security
 
-Own trust boundaries and defensive posture. Orchestration loop: follow `$route` → `references/orchestration.md`.  
-"Optimization" here means **hardening the attack surface and gates**, not Web Vitals (that's `$performance`).
+Identify the assets, actors, trust boundary, and authorized scope. Trace current authentication, tenant/role policy, privileged clients, validation, and error paths before changing controls.
 
+Enforce least privilege at the owning server/database boundary. Validate untrusted input; fail closed on missing authorization. Hidden UI controls do not authorize requests. Keep secrets out of client bundles, logs, reports, and fixtures.
 
-## Module convention
+Choose the repository's actual security and release checks. Discover commands in its scripts and CI; do not assume a universal CASA, package-manager, or handoff command. Consult current primary sources for security-sensitive external behavior and dependency findings.
 
-Top-level skills are only: `$route` `$frontend` `$code` `$writing` `$motion` `$performance` `$security` `$growth` `$media`.
+Prove relevant allowed and denied paths: logged-out, wrong role, other tenant, inactive account, malformed input, and privileged operations as applicable. Test rate-limit response/retry behavior when touched. Database/RLS policy needs database-backed evidence in an isolated environment; mocks prove only their exercised contract.
 
-Any other `$name` (e.g. `$impeccable`, `$unslop`) is a **module**. Load it by reading:
+Use `~/.agents/skill-modules/rate-limit/SKILL.md` for abuse/cost-sensitive routes. For incident work, use the current project's observability and incident procedures. Do not resolve monitoring issues, mutate live data, or publish findings merely because a security audit was requested.
 
-`~/.agents/skill-modules/<name>/SKILL.md`
-
-The skills menu lists only the nine top-level skills; every module loads by that path. If the file is missing, search `~/.agents/skill-modules/` and pick the closest match.
-
-## Phase 0 — Threat & scope
-
-**Goal:** What trust boundary is in play?
-
-- Auth session, tenant isolation, admin vs user, public vs private routes
-- Data classes: PII, secrets, tokens, webhooks
-
-**Green:** Assets, attackers, and in-scope surfaces named.
-
-## Phase 1 — Controls
-
-**Goal:** Enforce least privilege in the primary path.
-
-- Validate/sanitize at the edge; fail closed on authz miss
-- `$rate-limit` for abuse/cost-sensitive routes
-- No secrets in logs, client bundles, or committed env samples
-- Prefer server-side checks even when UI hides actions
-
-**Green:** Unauthorized paths return the correct failure; no client-only authz.
-
-## Phase 2 — Dependencies & compliance
-
-**Goal:** Known issues handled deliberately.
-
-- CASA/security gates: `pnpm casa:check` / `pnpm security:check` / `pnpm verify:handoff` as risk requires
-- Sentry: pack `references/sentry-triage.md` — fix real regressions, don't "resolve" noise
-
-**Green:** Commands run; findings classified; no silent skip of CASA when required.
-
-## Phase 3 — Verify
-
-**Goal:** Prove the boundary.
-
-- Attempt unauthorized access cases (other tenant, logged-out, wrong role)
-- Confirm rate limit 429 + Retry-After behavior if touched
-- Confirm no secret leakage in responses/logs for the change
-
-**Green:** Evidence for allow and deny paths.
-
-## Hand off when
-
-| Signal | Switch to |
-|--------|-----------|
-| Perf-only | `$performance` |
-| Feature logic without trust issues | `$code` |
-| UI copy for security errors | `$writing` after controls land |
----
-
-## Modules (load by path)
-
-Base: `~/.agents/skill-modules/`
-
-When a phase names a former skill like impeccable or unslop, **read**:
-
-`~/.agents/skill-modules/<module-name>/SKILL.md`
-
-| Module | Path |
-|--------|------|
-| `rate-limit` | `~/.agents/skill-modules/rate-limit/SKILL.md` |
-
-If a needed module is missing from the table, list `~/.agents/skill-modules/` and open the closest match.
-
+State the evidence boundary and remaining risk. Preserve explicit user-owned testing and release approval boundaries.

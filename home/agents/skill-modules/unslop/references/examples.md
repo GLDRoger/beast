@@ -1,5 +1,6 @@
 # Before/After Examples
 
+Use these as diagnostic examples, not blanket bans or required passes. Preserve meaning, warranted uncertainty, quotations, and the user's intentional voice. Apply only the patterns that weaken the current piece.
 ## Example 1: Throat-clearing + binary contrast
 
 **Before:**

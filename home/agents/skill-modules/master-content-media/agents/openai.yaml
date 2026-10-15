@@ -1,4 +1,0 @@
-interface:
-  display_name: "Master Content Media"
-  short_description: "Docs, copy, media, animation, and artifact workflow"
-  default_prompt: "Use $master-content-media to create, render, polish, and verify this artifact."

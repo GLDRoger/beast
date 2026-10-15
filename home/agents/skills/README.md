@@ -1,43 +1,9 @@
-# Skills layout
+# Active skills
 
-## Primary skills (orchestration — short names)
+The nine primary workflows are `route`, `code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, and `media`.
 
-| Skill | Job |
-|-------|-----|
-| `route` | Pick which skill owns the work |
-| `frontend` | UI design + build + visual QA |
-| `code` | TypeScript / app logic / verify |
-| `writing` | Prose, UI copy, docs, outreach |
-| `motion` | Taste, micro-interactions, animation |
-| `performance` | Speed, jank, stability |
-| `security` | AuthZ, secrets, CASA, abuse controls |
-| `growth` | Product strategy, SEO/AEO, launch |
-| `media` | HyperFrames, Lottie, video, images |
+Keep automatic discovery precise. A workflow owns the requested result; specialist material is loaded only when its procedure helps the current task. Child reviews and checkpoints feed that result without creating redundant interviews or approval gates.
 
-## Legacy path restores (symlinks → `skill-modules`)
+Specialists live at `~/.agents/skill-modules/<name>/SKILL.md`. The active set also exposes the retained Remotion entrypoints, `taste-craft`, and `unslop` for direct discovery. A module is not a required stage just because it is installed.
 
-These exist **again** at `~/.agents/skills/<name>` because BEAST / config / packs hard-code paths or names. Content lives in `~/.agents/skill-modules/`; the skill dir is a symlink.
-
-| Path | Why |
-|------|-----|
-| `unslop` | `BEAST.v2.md` — `Read ~/.agents/skills/unslop/SKILL.md` every session |
-| `remove-ai-slop` | Named with unslop in BEAST prose section |
-| `impeccable`, `taste-craft` | BEAST frontend/design section |
-| `master-content-media` | config.toml path (alias → `$media`) |
-| `master-frontend` → `$frontend`, `master-engineering` → `$code`, `master-product-growth` → `$growth`, `master-skill-router` → `$route` | Legacy master names |
-
-The hyperframes family (`hyperframes*`, `website-to-hyperframes`) was delisted from the
-active set in 2026-08: seven entries cost 3,584 of the ~6,000-char Claude listing budget.
-The modules remain in the library; the `$media` router loads them by path.
-
-## Modules library
-
-Full former skill tree (not all re-linked into the menu):
-
-`~/.agents/skill-modules/`
-
-Load any module: `~/.agents/skill-modules/<name>/SKILL.md`
-
-## Mirrors
-
-`~/.claude/skills` and `~/.codex/skills` mirror the same set (primary + legacy restores).
+Use `beast skills` to inspect the current active set. `beast skills add <name>` and `beast skills rm <name>` change discovery; reinstall only when intentionally updating harness links. Managed system/plugin skills and project-local skills remain owned by their respective installers or projects.
