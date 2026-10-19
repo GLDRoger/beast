@@ -6,6 +6,29 @@ Beast keeps shared operating principles, partner/taste guidance, and optional sp
 
 Corrections should advance the unresolved goal. Reviews remain read-only; authorized changes include implementation and proportionate verification. More context or more agents does not by itself prove better completion. Evaluate setup changes against actual outcomes and scope violations.
 
+## What each file holds
+
+Every instruction an agent sees comes from one of five places. Each has one job, and a rule lives in the place whose job it matches. Many things belong nowhere: a line that no model needs to be told is cost without benefit.
+
+| File | Its job | Loaded |
+|---|---|---|
+| `home/shared/BEAST.md` (system prompt) | How the agent lives: its stance and working principles. True for any user on any machine. | Every session, as the system prompt |
+| `home/shared/USER.md` (global `CLAUDE.md` / `AGENTS.md`) | How the work is done here, as given: model routing and briefs, how to call each model, the worker contract, the skill index, engineering and git conventions. | Every session |
+| A project's `AGENTS.md` (`CLAUDE.md` is just `@AGENTS.md`) | The specifics of that project: what it is, its goals, commands, architecture, and gotchas. Nothing that is true of every project. | Sessions in that repository |
+| Skills (`home/agents/skills`, `skill-modules`) | Workflows and behaviours injected by circumstance. Procedures an agent needs only while doing that kind of task. | When the task calls for them |
+| [Jevis](https://github.com/GLDRoger/jevis) tips | Like skills, but injected deterministically by hooks instead of waiting for the model to go and read them. | At a fixed moment, below |
+
+Jevis tips arrive at three kinds of moment:
+
+- **Session start and after compaction:** the session guide, the judgment examples, and all design guidance, including each model family's defaults to avoid. Design lives only here: in the system prompt or `USER.md` it has no effect, and at session start it reaches the first file an agent writes.
+- **Every message:** a short reminder of the session guide, the interface-copy line, and the GPT-only corrections.
+- **A specific moment:** vague feedback, repeated vague feedback, and sessions started by another agent.
+
+Two rules keep the layers consistent:
+
+1. **Repetition is deliberate, contradiction is a bug.** Over a long session a model stops following its system prompt, so a Jevis tip may restate a Beast rule in fewer words. It never adds or changes a rule; design guidance and per-family corrections are the exceptions, and Jevis is their only home. When a reminder and its source drift apart, the source wins and the reminder is rewritten.
+2. **Place a line by asking where it is true.** For anyone: Beast. For this user on every project: `USER.md`. For one project: its `AGENTS.md`. Only while doing one kind of task: a skill. Only at one moment or for one model: Jevis. For no one: delete it.
+
 ## Install deliberately
 
 Requirements: Node.js 22+, Git, and a supported harness. Keep the clone at its installed path: home-directory entries are symlinks into it.

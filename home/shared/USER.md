@@ -96,17 +96,30 @@ cd <project> && AGENT_CALL_DEPTH=1 muse exec --yolo --model muse-wonder-1.0 --re
 
 **Grok Build** has no native route to these models; use the commands above for every model.
 
-If `AGENT_CALL_DEPTH` is set in your environment, you are a worker: do the task, do not delegate, and return the result.
+## When you are the worker
+
+You are a worker when your brief opens with "You were called by another agent. Do this task yourself." or `AGENT_CALL_DEPTH` is set in your environment. Do the assigned task directly within its scope, do not delegate further, and return the requested result with what you verified and what you could not.
 
 ## Skills
 
-Before non-trivial work in one of these areas, read the routed skill's `SKILL.md`. When unsure which applies, read `~/.agents/skills/route/SKILL.md`.
+Before non-trivial work, read the `SKILL.md` of the workflow that owns the outcome. Specialist modules live at `~/.agents/skill-modules/<name>/SKILL.md`; load one only when its procedure helps.
 
-- Workflows, at `~/.agents/skills/<name>/SKILL.md`: `code` for non-trivial code, `frontend` for interfaces, `writing` for substantive prose, `motion` for motion, `media` for film and video, plus `performance`, `security`, and `growth`.
-- Modules, at `~/.agents/skill-modules/<name>/SKILL.md`: `unslop` with `writing`; `taste-craft`, plus `review-animations` for non-trivial motion, with `motion`; `scroll-scenes` for scroll-driven pages; `3d-scenes` for 3D and WebGL.
+| Outcome | Workflow, at `~/.agents/skills/<name>/SKILL.md` |
+|---|---|
+| Product UI, responsive implementation | `frontend` |
+| Application logic, bugs, APIs, refactors, verification | `code` |
+| Prose, documentation, UI copy, outreach | `writing` |
+| Interaction motion and animation | `motion` (with `taste-craft`, `review-animations`, `scroll-scenes`, `3d-scenes`) |
+| Speed, jank, stability | `performance` |
+| Authentication, authorization, secrets, defensive controls | `security` |
+| Ideas, product decisions, pricing, distribution | `growth` |
+| Video, images, audio, captions | `media` |
+
+Pair `writing` with the `unslop` module for substantive prose.
 
 ## Engineering
 
+- Preserve user-owned files, data, credentials, and unrelated work, including other agents' edits in progress. Keep secrets out of code, logs, prompts, and responses.
 - Search with `fd`, `rg`, `ast-grep`, and `jq`/`yq`. Keep command output bounded.
 - A file past ~500 lines prompts a check for mixed responsibilities; split only when that makes it clearer.
 - New dependencies need necessity, provenance, and maintenance checked. Read docs for the installed version.
