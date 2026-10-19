@@ -24,9 +24,7 @@ const USAGE = `${c.bold('beast')} — install one agent config across Claude Cod
   beast scan                   list every skill source and how to retire each
   beast doctor                 verify links, config, skill budget, secrets
   beast delegation             refresh capability guidance without reinstalling
-  beast skills                 list the active set
-  beast skills add <name>      activate a module from the library
-  beast skills rm <name>       deactivate a skill
+  beast skills                 list the eight workflows and module library
 
   harnesses: ${HARNESS_NAMES.join(', ')}
   packs:     ${PACK_NAMES.join(', ')}   ${c.dim('(core is always included)')}

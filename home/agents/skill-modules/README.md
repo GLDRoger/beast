@@ -31,10 +31,6 @@ The primary workflows own completion. A standalone review remains read-only; a r
 - `rate-limit`
 - `readme`
 - `redesign-skill`
-- `remotion`
-- `remotion-animation`
-- `remotion-cli`
-- `remotion-core`
 - `review-animations`
 - `review-swarm`
 - `ruthless-release-qa`
@@ -54,3 +50,9 @@ The primary workflows own completion. A standalone review remains read-only; a r
 - `unslop`
 - `wayfinder`
 - `web-shader-extractor`
+- `ai-features`
+- `data-work`
+- `dependency-upgrades`
+- `explaining`
+- `long-work`
+- `mobile`

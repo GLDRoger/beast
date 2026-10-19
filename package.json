@@ -1,7 +1,7 @@
 {
   "name": "beast-config",
   "version": "0.1.0",
-  "description": "One agent config installed across Claude Code, Codex, and Grok",
+  "description": "One agent config installed across Claude Code, Codex, Grok, Gemini, Antigravity, Muse, and Hermes",
   "type": "module",
   "bin": {
     "beast": "./bin/beast.mjs"
@@ -9,9 +9,7 @@
   "//private": [
     "Not publishable, and not by accident. beast installs symlinks that point INTO the",
     "clone, so the clone is the source of truth and `git diff` is how you see drift \u2014 an",
-    "immutable copy under node_modules cannot fill that role. npm also refuses to",
-    "materialise the 18 symlinked skill directories in the active set: `npm pack` shipped",
-    "9 of 27 active skills, silently, which is worse than not publishing at all.",
+    "immutable copy under node_modules cannot fill that role.",
     "Install with `git clone` + `npm link`; see README.md."
   ],
   "private": true,

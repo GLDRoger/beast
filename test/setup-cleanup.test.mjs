@@ -65,7 +65,7 @@ test('a reinstall retires stale owned aliases while preserving the remaining set
   assert.equal(run(['install', '--all'], home).status, 0)
   assert.throws(() => lstatSync(stale), { code: 'ENOENT' })
   for (const tree of ['.agents/skills', '.agents/skill-modules', '.codex/skills', '.claude/skills']) {
-    const names = readdirSync(join(home, tree))
+    const names = existsSync(join(home, tree)) ? readdirSync(join(home, tree)) : []
     assert.deepEqual(names.filter((n) => RETIRED_SKILLS.includes(n)), [])
   }
   assert.equal(existsSync(join(home, '.agents/skill-modules/unslop/references/visual.md')), true)

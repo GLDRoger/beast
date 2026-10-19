@@ -23,7 +23,7 @@ TOPIC_RULES = {
     "codex_config": r"codex|agents\.md|beast\.md|skill|prompt|memory|session|config\.toml|model|opus|sonnet|haiku|kimi",
     "automation": r"automation|remind|recurring|monitor|watch|check back|every day|weekly",
     "remote_ml": r"runpod|comfyui|cuda|torch|gpu|pod|ssh|model endpoint|ollama",
-    "media_docs": r"pptx|slides|spreadsheet|xlsx|docx|pdf|video|hyperframes|remotion|image|sprite|pet",
+    "media_docs": r"pptx|slides|spreadsheet|xlsx|docx|pdf|video|hyperframes|image|sprite|pet",
 }
 
 

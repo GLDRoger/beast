@@ -67,7 +67,6 @@ test('packOf round-trips a sample and returns null for a non-skill', () => {
     ['code', 'core'],
     ['taste-craft', 'design'],
     ['text-to-lottie', 'design'],       // animation asset helper
-    ['remotion', 'remotion'],
     ['unslop', 'prose'],
     ['ship-email', 'product'],          // scaffolds email infra, not copy
     ['web-shader-extractor', 'engineering'],

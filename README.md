@@ -1,6 +1,6 @@
 # beast
 
-A curated agent setup for Claude Code, Codex, Grok Build, Gemini / Antigravity, and Hermes.
+A curated agent setup for Claude Code, Codex, Grok Build, Gemini / Antigravity, Muse Code, and Hermes.
 
 Beast keeps shared operating principles, partner/taste guidance, and optional specialist methods in one repository. Eight primary workflows own the requested outcome. They load specialist material when it helps instead of imposing every checklist, interview, or report format on every task.
 
@@ -48,7 +48,7 @@ Interactive installation selects harnesses and packs and asks before writing. Ex
 ```sh
 beast install --all
 beast install --harness=codex --packs=core,design,engineering
-beast install --harness=claude,codex --packs=core,remotion
+beast install --harness=claude,codex --packs=core,prose
 beast install --dry-run --harness=codex --packs=core
 ```
 
@@ -86,21 +86,22 @@ Shared policy edits affect symlinked files immediately on disk. Generated output
 
 ## Skills and scope
 
-Primary workflows live under `home/agents/skills/`; specialist bodies live under `home/agents/skill-modules/`. Some specialists also have discovery links resolving to that same source.
+Primary workflows live under `home/agents/skills/`; specialist bodies live under `home/agents/skill-modules/`. Only the eight workflows are automatically discoverable; modules are loaded by path.
+
+The installer uses the shared `~/.agents/skills` root for Codex, Grok, Gemini CLI, and Muse, and mirrors the eight workflows into `~/.claude/skills` and Antigravity's global roots (`~/.gemini/config/skills` for the app/IDE and `~/.gemini/antigravity-cli/skills` for the CLI). Grok's configured skill ignores and compatibility settings still apply. Hermes uses the shared root when its `skills.external_dirs` already includes it; otherwise the installer links workflows under `~/.hermes/skills/beast`, leaving bundled category directories untouched. Existing legacy Beast mirrors are retired on reinstall.
+
+Discovery locations are documented by [Claude Code](https://code.claude.com/docs/en/skills), [Codex](https://developers.openai.com/codex/skills), [Gemini CLI](https://geminicli.com/docs/cli/skills/), and [Antigravity](https://antigravity.google/docs/skills). `grok inspect --json`, `muse skills list --source user --json`, and `hermes skills list --enabled-only` show the installed CLI's discovered workflows. `beast doctor` warns about exposed modules, duplicate names within one harness, broken links, and unexpected real directories; tool-owned system collections and deliberately excluded private modules stay under their owners' control.
 
 Installed files, discoverable descriptions, and loaded skill bodies are different things. Inspect the current harness to establish what is loaded; do not infer context cost from directory counts.
 
 | Pack | Skills | Purpose |
 |---|---:|---|
 | `core` | 8 | Primary workflow ownership |
-| `design` | 10 | Optional visual/interaction craft and Lottie |
-| `remotion` | 4 | React video composition, animation, rendering |
-| `prose` | 7 | Prose/visual cleanup, docs, outreach |
+| `design` | 12 | Optional visual/interaction craft, Lottie, and canvas films |
+| `prose` | 8 | Prose/visual cleanup, docs, outreach |
 | `product` | 8 | Positioning, pricing, discoverability, validation |
-| `engineering` | 13 | Architecture, review, performance, investigation |
+| `engineering` | 18 | Architecture, review, performance, investigation |
 | `tooling` | 5 | Local agent/runtime diagnostics and headless model calls |
-
-Remotion is the retained video stack. Follow its current project/version and licensing instructions for video work. Removing a production skill does not authorize migrating existing user projects or deleting their assets.
 
 `unslop` separates prose and visual cleanup into optional references. It preserves user voice, brand, facts, uncertainty, accessibility, and review/edit scope. Aesthetic modules are optional recipes, not mandatory brand interviews.
 
@@ -108,12 +109,11 @@ Retired families and aliases are recorded in `RETIRED_SKILLS` in `lib/manifest.m
 
 ```sh
 beast skills
-beast skills add apple-design
-beast skills rm apple-design
+beast install --packs=core,design
 beast scan
 ```
 
-Adding/removing a skill changes discovery. Intentionally reinstall selected harnesses when their mirror links need updating. System/plugin and project-local skills remain owned by their installers or projects.
+Pack selection changes the optional module library, not the eight discoverable workflows. Reinstall selected harnesses when their links need updating. System/plugin and project-local skills remain owned by their installers or projects.
 
 ## Delegation
 

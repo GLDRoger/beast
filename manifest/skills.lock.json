@@ -1,15 +1,6 @@
 {
   "version": 3,
   "skills": {
-    "remotion-best-practices": {
-      "source": "remotion-dev/skills",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/remotion-dev/skills.git",
-      "skillPath": "skills/remotion/SKILL.md",
-      "skillFolderHash": "9571b6f1d9b42233e4ce48ad121933574d67023c",
-      "installedAt": "2026-01-25T11:23:54.964Z",
-      "updatedAt": "2026-01-25T11:24:09.825Z"
-    },
     "Agent Browser": {
       "source": "am-will/codex-skills",
       "sourceType": "github",

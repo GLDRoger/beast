@@ -1,6 +1,6 @@
 ---
 name: media
-description: Produce and inspect requested video, image, audio, caption, and Lottie deliverables. Use Remotion for React-based video and available media tools for assets.
+description: Produce and inspect requested video, image, audio, caption, and Lottie deliverables. Use available media tools and preserve the established project stack.
 ---
 
 # Media
@@ -10,7 +10,7 @@ Own the artifact from the supplied material and brief to a usable, inspected out
 ## Choose the tool for the artifact
 
 - A film, short, or launch video from a prompt with no existing project: `~/.agents/skill-modules/drawing-canvas-films/SKILL.md`. Every frame is drawn in code, and its look loop checks the frames at full size. Use its treatment step as the creative brief.
-- React video, or an existing Remotion project: `~/.agents/skill-modules/remotion/SKILL.md`; load its core, animation, or CLI references only for the current work.
+- Video production or an existing video project: inspect the project and available media tools; use the established stack and its version-matched documentation.
 - 3D shots inside a film: `~/.agents/skill-modules/3d-scenes/SKILL.md`.
 - Lottie: `~/.agents/skill-modules/text-to-lottie/SKILL.md`.
 - Generated or edited raster images: the available image-generation skill/tool.
