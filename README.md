@@ -4,7 +4,7 @@ A curated agent setup for Claude Code, Codex, Grok Build, Gemini / Antigravity, 
 
 Beast keeps shared operating principles, partner/taste guidance, and optional specialist methods in one repository. Eight primary workflows own the requested outcome. They load specialist material when it helps instead of imposing every checklist, interview, or report format on every task.
 
-Corrections should advance the unresolved goal. Reviews remain read-only; authorized changes include implementation and proportionate verification. More context or more agents does not by itself prove better completion. Evaluate setup changes against actual outcomes and scope violations.
+Corrections should advance the unresolved goal. More context or more agents does not by itself prove better completion. Evaluate setup changes against actual outcomes and scope violations.
 
 ## What each file holds
 
@@ -20,13 +20,13 @@ Every instruction an agent sees comes from one of five places. Each has one job,
 
 Jevis tips arrive at three kinds of moment:
 
-- **Session start and after compaction:** the session guide, the judgment examples, and all design guidance, including each model family's defaults to avoid. Design lives only here: in the system prompt or `USER.md` it has no effect, and at session start it reaches the first file an agent writes.
-- **Every message:** a short reminder of the session guide, the interface-copy line, and the GPT-only corrections.
-- **A specific moment:** vague feedback, repeated vague feedback, and sessions started by another agent.
+- **Session start and after compaction:** the session guide, the judgment examples, and the design reminders, including each model family's defaults to avoid. Design reminders live here rather than in the system prompt or `USER.md`, where they had no effect; at session start they reach the first file an agent writes. The `frontend` and `motion` skills keep their task procedures.
+- **Every message:** a short reminder of the session guide, the interface-copy line, and the GPT-only corrections. In a session started by another agent, the worker tip replaces all three.
+- **A specific moment:** vague feedback, and a second vague correction in the same session. Worker sessions get neither.
 
 Two rules keep the layers consistent:
 
-1. **Repetition is deliberate, contradiction is a bug.** Over a long session a model stops following its system prompt, so a Jevis tip may restate a Beast rule in fewer words. It never adds or changes a rule; design guidance and per-family corrections are the exceptions, and Jevis is their only home. When a reminder and its source drift apart, the source wins and the reminder is rewritten.
+1. **Repetition is deliberate, contradiction is a bug.** Over a long session a model stops following its system prompt, so a Jevis tip may restate a Beast or `USER.md` rule in fewer words. Some guidance lives only in Jevis: the session guide, the judgment examples, the design reminders, the per-family corrections, and the feedback tips. Everything else a tip says must have a source in another layer, and when a reminder and its source drift apart, the source wins and the reminder is rewritten.
 2. **Place a line by asking where it is true.** For anyone: Beast. For this user on every project: `USER.md`. For one project: its `AGENTS.md`. Only while doing one kind of task: a skill. Only at one moment or for one model: Jevis. For no one: delete it.
 
 ## Install deliberately
