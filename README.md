@@ -40,3 +40,4 @@ The full rules, and when Jevis tips arrive, are in [docs/layers.md](docs/layers.
 - [Setup](docs/setup.md): install options, config edits, where each harness loads Beast from, launch helpers, updating, what install touches, and checks.
 - [Skills](docs/skills.md): the workflows, the packs, and maintaining the library.
 - [Where an instruction belongs](docs/layers.md): which layer a rule goes in.
+- [Coding models](docs/models.md): the tier list, and what each top model is good for. Mirrored in Jevis.
