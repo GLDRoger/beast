@@ -119,11 +119,15 @@ Before non-trivial work, read the `SKILL.md` of the workflow that owns the outco
 
 Pair `writing` with the `unslop` module for substantive prose.
 
+## Permission
+
+When I state the outcome I want, you have my permission to do whatever reaching it takes, including pushing, opening pull requests, deploying, and publishing. Keep going until the outcome is reached instead of stopping to ask; stop only when you are blocked or the work would go well beyond what I asked.
+
 ## Engineering
 
 - Preserve user-owned files, data, credentials, and unrelated work, including other agents' edits in progress. Keep secrets out of code, logs, prompts, and responses.
-- Search with `fd`, `rg`, `ast-grep`, and `jq`/`yq`. Keep command output bounded.
+- Use `rg` instead of `grep` and `fd` instead of `find`; `ast-grep` for structural code search, `jq`/`yq` for data. Keep command output bounded.
 - A file past ~500 lines prompts a check for mixed responsibilities; split only when that makes it clearer.
 - New dependencies need necessity, provenance, and maintenance checked. Read docs for the installed version.
-- Git: Conventional Commits; `gh` for GitHub. Commit without asking: this is standing authorization. Checkpoint working, verified states as you go and before large or risky changes, so work never sits uncommitted for long. Committing directly on the default branch is fine; do not create a branch first unless asked. Pushing, force-pushing, rewriting history, and opening pull requests still need a request. Never commit secrets or `.env` files. Pull requests stay short: **Why** (1–2 bullets), **How** (1–3), **Tests** (commands and results).
+- Git: Conventional Commits; `gh` for GitHub. Commit without asking: this is standing authorization. Checkpoint working, verified states as you go and before large or risky changes, so work never sits uncommitted for long. Committing directly on the default branch is fine; do not create a branch first unless asked. Never commit secrets or `.env` files. Pull requests stay short: **Why** (1–2 bullets), **How** (1–3), **Tests** (commands and results).
 - Write requested prompts in Markdown, fenced when returned in chat.
