@@ -13,7 +13,7 @@ import { isInteractive, multiselect, confirm } from '../lib/prompt.mjs'
 import { coverageWarning } from '../lib/coverage.mjs'
 import { planConfigEdits, hasPendingEdits, configQuestion, EDITABLE } from '../lib/config-write.mjs'
 
-const USAGE = `${c.bold('beast')} — install one agent config across Claude Code, Codex, and Grok
+const USAGE = `${c.bold('beast')} — install one agent config across every coding harness
 
   beast install                interactive: pick harnesses, then skill packs
   beast install --all          everything, no prompts
