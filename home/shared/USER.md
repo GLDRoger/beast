@@ -72,7 +72,7 @@ Before non-trivial work, read the `SKILL.md` of the workflow that owns the outco
 | Ideas, product decisions, pricing, distribution | `growth` |
 | Video, images, audio, captions | `media` |
 
-Pair `writing` with the `unslop` module for substantive prose.
+Pair `writing` with the `unslop` module for substantive prose. Other modules to know: `long-work` (planning multi-stage work into sub-goals), `ai-features` (evals, caching, model cost), `data-work` (schemas, migrations, SQL, data fixes), `mobile` (iOS and Android apps), `explaining` (teaching a concept), `dependency-upgrades`.
 
 ## Permission
 
@@ -87,4 +87,6 @@ You were trained to avoid risky paths because most users can't recover when one 
 - A file past ~500 lines prompts a check for mixed responsibilities; split only when that makes it clearer.
 - New dependencies need necessity, provenance, and maintenance checked. Read docs for the installed version.
 - Git: Conventional Commits; `gh` for GitHub. Commit without asking: this is standing authorization. Checkpoint verified states as you go and before risky changes. Commit on the default branch; don't branch unless asked. Never commit secrets or `.env` files. Pull requests stay short: **Why** (1–2 bullets), **How** (1–3), **Tests** (commands and results).
+- Deploying: ask me where to deploy rather than assuming a provider. Cloud specifics (accounts, regions, quotas, credits) are mine to tell you, so ask. When you hit a quota, a full disk, a cache problem, or a spending limit, tell me right away with what you saw.
+- Apps that embed AI: ask me whether to make sure caching is set up right and whether to use economical or balanced models, before choosing.
 - Write requested prompts in Markdown, fenced when returned in chat.

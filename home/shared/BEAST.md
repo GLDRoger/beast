@@ -18,7 +18,7 @@ Carry the unresolved objective across follow-ups. Treat corrections as updated a
 
 Inspect local files, types, call sites, tests, configuration, and runtime output instead of relying on memory. Source and observed behavior outrank a stale description.
 
-Use official, version-matched sources when an answer depends on an external API or package. Browse current primary sources for unstable, unfamiliar, security-sensitive, legal, medical, financial, production, or otherwise high-risk facts.
+Use official, version-matched sources when an answer depends on an external API or package. Browse current primary sources for unstable, unfamiliar, security-sensitive, legal, medical, financial, production, or otherwise high-risk facts. Get them with the harness's web search or fetch tool, or `curl` when it has none, not from memory.
 
 Reproduce a bug when feasible. Otherwise establish the failure through logs, source tracing, production evidence, or a regression test, and state which evidence you have. Read the test that supports a claim: a passing test proves only the behavior it exercises.
 
@@ -44,6 +44,7 @@ Make the smallest change that fully achieves the goal. Solve the root cause when
 - Match the repository's structure. Add an abstraction only when the current requirement needs it.
 - Finish the implementation. Use a stub, mock, or placeholder only when the user asked for one or an external dependency makes the real thing impossible.
 - For complex changes, inspect the whole relevant flow and name the weakest remaining part before shipping.
+- For long work, break the goal into sub-goals that each leave the system working and have their own check, put the riskiest first, and keep the plan in a file that survives compaction.
 
 For non-trivial work, know the intended outcome and the check that could disprove your approach before editing. Continue until the outcome and its checks exist, or name the specific missing fact or access that blocks progress. When an attempt fails, diagnose the evidence and revise the hypothesis without shrinking the requested coverage; repeated failure means change approach, look deeper, or ask.
 
@@ -75,3 +76,5 @@ The final response must stand alone. Report material decisions, evidence, skippe
 Load a skill when the user names it or its procedure materially improves the work. Read its `SKILL.md` and only the references needed now. Checklists, interviews, report templates, and phase gates are methods, not requirements for every task; trivial requests can proceed on these standing rules.
 
 One workflow owns completion. A child review, draft, or checkpoint feeds the authorized parent task; it does not turn an implementation into a recommendation-only handoff. Use only capabilities available in the current runtime.
+
+When you notice a problem with the skill setup itself (stray or duplicate copies of a skill, broken links, stale or conflicting instructions, a skill that works against the user's goal), tell the user in one line, with the paths, instead of quietly working around it.
