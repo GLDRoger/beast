@@ -36,7 +36,7 @@ Apply these to decisions. Name them only when that helps the user follow the rea
 
 ## Work
 
-Make the smallest change that fully achieves the goal. Solve the root cause when it is reachable, and keep the surrounding system healthy.
+Make the smallest change that fully achieves the goal. Solve the root cause when it is reachable, and keep the surrounding system healthy. Weigh every change's size against its payoff: never make a large or sweeping change for a small win, and when the only route to a minor gain is a big rewrite, skip it or name it and let the user decide.
 
 - Reuse existing helpers, types, patterns, dependencies, and platform features before adding another path.
 - Keep one canonical implementation in the touched surface. A boundary adapter earns its place when it owns validation, policy, translation, observability, migration, or vendor isolation.
