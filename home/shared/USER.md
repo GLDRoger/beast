@@ -12,8 +12,8 @@ Route by what the work produces:
 |---|---|---|
 | Research and exploration: codebase search, docs, web research, gathering facts | Haiku 5.5 | medium |
 | Long or multi-step check runs: full test suites, builds, end-to-end or simulated sessions | Haiku 5.5 or GPT-6 Luna | low |
-| Code outside the UI: APIs, data, infrastructure, scripts, tests, tooling, configuration, debugging, refactors | GPT-6.1 Sol | high |
-| User-facing code: UI components, pages, interaction, in-product copy | Opus 5.5 or Muse Wonder Full | high |
+| Code outside the UI: APIs, data, infrastructure, scripts, tests, tooling, configuration, debugging, refactors | GPT-6.1 Sol or Muse Wonder Full | high |
+| User-facing code: UI components, pages, interaction, in-product copy | Opus 5.5 | high |
 | 3D, WebGL, motion, and animation | Opus 5.5 only | high |
 | Reviews, analysis, and verdicts on work by Opus, Muse, or Haiku | GPT-6.1 Sol | high |
 | Reviews of Sol's work | Opus 5.5 | high |
@@ -29,11 +29,11 @@ Briefs:
 Routing rules:
 
 - When you are the routed model, do the work yourself; spawn a worker of your own model only for parallel or context-heavy pieces.
-- Opus 5.5 and Muse Wonder Full share user-facing code at equal priority. Use the one native to your harness; from Codex or Grok, use either, and split parallel user-facing work across both. 3D and animation go to Opus only.
+- GPT-6.1 Sol and Muse Wonder Full share code outside the UI at equal priority. Use the one native to your harness; from Claude Code or Grok, use either, and split parallel work across both. User-facing code, 3D, and animation go to Opus: Muse Wonder Full can't do frontend or 3D work at all.
 - A reviewer is never the author's model: an independent model catches what the author's own tests passed.
 - Split mixed tasks along the boundary: Sol builds the API, Opus builds the screen that calls it. Give each worker its own files.
 - Raise effort to xhigh for hard debugging, security-sensitive changes, and Astra reviews.
-- If a routed model fails (auth, rate limit, outage), retry once, then fall back: Sol, Opus, and Muse Wonder Full cover for one another; Sol covers for Astra, except on Sol's own work, where Opus does; Haiku and Luna cover for each other. If 3D or animation work cannot reach Opus, tell the user. When you are the fallback, do the work yourself. Tell the user which model did the work.
+- If a routed model fails (auth, rate limit, outage), retry once, then fall back: Sol and Muse Wonder Full cover for each other, and Opus covers for both; Sol covers for Astra, except on Sol's own work, where Opus does; Haiku and Luna cover for each other. If user-facing, 3D, or animation work cannot reach Opus, tell the user. When you are the fallback, do the work yourself. Tell the user which model did the work.
 
 ## Calling each model
 

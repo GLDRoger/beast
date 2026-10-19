@@ -11,7 +11,7 @@ Models in tier A+ and above.
 | Claude Opus 5.5 | SSS | The best model available. User-facing code, 3D, WebGL, motion and animation, and reviewing GPT-6.1 Sol's work. |
 | GPT-6.1 Sol | SS | Code outside the UI (APIs, data, infrastructure, scripts, tests, debugging, refactors), and reviewing work by Claude and Muse models. As good as Astra. |
 | GPT-6 Astra | SS | 3D modeling work and decent frontend designs. Expensive: use GPT-6.1 Sol instead, except for the most thorough reviews. |
-| Muse Wonder Full | SS | User-facing code, on a par with Opus 5.5. |
+| Muse Wonder Full | SS | Backend code. It can't do frontend or 3D work at all, so never use it for either. |
 | Claude Fable 5.1 | S | Frontend animation. Strong, but Opus 5.5 is better and cheaper. |
 | Claude Mythos 5.1 | S | Fable 5.1 with lowered safeguards. |
 | Claude Haiku 5.5 | A+ | Research and exploration (codebase search, docs, web research), and long check runs. |
