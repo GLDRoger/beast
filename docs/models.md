@@ -16,7 +16,7 @@ Models in tier A+ and above.
 | Claude Mythos 5.1 | S | Fable 5.1 with lowered safeguards. |
 | Claude Haiku 5.5 | A+ | Research and exploration (codebase search, docs, web research), and long check runs. |
 | GPT-6 Luna | A+ | Research and exploration (codebase search, docs, web research), and long check runs. |
-| Gemini 4 Argon | A+ | 3D modeling work, spatial reasoning, and multilingual and multimodal reasoning. Don't use it for frontend or backend code. |
+| Gemini 4 Argon | A+ | 3D modeling work, spatial reasoning, and multilingual and multimodal reasoning. Don't use it for frontend or backend code. Tends to reread the same files. |
 
 ## Tier list
 
@@ -35,4 +35,4 @@ Models in tier A+ and above.
 
 Daybreak Blue is GPT-5.6 Sol with lowered safeguards.
 
-The Gemini 3.x Flash models tend to reread the same files and drift off the task, so they aren't recommended. Gemini 4 Argon doesn't share that ranking.
+Gemini models, Gemini 4 Argon included, tend to reread the same files. The Gemini 3.x Flash models also drift off the task, so they aren't recommended.
