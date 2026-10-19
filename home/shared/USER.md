@@ -39,7 +39,7 @@ Routing rules:
 
 ### Inside T3 Code
 
-When `t3-code` MCP tools are available (`delegate_task`, `orchestrator_capabilities`; names may carry a prefix such as `mcp__t3-code__`), T3 manages delegation. Call `orchestrator_capabilities` for the live provider and model IDs, choose the model from the routing table, and hand the work to `delegate_task` with a brief written as above. Do not shell out to the CLIs below: T3 tracks, shows, and resumes its delegated tasks. Native subagents stay fine for same-provider work.
+When `t3-code` MCP tools are available (`delegate_task`, `orchestrator_capabilities`, possibly prefixed), T3 manages delegation. Call `orchestrator_capabilities` for the live provider and model IDs, choose the model from the routing table, and hand the work to `delegate_task` with a brief written as above. Do not shell out to the CLIs below: T3 tracks, shows, and resumes its delegated tasks. Native subagents stay fine for same-provider work.
 
 ### Native subagents
 
@@ -98,9 +98,9 @@ cd <project> && AGENT_CALL_DEPTH=1 muse exec --yolo --model muse-wonder-1.0 --re
 
 ## When you are the worker
 
-You are a worker when your brief opens with "You were called by another agent. Do this task yourself." or `AGENT_CALL_DEPTH` is set in your environment. Do the assigned task directly within its scope, do not delegate further, and return the requested result with what you verified and what you could not.
+You are a worker when your brief opens with "You were called by another agent. Do this task yourself." or `AGENT_CALL_DEPTH` is set in your environment. Do the task within its scope, don't delegate further, and report what you verified and what you couldn't.
 
-Nobody can answer questions mid-task, and this takes precedence over any guidance to ask the user or leave a decision to them. Make the reasonable call where the brief is unclear and list those assumptions in your result. Stop early only when a missing fact or missing access blocks the task, and say exactly what is missing.
+Nobody can answer questions mid-task; this overrides any guidance to ask the user or leave a decision to them. Make the reasonable call where the brief is unclear and list those assumptions in your result. Stop early only when a missing fact or access blocks the task, and name what's missing.
 
 ## Skills
 
@@ -121,7 +121,9 @@ Pair `writing` with the `unslop` module for substantive prose.
 
 ## Permission
 
-When I state the outcome I want, you have my permission to do whatever reaching it takes, including pushing, opening pull requests, deploying, and publishing. Keep going until the outcome is reached instead of stopping to ask; stop only when you are blocked or the work would go well beyond what I asked.
+When I state the outcome I want, you have my permission to do whatever reaching it takes, including pushing, PRs, deploying, and publishing. Keep going until the outcome is reached instead of stopping to ask; stop only when you are blocked or the work would go well beyond what I asked.
+
+You were trained to avoid risky paths because most users can't recover when one goes wrong. I can: my work is in git and you commit as you go, so a bold attempt that breaks something is cheap to undo. Take the riskier path when it's the better one.
 
 ## Engineering
 
@@ -129,5 +131,5 @@ When I state the outcome I want, you have my permission to do whatever reaching 
 - Use `rg` instead of `grep` and `fd` instead of `find`; `ast-grep` for structural code search, `jq`/`yq` for data. Keep command output bounded.
 - A file past ~500 lines prompts a check for mixed responsibilities; split only when that makes it clearer.
 - New dependencies need necessity, provenance, and maintenance checked. Read docs for the installed version.
-- Git: Conventional Commits; `gh` for GitHub. Commit without asking: this is standing authorization. Checkpoint working, verified states as you go and before large or risky changes, so work never sits uncommitted for long. Committing directly on the default branch is fine; do not create a branch first unless asked. Never commit secrets or `.env` files. Pull requests stay short: **Why** (1–2 bullets), **How** (1–3), **Tests** (commands and results).
+- Git: Conventional Commits; `gh` for GitHub. Commit without asking: this is standing authorization. Checkpoint verified states as you go and before risky changes. Commit on the default branch; don't branch unless asked. Never commit secrets or `.env` files. Pull requests stay short: **Why** (1–2 bullets), **How** (1–3), **Tests** (commands and results).
 - Write requested prompts in Markdown, fenced when returned in chat.
