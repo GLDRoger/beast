@@ -98,7 +98,7 @@ Installed files, discoverable descriptions, and loaded skill bodies are differen
 | `prose` | 7 | Prose/visual cleanup, docs, outreach |
 | `product` | 8 | Positioning, pricing, discoverability, validation |
 | `engineering` | 13 | Architecture, review, performance, investigation |
-| `tooling` | 4 | Local agent/runtime diagnostics |
+| `tooling` | 5 | Local agent/runtime diagnostics and headless model calls |
 
 Remotion is the retained video stack. Follow its current project/version and licensing instructions for video work. Removing a production skill does not authorize migrating existing user projects or deleting their assets.
 
