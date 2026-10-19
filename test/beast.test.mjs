@@ -433,7 +433,7 @@ test('the loaded set is resolved per listing name, against a fixture $HOME', asy
     mkdirSync(dir, { recursive: true })
     writeFileSync(join(dir, 'SKILL.md'), `---\nname: ${name}\ndescription: ${desc}\n---\nbody\n`)
   }
-  mk(join(home, '.claude/skills/route'), 'route', 'picks a lane')
+  mk(join(home, '.claude/skills/lane'), 'lane', 'picks a lane')
   // A directory whose frontmatter claims another name. Claude Code keys the listing on
   // the frontmatter name, so this shadows the plugin's `shared` and must be reported
   // under `shared`, once.
@@ -441,7 +441,7 @@ test('the loaded set is resolved per listing name, against a fixture $HOME', asy
   mk(join(home, 'plug/p1/skills/shared'), 'shared', 'the plugin copy')
   mk(join(home, 'plug/p2/skills/ghost'), 'ghost', 'only from a disabled plugin')
   // Same name as the home copy, but inside the disabled plugin: shadows nothing.
-  mk(join(home, 'plug/p2/skills/route'), 'route', 'a cached copy that does not load')
+  mk(join(home, 'plug/p2/skills/lane'), 'lane', 'a cached copy that does not load')
   mk(join(home, 'plug/p2extra/skills/extra'), 'extra', 'from the plugin whose id contains the other')
   mkdirSync(join(home, '.claude/plugins'), { recursive: true })
   writeFileSync(join(home, '.claude/plugins/installed_plugins.json'), JSON.stringify({
@@ -456,7 +456,7 @@ test('the loaded set is resolved per listing name, against a fixture $HOME', asy
   const warnings = []
   const res = checkSkillHygiene({ fail: () => {}, warn: (m) => warnings.push(m), info: () => {}, homeDir: home })
 
-  assert.deepEqual(res.listing.rows.map((r) => r.name).sort(), ['extra', 'route', 'shared'])
+  assert.deepEqual(res.listing.rows.map((r) => r.name).sort(), ['extra', 'lane', 'shared'])
   assert.equal(res.loaded, 3, '`ghost` comes only from the disabled plugin')
   assert.equal(res.total, 4)
   assert.equal(res.managed, 0, 'nothing here links into the payload')
@@ -466,18 +466,18 @@ test('the loaded set is resolved per listing name, against a fixture $HOME', asy
   assert.equal(shared.chars, '- shared: the home copy'.length)
   assert.equal(shared.plugin, null)
   assert.deepEqual(res.inventory.duplicates.map((d) => d.name), ['shared'],
-    '`route` is also provided twice, but only one of those providers loads')
+    '`lane` is also provided twice, but only one of those providers loads')
   assert.match(warnings.join('\n'), /skill name "shared" provided 2x/)
-  assert.equal(/"route" provided/.test(warnings.join('\n')), false)
-  // `route` still loads, priced from the home copy rather than the disabled plugin's.
-  assert.equal(res.listing.rows.find((r) => r.name === 'route').chars, '- route: picks a lane'.length)
+  assert.equal(/"lane" provided/.test(warnings.join('\n')), false)
+  // `lane` still loads, priced from the home copy rather than the disabled plugin's.
+  assert.equal(res.listing.rows.find((r) => r.name === 'lane').chars, '- lane: picks a lane'.length)
   // The dir name never becomes a listing name.
   assert.equal(res.listing.rows.some((r) => r.name === 'helper'), false)
 
   // The enabled plugin whose id merely contains a disabled one's still loads.
   assert.equal(res.listing.rows.find((r) => r.name === 'extra').plugin, 'p2extra@m')
 
-  const expect = ['- route: picks a lane', '- shared: the home copy',
+  const expect = ['- lane: picks a lane', '- shared: the home copy',
     '- extra: from the plugin whose id contains the other']
   assert.equal(res.listing.chars, expect.reduce((n, s) => n + s.length, 0) + 2, 'entries plus two newlines')
   rmSync(home, { recursive: true, force: true })

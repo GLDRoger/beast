@@ -31,6 +31,7 @@ test('retired skills cannot remain in discovery, packs, payload, or bootstrap in
   const shipped = new Set(packSkills(PACK_NAMES))
   assert.ok(RETIRED_SKILLS.includes('hyperframes'))
   assert.ok(RETIRED_SKILLS.includes('impeccable'))
+  assert.ok(RETIRED_SKILLS.includes('route'))
   assert.ok(RETIRED_SKILLS.includes('decision-doc'))
   assert.ok(RETIRED_SKILLS.includes('product-brief'))
   for (const name of RETIRED_SKILLS) {

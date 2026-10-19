@@ -1,6 +1,6 @@
 # Active skills
 
-The nine primary workflows are `route`, `code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, and `media`.
+The eight primary workflows are `code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, and `media`.
 
 Keep automatic discovery precise. A workflow owns the requested result; specialist material is loaded only when its procedure helps the current task. Child reviews and checkpoints feed that result without creating redundant interviews or approval gates.
 

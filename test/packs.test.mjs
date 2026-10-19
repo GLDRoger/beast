@@ -48,9 +48,9 @@ test('core is the only required pack', () => {
     assert.notEqual(PACKS[n].required, true, `${n} must be optional`)
 })
 
-test('core is exactly the nine primary workflows', () => {
-  assert.equal(PACKS.core.skills.length, 9)
-  for (const s of ['route', 'code', 'frontend', 'writing', 'motion', 'performance', 'security', 'growth', 'media'])
+test('core is exactly the eight primary workflows', () => {
+  assert.equal(PACKS.core.skills.length, 8)
+  for (const s of ['code', 'frontend', 'writing', 'motion', 'performance', 'security', 'growth', 'media'])
     assert.equal(packOf(s), 'core', s)
   assert.equal(PACKS.core.skills.filter((s) => s.startsWith('master-')).length, 0)
 })
@@ -64,7 +64,7 @@ test('packSkills returns exactly what the named packs claim', () => {
 
 test('packOf round-trips a sample and returns null for a non-skill', () => {
   for (const [skill, pack] of [
-    ['route', 'core'],
+    ['code', 'core'],
     ['taste-craft', 'design'],
     ['text-to-lottie', 'design'],       // animation asset helper
     ['remotion', 'remotion'],

@@ -1,8 +1,8 @@
 # beast
 
-A curated agent setup for Claude Code, Codex, Grok Build, and Hermes.
+A curated agent setup for Claude Code, Codex, Grok Build, Gemini / Antigravity, and Hermes.
 
-Beast keeps shared operating principles, partner/taste guidance, and optional specialist methods in one repository. Nine primary workflows own the requested outcome. They load specialist material when it helps instead of imposing every checklist, interview, or report format on every task.
+Beast keeps shared operating principles, partner/taste guidance, and optional specialist methods in one repository. Eight primary workflows own the requested outcome. They load specialist material when it helps instead of imposing every checklist, interview, or report format on every task.
 
 Corrections should advance the unresolved goal. Reviews remain read-only; authorized changes include implementation and proportionate verification. More context or more agents does not by itself prove better completion. Evaluate setup changes against actual outcomes and scope violations.
 
@@ -78,6 +78,10 @@ The TOML writer requires Python 3.11+, verifies the intended semantic change, pr
 
 Hermes reads generated `~/.hermes/SOUL.md`. Its assembler combines the shared Beast body and partner policy with `home/hermes/SOUL.overlay.md`. Hermes generation runs only when Hermes is selected for installation. Ownership markers distinguish generated content from hand-written files, which are backed up rather than truncated.
 
+Gemini reads generated `~/.gemini/system.md` (Beast plus `home/gemini/system.overlay.md`) via `GEMINI_SYSTEM_MD`; `~/.gemini/GEMINI.md` links to the shared user file. Antigravity's documented rule loading does not use that Gemini-specific override; its generated `~/.gemini/config/AGENTS.md` contains Beast, the user instructions, and the Google compatibility paragraph, without Gemini's capability placeholders. `beast install --harness=gemini --write-config` backs up and preserves other Gemini settings while setting `context.fileName` to `["GEMINI.md", "AGENTS.md"]` and the system-prompt environment variable. Shell `gemini` and `agy` helpers refresh the generated prompts before launch. Direct and GUI launches need a reinstall after source edits. Rule discovery varies between Antigravity versions; confirm the loaded files in that runtime rather than assuming overlapping global rules are deduplicated.
+
+Muse's `mu` helper synchronizes Beast and the shared user instructions into `run.system_prompt` before launch. `aug` passes the two current source files through Auggie's repeatable `--rules` option; it replaces the legacy shell alias without editing the shell profile.
+
 Shared policy edits affect symlinked files immediately on disk. Generated outputs and running sessions need an appropriate refresh. Do not reinstall every harness merely to refresh delegation guidance.
 
 ## Skills and scope
@@ -88,7 +92,7 @@ Installed files, discoverable descriptions, and loaded skill bodies are differen
 
 | Pack | Skills | Purpose |
 |---|---:|---|
-| `core` | 9 | Primary workflow ownership |
+| `core` | 8 | Primary workflow ownership |
 | `design` | 10 | Optional visual/interaction craft and Lottie |
 | `remotion` | 4 | React video composition, animation, rendering |
 | `prose` | 7 | Prose/visual cleanup, docs, outreach |
