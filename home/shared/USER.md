@@ -24,7 +24,7 @@ Briefs:
 - Every brief, by any route, opens with "You were called by another agent. Do this task yourself."
 - GPT and Muse workers (Sol, Astra, Luna, Muse Wonder) get direct, explicit briefs: exact files, exact commands, the expected output, and what done means. Leave them nothing to guess.
 - Claude workers (Opus, Haiku) take more open briefs well: building from scratch, or finding a direction in ambiguous or design work. Give them the goal and constraints and let them choose the approach.
-- Verification workers run the named checks and report exact results. They do not fix anything. Their report counts as the rerun Beast asks for; you still read the diff and spot-check the evidence.
+- Verification workers run the named checks and report exact results. They do not fix anything. Their report counts as the verification run; you still read the diff and spot-check the evidence.
 
 Routing rules:
 
@@ -52,7 +52,7 @@ When `t3-code` MCP tools are available (`delegate_task`, `orchestrator_capabilit
 Every call follows the same steps:
 
 1. Make a scratch directory outside the repo: `W=$(mktemp -d)`. Write the brief to `$W/brief.md`, following the brief rules above.
-2. Pass the brief on standard input; never inline it in the command.
+2. Pass the brief on standard input, or through the CLI's prompt-file option where it has one; never inline it in the command.
 3. Calls take seconds to tens of minutes. Run them in the background: in Claude Code use the Bash tool's background mode; elsewhere wrap the call as `( <call>; echo $? > "$W/exit" ) &` and poll for `$W/exit`. Parallel workers each get their own scratch directory and disjoint files.
 
 **Claude Code, from Codex, Grok, or Muse Code.** Claude has no `--cd`, so run it from the project directory:
@@ -99,6 +99,8 @@ cd <project> && AGENT_CALL_DEPTH=1 muse exec --yolo --model muse-wonder-1.0 --re
 ## When you are the worker
 
 You are a worker when your brief opens with "You were called by another agent. Do this task yourself." or `AGENT_CALL_DEPTH` is set in your environment. Do the assigned task directly within its scope, do not delegate further, and return the requested result with what you verified and what you could not.
+
+Nobody can answer questions mid-task, and this takes precedence over any guidance to ask the user or leave a decision to them. Make the reasonable call where the brief is unclear and list those assumptions in your result. Stop early only when a missing fact or missing access blocks the task, and say exactly what is missing.
 
 ## Skills
 
