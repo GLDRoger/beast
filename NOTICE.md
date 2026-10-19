@@ -7,21 +7,13 @@ beast's own code (`bin/`, `lib/`, `scripts/`) is MIT — see LICENSE.
 The skills below are **other people's work, vendored into this repository**, and
 each retains its own upstream license.
 
-Original to this project: `frontend`, `code`, `writing`, `motion`, `performance`, `security`, `growth`, `media`, `codex-session-miner`, `headless-models`, `honest-prose`, `mac-codex-tooling-repair`, `next-runtime-triage`, `review-swarm`, `ruthless-release-qa`, `scroll-scenes`, `ai-features`, `data-work`, `dependency-upgrades`, `explaining`, `long-work`, `mobile`.
+Original to this project: `frontend`, `code`, `writing`, `motion`, `performance`, `security`, `growth`, `media`, `codex-session-miner`, `headless-models`, `honest-prose`, `mac-codex-tooling-repair`, `next-runtime-triage`, `review-swarm`, `ruthless-release-qa`, `scroll-scenes`, `3d-scenes`, `drawing-canvas-films`, `ai-features`, `data-work`, `dependency-upgrades`, `explaining`, `long-work`, `mobile`.
 
 **Attribution is recorded here, not inside the skill files.** These skills are being
 rewritten and will diverge from what their original authors published, so stamping a
 name into each file would misrepresent both sides. This file is the record.
 
 If your work is here and you want it removed or credited differently, open an issue.
-
-## ⚠️ Unattributed — publication blocker
-
-2 shipped modules have no entry in the lockfile, so their origin
-and license are unknown. These must be traced or removed before any public release.
-
-- agents/skill-modules/3d-scenes
-- agents/skill-modules/drawing-canvas-films
 
 ## Attributed upstreams
 
