@@ -27,8 +27,8 @@ Models in tier A+ and above.
 | S | Claude Fable 5.1, Claude Mythos 5.1 |
 | A+ | Claude Haiku 5.5, Claude Sonnet 5.5, Gemini 4 Argon, GPT-6 Luna |
 | A | GPT-6 Sol, Claude Opus 5, Claude Fable 5, GPT-5.6 Sol, Daybreak Blue, Kimi K3, Grok 4.7, Grok 4.6, Qwen3.8 Max 0902, GLM-5.3 Flash, Muse Spark 1.3, DeepSeek V4.1 Flash, Hy-4 Preview |
-| B | Muse Wonder, GPT-5.6 Terra, Qwen3.8-Flash-Next, GLM-5.3, Claude Sonnet 5, K2 Horizon 375B A23B |
-| C | GPT-5.6 Luna, Grok 4.5, Qwen3.8 27B, Muse Spark 1.2, MiMo V2.5 Pro, Hy-3, MiniMax-M3 |
+| B | Muse Wonder, GPT-5.6 Terra, Qwen3.8-Flash-Next, GLM-5.3, Claude Sonnet 5 |
+| C | K2 Horizon 375B A23B, GPT-5.6 Luna, Grok 4.5, Qwen3.8 27B, Muse Spark 1.2, MiMo V2.5 Pro, Hy-3, MiniMax-M3 |
 | D | Thinking Machines Inkling, Nemotron 3 Ultra, Muse Glimmer |
 | E | Claude Haiku 4.5, Mistral Medium 3.5, Nemotron 3.5 Lightning |
 | Below E | Gemini 3.8 Flash, Gemini 3.7 Flash, Gemini 3.6 Flash, Gemini 3.5 Flash |
