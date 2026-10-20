@@ -29,7 +29,7 @@ Put each line in the one layer where it's true.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/media/layers-dark.png">
-  <img src="docs/media/layers-light.png" width="900" alt="Where each kind of instruction lives. For anyone: Beast, the system prompt. For you on every project: USER.md. For one project: its AGENTS.md. During one kind of task: skills. At one moment or for one model: Jevis tips, at session start, on every message, or at a specific moment. For no one: delete it.">
+  <img src="docs/media/layers-light.png" width="900" alt="The final placement of each instruction. Every session: Beast, the system prompt (14 items); USER.md (16, including the worker contract, the skill list, and preserving user work); the project AGENTS.md (what it is, commands, architecture, gotchas). On demand: the code, frontend, writing and motion skills. Jevis: the full session guide and design notes at session start and after compaction; a two-line reminder, the interface-copy line and GPT corrections on every message; feedback, search, rerun and port tips at a specific moment. Eleven lines were removed.">
 </picture>
 
 The rules, and when Jevis tips arrive, are in [docs/layers.md](docs/layers.md).

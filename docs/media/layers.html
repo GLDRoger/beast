@@ -1,6 +1,7 @@
 <!doctype html>
 <!--
-  Source for docs/media/layers-light.png and layers-dark.png.
+  Source for docs/media/layers-light.png and layers-dark.png: the final placements
+  from the layer sort, after the agreed revisions.
   Re-render after editing:  node docs/media/render-layers.mjs
 -->
 <html>
@@ -9,140 +10,122 @@
 <style>
   :root {
     color-scheme: light;
-    --bg: #ffffff; --fg: #1f1f23; --muted: #6b6b75; --border: #dcdce2; --card: #f7f7f9;
-    --beast: #1b4ed8; --user: #0d8478; --project: #4d7c0f; --skill: #b45309; --jevis: #8b3fd9; --none: #9a9aa3;
+    --background: #fcfcfc; --foreground: #27272a; --muted-foreground: #71717b; --border: #e4e4e7; --card: #ffffff;
+    --chart-1: #1b4ed8; --chart-2: #0d9488; --chart-3: #d97706; --chart-4: #9333ea; --chart-5: #e11d48; --chart-6: #65a30d;
+    --radius: 10px;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       color-scheme: dark;
-      --bg: #0d1117; --fg: #e8e8ec; --muted: #8d96a0; --border: #2a313c; --card: #161b22;
-      --beast: #6d9bff; --user: #2dd4bf; --project: #a3e635; --skill: #fbbf24; --jevis: #c49bff; --none: #6e7681;
+      --background: #0a0a0a; --foreground: #f5f5f5; --muted-foreground: #818181; --border: #262626; --card: #111111;
+      --chart-1: #6d9bff; --chart-2: #2dd4bf; --chart-3: #fbbf24; --chart-4: #c084fc; --chart-5: #fb7185; --chart-6: #a3e635;
     }
   }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--fg); }
+  html, body { margin: 0; background: var(--background); color: var(--foreground); }
   body { font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-  .board { width: 1280px; padding: 32px; display: grid; grid-template-columns: 220px 1fr; gap: 12px 20px; }
-  .ask { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
-  .ask h1 { margin: 0; font-size: 20px; font-weight: 650; letter-spacing: -.01em; }
-  .ask p { margin: 0; color: var(--muted); font-size: 14px; }
-  .q { padding-top: 14px; }
-  .q b { display: block; font-size: 15px; font-weight: 600; }
-  .q span { color: var(--muted); font-size: 12.5px; }
-  .zone { border: 1.5px dashed var(--border); border-radius: 12px; padding: 12px 14px 14px; }
-  .zone header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-  .zone h2 { margin: 0; font-size: 14px; font-weight: 650; display: flex; align-items: center; gap: 8px; }
-  .zone h2 .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
-  .zone .when { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .wrap { width: 1280px; box-sizing: border-box; padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+  .top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+  .top h1 { margin: 0; font-size: 19px; font-weight: 650; }
+  .legend { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--muted-foreground); }
+  .zone { border: 1px dashed var(--border); border-radius: var(--radius); padding: 10px; }
+  .zone header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .zone h3 { margin: 0; font-size: 13px; }
+  .zone .what { font-size: 11.5px; color: var(--muted-foreground); margin: 2px 0 0; }
+  .zone .count { font-size: 11px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
   .cards { display: flex; flex-wrap: wrap; gap: 6px; }
-  .card { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); font-size: 12.5px; white-space: nowrap; }
-  .card.more { color: var(--muted); background: transparent; border-style: dashed; }
-  .card.gone { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
-  .split { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .split .zone { padding: 10px 12px 12px; }
-  .split h3 { margin: 0 0 8px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
-  .beast { --c: var(--beast); } .user { --c: var(--user); } .project { --c: var(--project); }
-  .skill { --c: var(--skill); } .jevis { --c: var(--jevis); } .none { --c: var(--none); }
-  .zone.jevis-wrap { padding: 12px 14px 14px; }
+  .grid { display: grid; gap: 10px; }
+  .g3 { grid-template-columns: 1fr 1fr 1fr; }
+  .g-stand { grid-template-columns: 1fr 1fr 0.62fr; }
+  .group { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-foreground); font-weight: 600; margin: 4px 0 -6px; }
+  .card { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 5px 9px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); font-size: 12.5px; }
+  .card .t { white-space: nowrap; }
+  .card .note { color: var(--muted-foreground); white-space: nowrap; }
+  .src { font-size: 10px; padding: 0 5px; border-radius: 999px; white-space: nowrap; border: 1px solid; }
+  .src.beast { color: var(--chart-1); border-color: color-mix(in srgb, var(--chart-1) 50%, transparent); }
+  .src.user { color: var(--chart-2); border-color: color-mix(in srgb, var(--chart-2) 50%, transparent); }
+  .src.jevis { color: var(--chart-4); border-color: color-mix(in srgb, var(--chart-4) 50%, transparent); }
+  .src.skill { color: var(--chart-3); border-color: color-mix(in srgb, var(--chart-3) 50%, transparent); }
+  .src.new { color: var(--chart-5); border-color: color-mix(in srgb, var(--chart-5) 50%, transparent); }
+  .src.project { color: var(--chart-6); border-color: color-mix(in srgb, var(--chart-6) 50%, transparent); }
+  .remove .card .t { color: var(--muted-foreground); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted-foreground) 55%, transparent); }
 </style>
 </head>
 <body>
-<div class="board">
-  <div class="ask"><h1>Where is the line true?</h1><p>Put each instruction in the one layer whose job it matches.</p></div>
-
-  <div class="q"><b>For anyone</b><span>any user, any machine</span></div>
-  <section class="zone beast">
-    <header><h2><span class="dot"></span><span>Beast · <code>BEAST.md</code>, the system prompt</span></h2><span class="when">Every session</span></header>
-    <div class="cards">
-      <span class="card">Engineering partner who owns the outcome</span>
-      <span class="card">Be brave; offer the unexpected idea</span>
-      <span class="card">Read the whole request at its best reading</span>
-      <span class="card">Ground truth over memory</span>
-      <span class="card">Reproduce the bug first</span>
-      <span class="card">Decision principles</span>
-      <span class="card">Smallest complete change</span>
-      <span class="card">No huge change for a small win</span>
-      <span class="card">Never weaken a check</span>
-      <span class="card">When and how to delegate</span>
-      <span class="card">Lead with the answer</span>
+<div class="wrap">
+  <div class="top">
+    <h1>Where each instruction lives</h1>
+    <div class="legend">Tag: where the line lived before the split
+      <span class="src beast">Beast</span><span class="src user">USER.md</span><span class="src project">project</span><span class="src skill">skill</span><span class="src jevis">Jevis</span><span class="src new">new</span>
     </div>
-  </section>
-
-  <div class="q"><b>For you, everywhere</b><span>this user, every project</span></div>
-  <section class="zone user">
-    <header><h2><span class="dot"></span><span><code>USER.md</code>, your global CLAUDE.md / AGENTS.md</span></h2><span class="when">Every session</span></header>
-    <div class="cards">
-      <span class="card">Model routing table</span>
-      <span class="card">How to brief each model</span>
-      <span class="card">Fallbacks when a model fails</span>
-      <span class="card">Calling models in T3, natively, or headless</span>
-      <span class="card">The worker contract</span>
-      <span class="card">Skill index</span>
-      <span class="card">Permission to push, PR, deploy</span>
-      <span class="card">rg and fd, bounded output</span>
-      <span class="card">New dependencies</span>
-      <span class="card">Git conventions</span>
-    </div>
-  </section>
-
-  <div class="q"><b>For one project</b><span>true only in this repository</span></div>
-  <section class="zone project">
-    <header><h2><span class="dot"></span><span>The project's <code>AGENTS.md</code></span></h2><span class="when">Sessions in that repository</span></header>
-    <div class="cards">
-      <span class="card">What it is and its goals</span>
-      <span class="card">Commands</span>
-      <span class="card">Architecture</span>
-      <span class="card">Gotchas</span>
-    </div>
-  </section>
-
-  <div class="q"><b>During one kind of task</b><span>a procedure, not a principle</span></div>
-  <section class="zone skill">
-    <header><h2><span class="dot"></span><span>Skills</span></h2><span class="when">When the task calls for one</span></header>
-    <div class="cards">
-      <span class="card">code</span><span class="card">frontend</span><span class="card">writing</span><span class="card">motion</span>
-      <span class="card">performance</span><span class="card">security</span><span class="card">growth</span><span class="card">media</span>
-      <span class="card more">+ 51 specialist modules</span>
-    </div>
-  </section>
-
-  <div class="q"><b>At one moment, or for one model</b><span>sent by a hook, not left to the model</span></div>
-  <section class="zone jevis jevis-wrap">
-    <header><h2><span class="dot"></span><span>Jevis tips</span></h2><span class="when">At a fixed moment</span></header>
-    <div class="split">
-      <div class="zone"><h3>Session start and after compaction</h3><div class="cards">
-        <span class="card">Session guide</span>
-        <span class="card">Judgment examples</span>
-        <span class="card">Design reminders</span>
-        <span class="card">Each family's design defaults to avoid</span>
-      </div></div>
-      <div class="zone"><h3>Every message</h3><div class="cards">
-        <span class="card">Session-guide reminder</span>
-        <span class="card">Interface copy line</span>
-        <span class="card">GPT: you read words literally</span>
-        <span class="card">Worker tip, in agent-started sessions</span>
-      </div></div>
-      <div class="zone"><h3>A specific moment</h3><div class="cards">
-        <span class="card">Vague feedback</span>
-        <span class="card">A second vague correction</span>
-        <span class="card">grep or find where rg or fd fit</span>
-        <span class="card">Rerun after two failures</span>
-        <span class="card">Same check, nothing changed</span>
-        <span class="card">Port already in use</span>
-      </div></div>
-    </div>
-  </section>
-
-  <div class="q"><b>For no one</b><span>no model needs to be told</span></div>
-  <section class="zone none">
-    <header><h2><span class="dot"></span><span>Delete it</span></h2><span class="when">Never</span></header>
-    <div class="cards">
-      <span class="card gone">Things the model already does</span>
-      <span class="card gone">A second copy that disagrees</span>
-      <span class="card gone">Rules nobody follows</span>
-    </div>
-  </section>
+  </div>
+  <div class="group">Standing text, loaded every session</div>
+  <div class="grid g-stand" id="standing"></div>
+  <div class="group">On demand</div>
+  <div class="grid" id="demand"></div>
+  <div class="group">Jevis, injected at a moment</div>
+  <div class="grid g3" id="jevis"></div>
+  <div class="grid" id="other"></div>
 </div>
-<script>document.title = Math.ceil(document.querySelector(".board").getBoundingClientRect().height);</script>
+<script>
+const ZONES = [
+  ["standing", "Beast (system prompt)", "How the agent lives. True for any user on any machine.", [
+    ["beast", "Engineering partner who owns the outcome"], ["beast", "Carry the objective across follow-ups"],
+    ["beast", "Instruction files: most specific wins"], ["beast", "Ground truth over memory"],
+    ["beast", "Reproduce bugs; read the test behind a claim"], ["beast", "Decision principles"],
+    ["beast", "Smallest complete change, root cause, reuse"], ["beast", "Remove superseded code; report unrelated legacy"],
+    ["beast", "Finish it: no stubs or placeholders"], ["beast", "Know the disproving check before editing"],
+    ["beast", "Definition of done; never weaken checks"], ["beast", "When and how to delegate"],
+    ["beast", "Communication style"], ["beast", "Loading skills"],
+  ]],
+  ["standing", "USER.md (global CLAUDE.md / AGENTS.md)", "How the work is done here, as given.", [
+    ["user", "Model routing table"], ["user", "How to write briefs per model"], ["user", "Routing rules and fallbacks"],
+    ["user", "Calling models inside T3 Code"], ["user", "Native subagent tools per harness"], ["user", "Headless CLI recipes"],
+    ["user", "AGENT_CALL_DEPTH means you're a worker"], ["beast", "When you are the subagent", "worker contract"],
+    ["user", "Skill list and route pointer"], ["skill", "Workflow index (route)", "merged in"],
+    ["user", "Search tools, bounded output"], ["user", "Git conventions"], ["user", "Prompts in fenced Markdown"],
+    ["user", "Files past ~500 lines"], ["user", "New dependencies"], ["beast", "Preserve user work, data, secrets"],
+  ]],
+  ["standing", "Project AGENTS.md", "The specifics of one project.", [
+    ["project", "What it is, its goals"], ["project", "Commands"], ["project", "Architecture"], ["project", "Gotchas"],
+  ]],
+  ["demand", "Skills", "Workflows injected by circumstance, only while doing that kind of task.", [
+    ["skill", "Code workflow"], ["skill", "Frontend workflow"], ["skill", "Writing workflow"], ["skill", "Motion workflow"],
+  ]],
+  ["jevis", "Session start and after compaction", "The full guide, and design before the first file is written.", [
+    ["jevis", "Session guide: partner, intent, scope, finish"], ["jevis", "Judgment examples"],
+    ["jevis", "Design note"], ["beast", "Product and design judgment", "merged into the design note"],
+    ["jevis", "Claude's design defaults to avoid"], ["jevis", "GPT's design defaults to avoid"],
+    ["jevis", "Combined defaults for other models"],
+  ]],
+  ["jevis", "Every message", "Short, so it isn't skimmed by the tenth time.", [
+    ["jevis", "Session guide, as a two-line reminder"], ["new", "Interface copy: short and plain"],
+    ["jevis", "GPT: you read words literally"], ["jevis", "GPT: be a partner, suggest better"],
+    ["jevis", "Worker tip", "replaces the rest in worker sessions"],
+  ]],
+  ["jevis", "A specific moment", "Only when it applies.", [
+    ["jevis", "Vague feedback tip"], ["jevis", "Repeated vague feedback tip"],
+    ["new", "grep or find where rg or fd fit"], ["new", "A command failed twice"],
+    ["new", "Same check, nothing changed"], ["new", "Port already in use"], ["jevis", "Outage line"],
+  ]],
+  ["other", "Remove", "Covered elsewhere, or not worth the context anywhere.", [
+    ["beast", "Request type sets the boundary"], ["beast", "Ask one question only when it matters"],
+    ["beast", "Use the named library; dissent in one line"], ["beast", "Verification follows risk"],
+    ["beast", "Tie claims to evidence; last paragraph isn't a promise"], ["beast", "Subagent results are claims"],
+    ["beast", "Outward or destructive actions need authorization"], ["beast", "Unexpected changes are parallel work"],
+    ["new", "Check in proportion"], ["new", "Data matches its source"], ["new", "Mind the machine"],
+  ]],
+];
+const SRC = { beast: "Beast", user: "USER.md", jevis: "Jevis", skill: "skill", new: "new", project: "project" };
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+for (const [group, title, what, items] of ZONES) {
+  const el = document.createElement("section");
+  el.className = "zone" + (title === "Remove" ? " remove" : "");
+  el.innerHTML = `<header><div><h3>${esc(title)}</h3><p class="what">${esc(what)}</p></div><span class="count">${items.length}</span></header><div class="cards">${
+    items.map(([src, t, note]) => `<span class="card"><span class="src ${src}">${SRC[src]}</span><span class="t">${esc(t)}</span>${note ? `<span class="note">· ${esc(note)}</span>` : ""}</span>`).join("")
+  }</div>`;
+  document.getElementById(group).append(el);
+}
+document.title = Math.ceil(document.querySelector(".wrap").getBoundingClientRect().height);
+</script>
 </body>
 </html>
