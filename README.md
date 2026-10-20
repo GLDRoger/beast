@@ -25,15 +25,14 @@ Then add `source ~/.beast/beast.zsh` to your `~/.zshrc` for the launch helpers (
 
 ## Where an instruction belongs
 
-| File | Its job | Loaded |
-|---|---|---|
-| `home/shared/BEAST.md` (system prompt) | How the agent lives: its stance and working principles. True for any user on any machine. | Every session, as the system prompt |
-| `home/shared/USER.md` (global `CLAUDE.md` / `AGENTS.md`) | How the work is done here, as given: model routing and briefs, how to call each model, the worker contract, the skill index, engineering and git conventions. | Every session |
-| A project's `AGENTS.md` (`CLAUDE.md` is just `@AGENTS.md`) | The specifics of that project: what it is, its goals, commands, architecture, and gotchas. Nothing that is true of every project. | Sessions in that repository |
-| Skills (`home/agents/skills`, `skill-modules`) | Workflows and behaviours injected by circumstance. Procedures an agent needs only while doing that kind of task. | When the task calls for them |
-| [Jevis](https://github.com/GLDRoger/jevis) tips | Like skills, but injected deterministically by hooks instead of waiting for the model to go and read them. | At a fixed moment |
+Put each line in the one layer where it's true.
 
-The full rules, and when Jevis tips arrive, are in [docs/layers.md](docs/layers.md).
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/media/layers-dark.png">
+  <img src="docs/media/layers-light.png" width="900" alt="Where each kind of instruction lives. For anyone: Beast, the system prompt. For you on every project: USER.md. For one project: its AGENTS.md. During one kind of task: skills. At one moment or for one model: Jevis tips, at session start, on every message, or at a specific moment. For no one: delete it.">
+</picture>
+
+The rules, and when Jevis tips arrive, are in [docs/layers.md](docs/layers.md).
 
 ## Docs
 

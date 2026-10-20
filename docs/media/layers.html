@@ -1,0 +1,148 @@
+<!doctype html>
+<!--
+  Source for docs/media/layers-light.png and layers-dark.png.
+  Re-render after editing:  node docs/media/render-layers.mjs
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #ffffff; --fg: #1f1f23; --muted: #6b6b75; --border: #dcdce2; --card: #f7f7f9;
+    --beast: #1b4ed8; --user: #0d8478; --project: #4d7c0f; --skill: #b45309; --jevis: #8b3fd9; --none: #9a9aa3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --bg: #0d1117; --fg: #e8e8ec; --muted: #8d96a0; --border: #2a313c; --card: #161b22;
+      --beast: #6d9bff; --user: #2dd4bf; --project: #a3e635; --skill: #fbbf24; --jevis: #c49bff; --none: #6e7681;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); }
+  body { font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .board { width: 1280px; padding: 32px; display: grid; grid-template-columns: 220px 1fr; gap: 12px 20px; }
+  .ask { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+  .ask h1 { margin: 0; font-size: 20px; font-weight: 650; letter-spacing: -.01em; }
+  .ask p { margin: 0; color: var(--muted); font-size: 14px; }
+  .q { padding-top: 14px; }
+  .q b { display: block; font-size: 15px; font-weight: 600; }
+  .q span { color: var(--muted); font-size: 12.5px; }
+  .zone { border: 1.5px dashed var(--border); border-radius: 12px; padding: 12px 14px 14px; }
+  .zone header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .zone h2 { margin: 0; font-size: 14px; font-weight: 650; display: flex; align-items: center; gap: 8px; }
+  .zone h2 .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
+  .zone .when { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .cards { display: flex; flex-wrap: wrap; gap: 6px; }
+  .card { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); font-size: 12.5px; white-space: nowrap; }
+  .card.more { color: var(--muted); background: transparent; border-style: dashed; }
+  .card.gone { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+  .split { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .split .zone { padding: 10px 12px 12px; }
+  .split h3 { margin: 0 0 8px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+  .beast { --c: var(--beast); } .user { --c: var(--user); } .project { --c: var(--project); }
+  .skill { --c: var(--skill); } .jevis { --c: var(--jevis); } .none { --c: var(--none); }
+  .zone.jevis-wrap { padding: 12px 14px 14px; }
+</style>
+</head>
+<body>
+<div class="board">
+  <div class="ask"><h1>Where is the line true?</h1><p>Put each instruction in the one layer whose job it matches.</p></div>
+
+  <div class="q"><b>For anyone</b><span>any user, any machine</span></div>
+  <section class="zone beast">
+    <header><h2><span class="dot"></span><span>Beast · <code>BEAST.md</code>, the system prompt</span></h2><span class="when">Every session</span></header>
+    <div class="cards">
+      <span class="card">Engineering partner who owns the outcome</span>
+      <span class="card">Be brave; offer the unexpected idea</span>
+      <span class="card">Read the whole request at its best reading</span>
+      <span class="card">Ground truth over memory</span>
+      <span class="card">Reproduce the bug first</span>
+      <span class="card">Decision principles</span>
+      <span class="card">Smallest complete change</span>
+      <span class="card">No huge change for a small win</span>
+      <span class="card">Never weaken a check</span>
+      <span class="card">When and how to delegate</span>
+      <span class="card">Lead with the answer</span>
+    </div>
+  </section>
+
+  <div class="q"><b>For you, everywhere</b><span>this user, every project</span></div>
+  <section class="zone user">
+    <header><h2><span class="dot"></span><span><code>USER.md</code>, your global CLAUDE.md / AGENTS.md</span></h2><span class="when">Every session</span></header>
+    <div class="cards">
+      <span class="card">Model routing table</span>
+      <span class="card">How to brief each model</span>
+      <span class="card">Fallbacks when a model fails</span>
+      <span class="card">Calling models in T3, natively, or headless</span>
+      <span class="card">The worker contract</span>
+      <span class="card">Skill index</span>
+      <span class="card">Permission to push, PR, deploy</span>
+      <span class="card">rg and fd, bounded output</span>
+      <span class="card">New dependencies</span>
+      <span class="card">Git conventions</span>
+    </div>
+  </section>
+
+  <div class="q"><b>For one project</b><span>true only in this repository</span></div>
+  <section class="zone project">
+    <header><h2><span class="dot"></span><span>The project's <code>AGENTS.md</code></span></h2><span class="when">Sessions in that repository</span></header>
+    <div class="cards">
+      <span class="card">What it is and its goals</span>
+      <span class="card">Commands</span>
+      <span class="card">Architecture</span>
+      <span class="card">Gotchas</span>
+    </div>
+  </section>
+
+  <div class="q"><b>During one kind of task</b><span>a procedure, not a principle</span></div>
+  <section class="zone skill">
+    <header><h2><span class="dot"></span><span>Skills</span></h2><span class="when">When the task calls for one</span></header>
+    <div class="cards">
+      <span class="card">code</span><span class="card">frontend</span><span class="card">writing</span><span class="card">motion</span>
+      <span class="card">performance</span><span class="card">security</span><span class="card">growth</span><span class="card">media</span>
+      <span class="card more">+ 51 specialist modules</span>
+    </div>
+  </section>
+
+  <div class="q"><b>At one moment, or for one model</b><span>sent by a hook, not left to the model</span></div>
+  <section class="zone jevis jevis-wrap">
+    <header><h2><span class="dot"></span><span>Jevis tips</span></h2><span class="when">At a fixed moment</span></header>
+    <div class="split">
+      <div class="zone"><h3>Session start and after compaction</h3><div class="cards">
+        <span class="card">Session guide</span>
+        <span class="card">Judgment examples</span>
+        <span class="card">Design reminders</span>
+        <span class="card">Each family's design defaults to avoid</span>
+      </div></div>
+      <div class="zone"><h3>Every message</h3><div class="cards">
+        <span class="card">Session-guide reminder</span>
+        <span class="card">Interface copy line</span>
+        <span class="card">GPT: you read words literally</span>
+        <span class="card">Worker tip, in agent-started sessions</span>
+      </div></div>
+      <div class="zone"><h3>A specific moment</h3><div class="cards">
+        <span class="card">Vague feedback</span>
+        <span class="card">A second vague correction</span>
+        <span class="card">grep or find where rg or fd fit</span>
+        <span class="card">Rerun after two failures</span>
+        <span class="card">Same check, nothing changed</span>
+        <span class="card">Port already in use</span>
+      </div></div>
+    </div>
+  </section>
+
+  <div class="q"><b>For no one</b><span>no model needs to be told</span></div>
+  <section class="zone none">
+    <header><h2><span class="dot"></span><span>Delete it</span></h2><span class="when">Never</span></header>
+    <div class="cards">
+      <span class="card gone">Things the model already does</span>
+      <span class="card gone">A second copy that disagrees</span>
+      <span class="card gone">Rules nobody follows</span>
+    </div>
+  </section>
+</div>
+<script>document.title = Math.ceil(document.querySelector(".board").getBoundingClientRect().height);</script>
+</body>
+</html>
