@@ -1,42 +1,47 @@
 # Beast
 
-One agent setup, installed into every coding harness you use: a system prompt, your standing instructions, and a library of skills. Edit it once here, and Claude Code, Codex, Grok, Gemini CLI, Antigravity, Muse Code, and Hermes all pick it up.
+Beast keeps one set of agent instructions and installs it into every coding harness you use: Claude Code, Codex, Grok, Gemini CLI, Antigravity, Muse Code, and Hermes. You edit the text once in this clone, and every harness reads the same words.
 
-- **[`home/shared/BEAST.md`](home/shared/BEAST.md)**, the system prompt: how the agent works, for any user on any machine.
-- **[`home/shared/USER.md`](home/shared/USER.md)**, your global `CLAUDE.md` / `AGENTS.md`: model routing, how to call each model, skills, and engineering conventions.
-- **Eight workflow skills** (`code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, `media`) and 51 specialist modules they load when a task needs one.
+It installs three things:
 
-Most of what lands in your home directory is a symlink into this clone, so `git pull` updates it everywhere. A few prompts are generated and need a refresh ([Updating](docs/setup.md#updating)).
+- **A system prompt**, [`home/shared/BEAST.md`](home/shared/BEAST.md): how the agent works, written to hold for any user on any machine.
+- **Your standing instructions**, [`home/shared/USER.md`](home/shared/USER.md), installed as the global `CLAUDE.md` / `AGENTS.md`. It covers model routing, how to call each model, skills, and engineering conventions.
+- **Skills**: eight workflows (`code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, `media`) and 51 specialist modules that a workflow loads only when a task needs one.
+
+For example, after `beast install`, `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` are both links to `home/shared/USER.md` in your clone. Change a line there, and the next Claude Code or Codex session reads the new line. Most installed files are links like these, so `git pull` updates them. A few prompts are generated and need a refresh ([Updating](docs/setup.md#updating)).
 
 ## Install
 
-You need Node 22+ and Git. Keep the clone where it is: everything links into it.
+You need Node 22 or newer and Git. Keep the clone where you put it, because the installed files link into it.
 
 ```sh
-git clone https://github.com/Questili/beast.git ~/code/beast
+git clone https://github.com/GLDRoger/beast.git ~/code/beast
 cd ~/code/beast
 npm link                  # puts `beast` on your PATH
-beast install --dry-run   # see what would change
-beast install             # pick harnesses and packs
-beast doctor              # check the result
+beast install --dry-run   # shows what would change
+beast install             # asks which harnesses and skill packs
+beast doctor              # checks the result
 ```
 
-Then add `source ~/.beast/beast.zsh` to your `~/.zshrc` for the launch helpers (`c` for Claude Code, `co` for Codex, and others).
+Then add `source ~/.beast/beast.zsh` to `~/.zshrc` for the launch helpers, such as `c` for Claude Code and `co` for Codex. [Setup](docs/setup.md) covers flags, config edits, Windows, updating, and removal.
 
-## Where an instruction belongs
+## Before you adopt it
 
-Put each line in the one layer where it's true.
+`USER.md` is the maintainer's own file. It routes work to specific models, tells agents to commit without asking, and gives standing permission to push, open pull requests, and deploy. Rewrite it before you rely on it ([Make it yours](docs/setup.md#make-it-yours)). The `c` helper also turns off Claude Code's permission prompts.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/media/layers-dark.png">
-  <img src="docs/media/layers-light.png" width="900" alt="The final placement of each instruction. Every session: Beast, the system prompt (14 items); USER.md (16, including the worker contract, the skill list, and preserving user work); the project AGENTS.md (what it is, commands, architecture, gotchas). On demand: the code, frontend, writing and motion skills. Jevis: the full session guide and design notes at session start and after compaction; a two-line reminder, the interface-copy line and GPT corrections on every message; feedback, search, rerun and port tips at a specific moment. Eleven lines were removed.">
-</picture>
+The benefit is one setup to maintain across your tools; better model output hasn't been measured. Beast makes no network calls, and adds roughly 4,000 tokens of context per session ([Cost and privacy](docs/setup.md#cost-and-privacy)).
 
-The rules, and when Jevis tips arrive, are in [docs/layers.md](docs/layers.md).
+## Beast and Jevis
+
+[Jevis](https://github.com/GLDRoger/jevis) is a separate project by the same maintainer. It uses hooks to add short tips at set moments in a session. Beast is the standing text, and Jevis is the timed reminders. Each works without the other. [Beast and Jevis](docs/layers.md) explains how they fit together, how to adopt either or both, and where a new instruction belongs.
 
 ## Docs
 
-- [Setup](docs/setup.md): install options, config edits, where each harness loads Beast from, launch helpers, updating, what install touches, and checks.
+- [Setup](docs/setup.md): install options, config edits, where each harness loads Beast from, launch helpers, making it yours, updating, removal, and checks.
 - [Skills](docs/skills.md): the workflows, the packs, and maintaining the library.
-- [Where an instruction belongs](docs/layers.md): which layer a rule goes in.
-- [Coding models](docs/models.md): the tier list, and what each top model is good for. Mirrored in Jevis.
+- [Beast and Jevis](docs/layers.md): what each is, adoption paths, and where an instruction belongs.
+- [Coding models](docs/models.md): the maintainer's dated tier list and what each top model is good for.
+
+## License
+
+The original tooling and the vendored skills have different terms. See [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).

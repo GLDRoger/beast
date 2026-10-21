@@ -1,6 +1,6 @@
 # Coding models
 
-The maintainer's ranking from daily use, as of 19 October 2026. It's judgment, not a benchmark. This page is kept identical in [Beast](https://github.com/Questili/beast/blob/main/docs/models.md) and [Jevis](https://github.com/GLDRoger/jevis/blob/main/docs/models.md).
+The maintainer's personal ranking from daily use, as of 19 October 2026. It's opinion, not a benchmark: nothing here was measured, and models change quickly. This is the only copy; Jevis links here. The routing table in [`USER.md`](../home/shared/USER.md) follows it.
 
 ## What each is good for
 
