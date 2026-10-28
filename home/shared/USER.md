@@ -18,7 +18,7 @@ Route by what the work produces:
 | Reviews, analysis, and verdicts on work by Muse or Haiku | Opus 5.5 | high |
 | Reviews of Opus's code outside the UI | Muse Wonder Full | high |
 | Reviews of Opus's user-facing, 3D, or animation work | Fable 5.1 | high |
-| Reviews of the most important changes, spanning many files of different kinds | Opus 5.5, or Fable 5.1 when Opus wrote them | xhigh |
+| Reviews of the most important changes, spanning many files of different kinds | Opus 5.5, or Fable 5.1 when Opus wrote them | high |
 
 GPT models are not routed: don't delegate work or verification to them.
 
@@ -35,7 +35,7 @@ Routing rules:
 - Muse Wonder Full owns code outside the UI. User-facing code, 3D, and animation go to Opus: Muse Wonder Full can't do frontend or 3D work at all.
 - A reviewer is never the author's model: an independent model catches what the author's own tests passed.
 - Split mixed tasks along the boundary: Muse builds the API, Opus builds the screen that calls it. Give each worker its own files.
-- Raise effort to xhigh for hard debugging and security-sensitive changes.
+- Medium or high effort is enough for most tasks. Go to xhigh only for hard debugging or security-sensitive changes where high has already fallen short.
 - If a routed model fails (auth, rate limit, outage), retry once, then fall back: Opus covers for Muse Wonder Full, except when reviewing Opus's own work, where Fable 5.1 does; Fable 5.1 covers for Opus on reviews; if Haiku is unavailable, do the research or check run yourself. If user-facing, 3D, or animation work cannot reach Opus, tell the user. When you are the fallback, do the work yourself. Tell the user which model did the work.
 
 ## Calling each model
