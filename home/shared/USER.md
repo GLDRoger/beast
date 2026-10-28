@@ -11,29 +11,32 @@ Route by what the work produces:
 | Work | Model | Effort |
 |---|---|---|
 | Research and exploration: codebase search, docs, web research, gathering facts | Haiku 5.5 | medium |
-| Long or multi-step check runs: full test suites, builds, end-to-end or simulated sessions | Haiku 5.5 or GPT-6 Luna | low |
-| Code outside the UI: APIs, data, infrastructure, scripts, tests, tooling, configuration, debugging, refactors | GPT-6.1 Sol or Muse Wonder Full | high |
+| Long or multi-step check runs: full test suites, builds, end-to-end or simulated sessions | Haiku 5.5 | low |
+| Code outside the UI: APIs, data, infrastructure, scripts, tests, tooling, configuration, debugging, refactors | Muse Wonder Full | high |
 | User-facing code: UI components, pages, interaction, in-product copy | Opus 5.5 | high |
 | 3D, WebGL, motion, and animation | Opus 5.5 only | high |
-| Reviews, analysis, and verdicts on work by Opus, Muse, or Haiku | GPT-6.1 Sol | high |
-| Reviews of Sol's work | Opus 5.5 | high |
-| Reviews of the most important changes, spanning many files of different kinds, including Sol's | GPT-6 Astra | high |
+| Reviews, analysis, and verdicts on work by Muse or Haiku | Opus 5.5 | high |
+| Reviews of Opus's code outside the UI | Muse Wonder Full | high |
+| Reviews of Opus's user-facing, 3D, or animation work | Fable 5.1 | high |
+| Reviews of the most important changes, spanning many files of different kinds | Opus 5.5, or Fable 5.1 when Opus wrote them | xhigh |
+
+GPT models are not routed: don't delegate work or verification to them.
 
 Briefs:
 
 - Every brief, by any route, opens with "You were called by another agent. Do this task yourself."
-- GPT and Muse workers (Sol, Astra, Luna, Muse Wonder Full) get direct, explicit briefs: exact files, exact commands, the expected output, and what done means. Leave them nothing to guess.
-- Claude workers (Opus, Haiku) take more open briefs well: building from scratch, or finding a direction in ambiguous or design work. Give them the goal and constraints and let them choose the approach.
+- Muse workers (Muse Wonder Full) get direct, explicit briefs: exact files, exact commands, the expected output, and what done means. Leave them nothing to guess.
+- Claude workers (Opus, Fable, Haiku) take more open briefs well: building from scratch, or finding a direction in ambiguous or design work. Give them the goal and constraints and let them choose the approach.
 - Verification workers run the named checks and report exact results. They do not fix anything. Their report counts as the verification run; you still read the diff and spot-check the evidence.
 
 Routing rules:
 
 - When you are the routed model, do the work yourself; spawn a worker of your own model only for parallel or context-heavy pieces.
-- GPT-6.1 Sol and Muse Wonder Full share code outside the UI at equal priority. Use the one native to your harness; from Claude Code or Grok, use either, and split parallel work across both. User-facing code, 3D, and animation go to Opus: Muse Wonder Full can't do frontend or 3D work at all.
+- Muse Wonder Full owns code outside the UI. User-facing code, 3D, and animation go to Opus: Muse Wonder Full can't do frontend or 3D work at all.
 - A reviewer is never the author's model: an independent model catches what the author's own tests passed.
-- Split mixed tasks along the boundary: Sol builds the API, Opus builds the screen that calls it. Give each worker its own files.
-- Raise effort to xhigh for hard debugging, security-sensitive changes, and Astra reviews.
-- If a routed model fails (auth, rate limit, outage), retry once, then fall back: Sol and Muse Wonder Full cover for each other, and Opus covers for both; Sol covers for Astra, except on Sol's own work, where Opus does; Haiku and Luna cover for each other. If user-facing, 3D, or animation work cannot reach Opus, tell the user. When you are the fallback, do the work yourself. Tell the user which model did the work.
+- Split mixed tasks along the boundary: Muse builds the API, Opus builds the screen that calls it. Give each worker its own files.
+- Raise effort to xhigh for hard debugging and security-sensitive changes.
+- If a routed model fails (auth, rate limit, outage), retry once, then fall back: Opus covers for Muse Wonder Full, except when reviewing Opus's own work, where Fable 5.1 does; Fable 5.1 covers for Opus on reviews; if Haiku is unavailable, do the research or check run yourself. If user-facing, 3D, or animation work cannot reach Opus, tell the user. When you are the fallback, do the work yourself. Tell the user which model did the work.
 
 ## Calling each model
 
@@ -43,13 +46,13 @@ When `t3-code` MCP tools are available (`delegate_task`, `orchestrator_capabilit
 
 ### Native subagents
 
-- **Claude Code:** the Agent tool with `model: "haiku"` or `model: "opus"`.
-- **Codex:** `spawn_agent` with `model: "gpt-6.1-sol"`, `"gpt-6-astra"`, or `"gpt-6-luna"` and `reasoning_effort`.
+- **Claude Code:** the Agent tool with `model: "haiku"`, `"opus"`, or `"fable"`.
+- **Codex:** its native subagents run GPT models, which aren't routed; call Claude or Muse through the headless CLIs.
 - **Muse Code:** its native subagent tool, for Muse models.
 
 ### Headless CLIs (outside T3, across providers)
 
-Read `~/.agents/skill-modules/headless-models/SKILL.md` before calling Claude, Codex, or Muse from a CLI. It holds the exact commands, how to run them in the background, how to read results and follow up, and the read-only flags.
+Read `~/.agents/skill-modules/headless-models/SKILL.md` before calling Claude or Muse from a CLI. It holds the exact commands, how to run them in the background, how to read results and follow up, and the read-only flags.
 
 ## When you are the worker
 

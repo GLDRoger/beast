@@ -1,6 +1,6 @@
 # Coding models
 
-The maintainer's personal ranking from daily use, as of 19 October 2026. It's opinion, not a benchmark: nothing here was measured, and models change quickly. This is the only copy; Jevis links here. The routing table in [`USER.md`](../home/shared/USER.md) follows it.
+The maintainer's personal ranking from daily use, as of 19 October 2026. It's opinion, not a benchmark: nothing here was measured, and models change quickly. This is the only copy; Jevis links here. The routing table in [`USER.md`](../home/shared/USER.md) follows it, except that GPT models are not routed for work or verification.
 
 ## What each is good for
 
@@ -8,11 +8,11 @@ Models in tier A+ and above.
 
 | Model | Tier | Good for |
 |---|---|---|
-| Claude Opus 5.5 | SSS | The best model available. User-facing code, 3D, WebGL, motion and animation, and reviewing GPT-6.1 Sol's work. |
+| Claude Opus 5.5 | SSS | The best model available. User-facing code, 3D, WebGL, motion and animation, and reviewing work by Muse and Haiku. |
 | GPT-6.1 Sol | SS | Code outside the UI (APIs, data, infrastructure, scripts, tests, debugging, refactors), and reviewing work by Claude and Muse models. As good as Astra. |
 | GPT-6 Astra | SS | 3D modeling work and decent frontend designs. Expensive: use GPT-6.1 Sol instead, except for the most thorough reviews. |
-| Muse Wonder Full | SS | Backend code. It can't do frontend or 3D work at all, so never use it for either. |
-| Claude Fable 5.1 | S | Frontend animation. Strong, but Opus 5.5 is better and cheaper. |
+| Muse Wonder Full | SS | Backend code, and reviewing Opus's code outside the UI. It can't do frontend or 3D work at all, so never use it for either. |
+| Claude Fable 5.1 | S | Frontend animation. Strong, but Opus 5.5 is better and cheaper. Reviews Opus's user-facing, 3D, and animation work. |
 | Claude Mythos 5.1 | S | Fable 5.1 with lowered safeguards. |
 | Claude Haiku 5.5 | A+ | Research and exploration (codebase search, docs, web research), and long check runs. |
 | GPT-6 Luna | A+ | Research and exploration (codebase search, docs, web research), and long check runs. |

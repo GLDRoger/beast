@@ -76,6 +76,6 @@ Which modules are installed depends on the packs chosen with `beast install --pa
 |---|---|
 | `codex-session-miner` | Analyze historical Codex session JSONL logs to find repeated workflows, expensive tool patterns, reusable skill candidates, and script/globalization opportunities without loading raw transcripts into context |
 | `cua-driver` | Drive a native GUI app (macOS, Windows, Linux) via the cua-driver CLI (default) or MCP server — snapshot its accessibility tree, click/type/scroll by element_index or pixel coords, verify via re-snapshot, all without bringing the target to the foreground |
-| `headless-models` | Call Claude, Codex (GPT), or Muse models headlessly from a CLI, outside T3 Code: scratch directory, brief on stdin, background runs, reading results, follow-ups, and read-only flags |
+| `headless-models` | Call Claude or Muse models headlessly from a CLI, outside T3 Code: scratch directory, brief on stdin, background runs, reading results, follow-ups, and read-only flags |
 | `mac-codex-tooling-repair` | Repair the local macOS agent stack — CUA, MCP, daemon, auth, Python mismatches |
 | `next-runtime-triage` | Condense noisy Next.js runtime, .next chunk, Prisma, AbortError, and stack trace logs into source candidates and stale-build clues before editing |
