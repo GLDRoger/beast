@@ -21,7 +21,7 @@ cd <project> && AGENT_CALL_DEPTH=1 claude -p --model haiku --effort medium \
   --output-format json < "$W/brief.md" > "$W/result.json"
 ```
 
-- Opus: `--model claude-opus-5-5 --effort high`. Fable: `--model fable --effort high`.
+- Opus: `--model claude-opus-5-5 --effort high`.
 - Keep `--system-prompt-file`; without it headless Claude runs a generic prompt instead of Beast.
 - `jq -r .result` is the answer. `.is_error` flags failure, `.permission_denials` lists blocked actions, and `.session_id` continues the conversation.
 - Follow up with full context from the same directory: `claude -p --resume <session_id> --output-format json < "$W/followup.md"`.
