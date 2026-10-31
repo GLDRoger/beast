@@ -7,7 +7,7 @@ beast's own code (`bin/`, `lib/`, `scripts/`) is MIT — see LICENSE.
 The skills below are **other people's work, vendored into this repository**, and
 each retains its own upstream license.
 
-Original to this project: `frontend`, `code`, `writing`, `motion`, `performance`, `security`, `growth`, `media`, `codex-session-miner`, `headless-models`, `honest-prose`, `mac-codex-tooling-repair`, `next-runtime-triage`, `review-swarm`, `ruthless-release-qa`, `scroll-scenes`, `3d-scenes`, `drawing-canvas-films`, `ai-features`, `data-work`, `dependency-upgrades`, `explaining`, `long-work`, `mobile`.
+Original to this project: `code`, `writing`, `motion`, `performance`, `security`, `growth`, `media`, `codex-session-miner`, `headless-models`, `honest-prose`, `mac-codex-tooling-repair`, `next-runtime-triage`, `review-swarm`, `ruthless-release-qa`, `scroll-scenes`, `3d-scenes`, `drawing-canvas-films`, `ai-features`, `data-work`, `dependency-upgrades`, `explaining`, `long-work`, `mobile`.
 
 **Attribution is recorded here, not inside the skill files.** These skills are being
 rewritten and will diverge from what their original authors published, so stamping a
@@ -39,6 +39,14 @@ License: MIT — © Leonxlnx
 
 - redesign-skill
 - taste-skill-gpt
+
+### anthropics/skills
+
+<https://github.com/anthropics/skills/tree/main/skills/frontend-design>
+
+License: Apache-2.0 — © Anthropic, PBC
+
+- frontend (substantially rewritten)
 
 ### cursor/plugins
 
