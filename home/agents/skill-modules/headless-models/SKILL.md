@@ -1,11 +1,11 @@
 ---
 name: headless-models
-description: Call Claude or Muse models headlessly from a CLI, outside T3 Code: scratch directory, brief on stdin, background runs, reading results, follow-ups, and read-only flags. Use when delegating across providers without T3's delegate_task.
+description: Call Claude, Codex (GPT), or Muse models headlessly from a CLI, outside T3 Code: scratch directory, brief on stdin, background runs, reading results, follow-ups, and read-only flags. Use when delegating across providers without T3's delegate_task.
 ---
 
 # Calling models headlessly
 
-Briefs follow the rules in the user's instruction file (`~/.claude/CLAUDE.md` / `~/.codex/AGENTS.md`): open with "You were called by another agent. Do this task yourself.", explicit for Muse, open for Claude. GPT models are not routed, so there is no Codex worker call here.
+Briefs follow the rules in the user's instruction file (`~/.claude/CLAUDE.md` / `~/.codex/AGENTS.md`): open with "You were called by another agent. Do this task yourself.", explicit for GPT and Muse, open for Claude.
 
 Every call follows the same steps:
 
@@ -21,16 +21,29 @@ cd <project> && AGENT_CALL_DEPTH=1 claude -p --model haiku --effort medium \
   --output-format json < "$W/brief.md" > "$W/result.json"
 ```
 
-- Opus: `--model claude-opus-5-5 --effort high`.
+- Opus: `--model claude-opus-5-5 --effort medium`.
 - Keep `--system-prompt-file`; without it headless Claude runs a generic prompt instead of Beast.
 - `jq -r .result` is the answer. `.is_error` flags failure, `.permission_denials` lists blocked actions, and `.session_id` continues the conversation.
 - Follow up with full context from the same directory: `claude -p --resume <session_id> --output-format json < "$W/followup.md"`.
 - Read-only work: add `--disallowedTools Edit Write MultiEdit NotebookEdit`. Editing work blocked by permission denials: rerun with `--permission-mode bypassPermissions`.
 
+**Codex, from Claude Code, Grok, or Muse Code.**
+
+```sh
+AGENT_CALL_DEPTH=1 codex exec --model gpt-6.1-sol -c model_reasoning_effort=medium \
+  -C <project> --skip-git-repo-check \
+  --json -o "$W/result.md" - < "$W/brief.md" > "$W/events.jsonl"
+```
+
+- Use `model_reasoning_effort=high` only for the hardest work. Codex loads Beast and this file from its own config; no prompt flag is needed.
+- `$W/result.md` is the answer. A nonzero exit or an empty file means failure; read the end of `events.jsonl`.
+- The thread ID: `jq -r 'select(.type=="thread.started").thread_id' "$W/events.jsonl"`. Follow up with full context from the project directory: `codex exec resume --skip-git-repo-check <thread_id> -o "$W/result2.md" - < "$W/followup.md"`.
+- Read-only work: add `--sandbox read-only`. The default config already allows edits.
+
 **Muse Code, from Claude Code, Codex, or Grok.**
 
 ```sh
-cd <project> && AGENT_CALL_DEPTH=1 muse exec --yolo --model muse-wonder-1.0 --reasoning-effort high \
+cd <project> && AGENT_CALL_DEPTH=1 muse exec --yolo --model muse-wonder-full-1.0 --reasoning-effort medium \
   --prompt-file "$W/brief.md" > "$W/result.md" 2> "$W/log.txt"
 ```
 

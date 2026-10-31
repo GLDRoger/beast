@@ -298,18 +298,18 @@ test('delegation distinguishes runtime tools, detected CLIs, unverified broker a
     assert.match(text, /discover its current providers, authentication, models/)
     assert.match(text, /native subagents/)
     assert.doesNotMatch(text, /Fable|Opus|grok-4\.|gpt-5\.|Providers reachable/)
-    assert.doesNotMatch(text, /## Direct CLIs detected|## Calling Claude Code from Codex/)
+    assert.doesNotMatch(text, /## Direct CLIs detected|## Calling the other harness/)
   }
 
-  // Codex and Claude Code both present: Codex gets the headless fallback for calling Claude Code.
-  // GPT models are not routed, so there is no Codex worker call.
+  // Codex and Claude Code both present: each gets the headless fallback for calling the other.
   for (const selection of ['--all', '--harness=hermes']) {
     const home = join(d, selection === '--all' ? 'both-all' : 'both-hermes')
     assert.equal(install(home, bothBin, selection).status, 0)
     const text = readFileSync(join(home, '.beast', 'delegation.md'), 'utf8')
-    assert.match(text, /## Calling Claude Code from Codex/)
+    assert.match(text, /## Calling the other harness/)
     assert.match(text, /AGENT_CALL_DEPTH=1 claude -p .*--output-format json < brief\.md/)
-    assert.doesNotMatch(text, /AGENT_CALL_DEPTH=1 codex exec|gpt-6/)
+    assert.match(text, /AGENT_CALL_DEPTH=1 codex exec .*--json -o result\.md - < brief\.md/)
+    assert.match(text, /codex exec resume --skip-git-repo-check <thread_id>/)
     assert.match(text, /native subagents/)
     assert.match(text, /when agent-broker is unavailable/)
     assert.doesNotMatch(text, /agent-broker executable is present|Fable|Opus|grok-4\.|gpt-5\.|Providers reachable/)
@@ -321,7 +321,7 @@ test('delegation distinguishes runtime tools, detected CLIs, unverified broker a
   assert.match(direct, /Configured Beast harnesses: Hermes/)
   assert.match(direct, /## Direct CLIs detected on PATH/)
   assert.match(direct, /codex exec/)
-  assert.doesNotMatch(direct, /claude -p|grok -p|agent-broker executable|## Calling Claude Code from Codex/)
+  assert.doesNotMatch(direct, /claude -p|grok -p|agent-broker executable|## Calling the other harness/)
   assert.match(direct, /executable-presence checks only/)
 
   const emptyHome = join(d, 'no-clis')
