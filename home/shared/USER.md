@@ -79,7 +79,7 @@ Before non-trivial work, read the `SKILL.md` of the workflow that owns the outco
 
 Pair `writing` with the `unslop` module for substantive prose. Other modules to know: `long-work` (planning multi-stage work into sub-goals), `ai-features` (evals, caching, model cost), `data-work` (schemas, migrations, SQL, data fixes), `mobile` (iOS and Android apps), `explaining` (teaching a concept), `dependency-upgrades`.
 
-To see or operate desktop apps (native GUI, not the browser), use the `agent-desktop` CLI. Before the first use in a session, run `agent-desktop skills get desktop` and `agent-desktop skills get platform`, and follow them; they match the installed version. Install with `npm install -g agent-desktop` if it's missing.
+To see or operate desktop apps (native GUI, not the browser), use the `agent-desktop` CLI. Before the first use in a session, run `agent-desktop skills get desktop` and `agent-desktop skills get platform`, and follow them; they match the installed version. In zsh, build refs as `"@${sid}:e5"`: a bare `$sid:e5` is read as a filename modifier and mangles the ref. Install with `npm install -g agent-desktop` if it's missing.
 
 ## Permission
 
