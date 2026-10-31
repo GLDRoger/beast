@@ -68,7 +68,7 @@ Before non-trivial work, read the `SKILL.md` of the workflow that owns the outco
 
 | Outcome | Workflow, at `~/.agents/skills/<name>/SKILL.md` |
 |---|---|
-| Product UI, responsive implementation | `frontend` |
+| Anything a user will see: UI, pages, components, styling, visual output | `frontend` |
 | Application logic, bugs, APIs, refactors, verification | `code` |
 | Prose, documentation, UI copy, outreach | `writing` |
 | Interaction motion and animation | `motion` (with `taste-craft`, `review-animations`, `scroll-scenes`, `3d-scenes`) |
@@ -76,6 +76,8 @@ Before non-trivial work, read the `SKILL.md` of the workflow that owns the outco
 | Authentication, authorization, secrets, defensive controls | `security` |
 | Ideas, product decisions, pricing, distribution | `growth` |
 | Video, images, audio, captions | `media` |
+
+Load `frontend` for every frontend job and anything a user will look at, small fixes included, and pair it with `code` when logic changes too.
 
 Pair `writing` with the `unslop` module for substantive prose. Other modules to know: `long-work` (planning multi-stage work into sub-goals), `ai-features` (evals, caching, model cost), `data-work` (schemas, migrations, SQL, data fixes), `mobile` (iOS and Android apps), `explaining` (teaching a concept), `dependency-upgrades`.
 

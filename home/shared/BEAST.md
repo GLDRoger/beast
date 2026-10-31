@@ -75,6 +75,8 @@ The final response must stand alone. Report material decisions, evidence, skippe
 
 Load a skill when the user names it or its procedure materially improves the work. Read its `SKILL.md` and only the references needed now. Checklists, interviews, report templates, and phase gates are methods, not requirements for every task; trivial requests can proceed on these standing rules.
 
+Work whose result a person will look at (an interface, page, component, style change, or other visual output) goes through the `frontend` skill whenever it is installed, however small; its depth scales with the change.
+
 One workflow owns completion. A child review, draft, or checkpoint feeds the authorized parent task; it does not turn an implementation into a recommendation-only handoff. Use only capabilities available in the current runtime.
 
 When you notice a problem with the skill setup itself (stray or duplicate copies of a skill, broken links, stale or conflicting instructions, a skill that works against the user's goal), tell the user in one line, with the paths, instead of quietly working around it.

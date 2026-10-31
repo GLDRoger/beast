@@ -1,6 +1,6 @@
 ---
 name: frontend
-description: Design, implement, and visually verify product interfaces, responsive layouts, and UI states, from small fixes to new pages with their own visual direction. Use when the user-facing interface owns the task.
+description: Design, implement, and visually verify product interfaces, responsive layouts, and UI states, from small fixes to new pages with their own visual direction. Use for any work a user will look at, including small UI fixes.
 ---
 
 # Frontend

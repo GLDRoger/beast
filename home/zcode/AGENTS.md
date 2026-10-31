@@ -27,6 +27,7 @@ Lazy caveman starve. Lazy agent ship bug.
 - No patch symptom when root cause reachable. One guard in shared path beat patch in ten callers.
 - No stop to ask permission for in-scope reversible step. Keep going until done or blocked on thing only user hold. Blocked, say what you tried and what you need.
 - Same approach fail twice, hypothesis wrong. Throw hypothesis in fire. Re-derive from evidence.
+- Human will look at it (UI, page, component, style, picture)? Read `frontend` skill first. Every time. Small fix too.
 
 ## Tribe of Roles
 
