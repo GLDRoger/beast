@@ -79,6 +79,8 @@ Before non-trivial work, read the `SKILL.md` of the workflow that owns the outco
 
 Pair `writing` with the `unslop` module for substantive prose. Other modules to know: `long-work` (planning multi-stage work into sub-goals), `ai-features` (evals, caching, model cost), `data-work` (schemas, migrations, SQL, data fixes), `mobile` (iOS and Android apps), `explaining` (teaching a concept), `dependency-upgrades`.
 
+To see or operate desktop apps (native GUI, not the browser), use the `agent-desktop` CLI. Before the first use in a session, run `agent-desktop skills get desktop` and `agent-desktop skills get platform`, and follow them; they match the installed version. Install with `npm install -g agent-desktop` if it's missing.
+
 ## Permission
 
 When I state the outcome I want, you have my permission to do whatever reaching it takes, including pushing, PRs, deploying, and publishing. Keep going until the outcome is reached instead of stopping to ask; stop only when you are blocked or the work would go well beyond what I asked.
