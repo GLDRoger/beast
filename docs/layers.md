@@ -46,7 +46,7 @@ An agent reads instructions from five places. Each place has one job, and a rule
 |---|---|---|
 | `home/shared/BEAST.md` (system prompt) | How the agent works: its stance and working principles. True for any user on any machine. | Every session, as the system prompt |
 | `home/shared/USER.md` (global `CLAUDE.md` / `AGENTS.md`) | How this user's work is done: model routing and briefs, how to call each model, the worker contract, the skill index, engineering and git conventions. | Every session |
-| A project's `AGENTS.md` (`CLAUDE.md` is just `@AGENTS.md`) | That project's specifics: what it is, its goals, commands, architecture, and gotchas. Nothing that's true of every project. | Sessions in that repository |
+| A project's `AGENTS.md` (`CLAUDE.md` is just `@AGENTS.md`) | That project's specifics that the code can't show: what it is, its goals, commands, conventions, and gotchas. No architecture overview or file layout: the agent reads the repo. Nothing that's true of every project. | Sessions in that repository |
 | Skills (`home/agents/skills`, `skill-modules`) | Procedures an agent needs only while doing one kind of task. | When the task calls for them |
 | [Jevis](https://github.com/GLDRoger/jevis) tips | Short text that hooks inject at a fixed moment, without waiting for the model to go and read it. | At session start, on each message, or at a specific moment ([Jevis tips](https://github.com/GLDRoger/jevis/blob/main/docs/tips.md)) |
 
@@ -61,7 +61,7 @@ In October 2026, the maintainer sorted every instruction line across these place
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="media/layers-dark.png">
-  <img src="media/layers-light.png" width="900" alt="The final placement of each instruction. Every session: Beast, the system prompt (14 items); USER.md (16, including the worker contract, the skill list, and preserving user work); the project AGENTS.md (what it is, commands, architecture, gotchas). On demand: the code, frontend, writing and motion skills. Jevis: the full session guide and design notes at session start and after compaction; a two-line reminder, the interface-copy line and GPT corrections on every message; feedback, search, rerun and port tips at a specific moment. Eleven lines were removed.">
+  <img src="media/layers-light.png" width="900" alt="The final placement of each instruction. Every session: Beast, the system prompt (14 items); USER.md (16, including the worker contract, the skill list, and preserving user work); the project AGENTS.md (what it is, commands, conventions, gotchas). On demand: the code, frontend, writing and motion skills. Jevis: the full session guide and design notes at session start and after compaction; a two-line reminder, the interface-copy line and GPT corrections on every message; feedback, search, rerun and port tips at a specific moment. Eleven lines were removed.">
 </picture>
 
 The source is [`media/layers.html`](media/layers.html). Re-render the images with `node docs/media/render-layers.mjs`.

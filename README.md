@@ -8,7 +8,7 @@ It installs three things:
 - **Your standing instructions**, [`home/shared/USER.md`](home/shared/USER.md), installed as the global `CLAUDE.md` / `AGENTS.md`. It covers model routing, how to call each model, skills, and engineering conventions.
 - **Skills**: eight workflows (`code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, `media`) and 51 specialist modules that a workflow loads only when a task needs one.
 
-For example, after `beast install`, `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` are both links to `home/shared/USER.md` in your clone. Change a line there, and the next Claude Code or Codex session reads the new line. Most installed files are links like these, so `git pull` updates them. A few prompts are generated and need a refresh ([Updating](docs/setup.md#updating)).
+For example, after `beast install`, `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` both resolve to `home/shared/USER.md` in your clone, through per-harness aliases such as `home/claude/CLAUDE.md` that `lib/manifest.mjs` lists. Change a line there, and the next Claude Code or Codex session reads the new line. Most installed files are links like these, so `git pull` updates them. A few prompts are generated and need a refresh ([Updating](docs/setup.md#updating)).
 
 ## Install
 
