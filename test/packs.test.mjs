@@ -70,7 +70,7 @@ test('packOf round-trips a sample and returns null for a non-skill', () => {
     ['unslop', 'prose'],
     ['ship-email', 'product'],          // scaffolds email infra, not copy
     ['web-shader-extractor', 'engineering'],
-    ['cua-driver', 'tooling'],
+    ['headless-models', 'tooling'],
   ]) {
     assert.equal(packOf(skill), pack, skill)
     assert.ok(PACKS[pack].skills.includes(skill), `${pack} should list ${skill}`)

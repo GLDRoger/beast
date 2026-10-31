@@ -111,14 +111,6 @@ License: MIT — © Matt Pocock
 
 - improve
 
-### trycua/cua
-
-<https://github.com/trycua/cua>
-
-License: MIT — © Cua AI, Inc.
-
-- cua-driver
-
 ### tushaarmehtaa/tushar-skills
 
 <https://github.com/tushaarmehtaa/tushar-skills.git>

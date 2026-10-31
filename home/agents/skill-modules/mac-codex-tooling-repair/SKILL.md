@@ -17,13 +17,7 @@ Use this skill for machine-local setup/debugging where "done" means the tool is 
    - macOS permissions/TCC status for Accessibility and Screen Recording when GUI control is involved;
    - existing venvs or app bundles.
 3. Prefer official docs/installers for current third-party tooling, but isolate Python SDK experiments in a venv. Avoid `pip install --user` for CUA-style packages on this Mac unless there is a strong reason.
-4. For `trycua/cua` specifically:
-   - Codex integration is the `cua-driver` MCP path, not the Python SDK;
-   - expected driver bundle: `/Applications/CuaDriver.app`;
-   - useful CLI symlink: `~/.local/bin/cua-driver`;
-   - registration pattern: `codex mcp add cua-driver -- ~/.local/bin/cua-driver mcp`;
-   - start daemon through the app bundle: `open -n -g -a CuaDriver --args serve`;
-   - verify with driver status plus Accessibility and Screen Recording permissions.
+4. Desktop control on this Mac is `agent-desktop` (npm, `/opt/homebrew/bin/agent-desktop`); `trycua/cua` and its `cua-driver` were retired. Check it with `agent-desktop status` and `agent-desktop permissions`, and don't reinstall CuaDriver unless the user asks for it.
 5. For CUA Python SDK work, prefer an isolated venv such as `~/.local/share/cua-sdk-venv`. The old `cua==0.1.0` PyPI package did not match the modern documented `from cua import Sandbox` shape here; split packages like `cua-sandbox` and `cua-agent` were the verified path.
 6. For FastMCP/Pydantic startup crashes involving image returns, inspect the registered tool signature. A tool returning `Tuple[str, Image]` may need `@server.tool(structured_output=False)` rather than schema coercion.
 
