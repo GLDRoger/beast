@@ -20,7 +20,7 @@ Route by what the work produces:
 | Reviews of Opus's user-facing, 3D, or animation work | Opus 5.5, in a fresh worker that didn't write it | medium |
 | Reviews of Sol's work | Opus 5.5 | medium |
 | Reviews of the most important changes, spanning many files of different kinds | GPT-6.1 Sol, or Opus 5.5 when Sol wrote them | high |
-| Critiquing a plan and its checks before long data jobs or security-sensitive designs, a second opinion after two failed attempts, creative work with an unclear goal | Mythos 5.2 | high |
+| Consulting: creative direction, review of plans, architecture, specs, and checks, re-review once progress is made, a second opinion after two failed attempts | Mythos 5.2 | high |
 
 Mythos 5.2 costs twice Opus on a capped allowance, so it directs and never does grunt work: it weighs every option and factor, writes the plan and briefs, and judges results, while the routes above code, run checks, and gather facts. Given work in a Mythos session, tell the user you will direct and delegate the doing. Don't route to Fable: it is Mythos with more refusals.
 
