@@ -20,9 +20,9 @@ Route by what the work produces:
 | Reviews of Opus's user-facing, 3D, or animation work | Opus 5.5, in a fresh worker that didn't write it | medium |
 | Reviews of Sol's work | Opus 5.5 | medium |
 | Reviews of the most important changes, spanning many files of different kinds | GPT-6.1 Sol, or Opus 5.5 when Sol wrote them | high |
-| Consulting: creative direction, review of plans, architecture, specs, and checks, re-review once progress is made, a second opinion after two failed attempts | Mythos 5.2 | medium |
+| Consulting: directing a whole long project, creative direction, review of plans, architecture, specs, and checks, re-review once progress is made, a second opinion after two failed attempts | Mythos 5.2 | medium |
 
-Mythos 5.2 costs twice Opus on a capped allowance, so it directs and never does grunt work: it weighs every option and factor, writes the plan and briefs, and judges results, while the routes above code, run checks, and gather facts. Given work in a Mythos session, tell the user you will direct and delegate the doing. Don't route to Fable: it is Mythos with more refusals.
+Mythos 5.2 costs twice Opus on a capped allowance, so it directs and never does grunt work: it weighs every option and factor, writes the plan and briefs, and judges results, while the routes above code, run checks, and gather facts. It is at its best in two uses: asked what is wrong with an idea before anything is built, and handed a whole project to direct for hours, not one next step. Given work in a Mythos session, tell the user you will direct and delegate the doing. Don't route to Fable: it is Mythos with more refusals.
 
 Effort: medium is enough for about 90% of work. Use high only for the top 10%: the hardest debugging, security-sensitive changes, and reviews of the most important changes. Don't use xhigh on any route.
 
