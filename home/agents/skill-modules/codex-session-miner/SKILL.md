@@ -1,6 +1,6 @@
 ---
 name: codex-session-miner
-description: "Analyze historical Codex session JSONL logs to find repeated workflows, expensive tool patterns, reusable skill candidates, and script/globalization opportunities without loading raw transcripts into context. Use when asked to inspect sessions, optimize repeated Codex work, or refresh the session reuse analysis."
+description: Use when asked to analyse past Codex sessions in ~/.codex/sessions for repeated workflows, costly tool patterns, or candidates for new skills and scripts, or to refresh the session reuse analysis. It runs a local script and never loads raw logs into context.
 ---
 
 # Codex Session Miner

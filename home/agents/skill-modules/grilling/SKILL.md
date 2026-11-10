@@ -1,6 +1,6 @@
 ---
 name: grilling
-description: "Pressure-test a plan with relentless questions before you spend build cycles. Use when conviction is high but assumptions haven’t been attacked yet."
+description: Use when the user asks to be questioned or grilled on a plan or design before building, and is present to answer one question at a time. Not for delegated or unattended work, where nobody can answer.
 ---
 
 Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.

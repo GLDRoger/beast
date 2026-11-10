@@ -1,6 +1,6 @@
 ---
 name: performance
-description: Diagnose and improve speed, Core Web Vitals, jank, resource use, and failure resilience using observed behavior.
+description: Use when something is slow, janky, heavy, or fails under load, such as page load and Core Web Vitals, slow queries or endpoints, bundle size, memory or CPU use, or dev-server lag. Use code when the problem is wrong behaviour rather than speed.
 ---
 
 # Performance

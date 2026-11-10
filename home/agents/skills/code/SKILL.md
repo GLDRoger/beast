@@ -1,6 +1,6 @@
 ---
 name: code
-description: Implement and verify application logic, APIs, bug fixes, types, and refactors. Use for behavior changes rather than primarily visual or prose work.
+description: Use when the task changes how software behaves, such as application logic, APIs, bug fixes, types, tests, scripts, configuration, or refactors. If the change is mainly what a user sees, use frontend; if the deliverable is words, use writing.
 ---
 
 # Code
@@ -31,6 +31,8 @@ Load only when the task needs the procedure:
 - Streaming or abuse controls: `~/.agents/skill-modules/ai-streaming/SKILL.md` or `~/.agents/skill-modules/rate-limit/SKILL.md`
 - Generated Next.js runtime/type noise: `~/.agents/skill-modules/next-runtime-triage/SKILL.md`
 - Explicit independent review or exhaustive release QA: `~/.agents/skill-modules/review-swarm/SKILL.md` or `~/.agents/skill-modules/ruthless-release-qa/SKILL.md`
+- Requested strict maintainability review of a branch (structure, file size, scattered conditionals): `~/.agents/skill-modules/thermo-nuclear-code-quality-review/SKILL.md`
+- The user asks to be questioned on a plan before building and is present to answer: `~/.agents/skill-modules/grilling/SKILL.md`
 - Long-task continuity: `~/.agents/skill-modules/handoff/SKILL.md`
 
 Use the frontend, security, or performance workflow when that domain owns the task. A specialist's findings feed the authorized implementation; its optional interview or report format is not a new approval gate.

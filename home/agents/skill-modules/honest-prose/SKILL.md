@@ -1,9 +1,6 @@
 ---
 name: honest-prose
-description: >
-  Write or edit essays and long-form prose that sound like a person, not a model.
-  Use when drafting an essay, or when writing feels "AI," stiff, forced, or over-explained.
-  Compatibility wrapper — routes to unslop.
+description: Use only when something asks for honest-prose by name, since it now redirects to unslop. For essays or prose that reads as machine-written, stiff, or over-explained, load unslop directly.
 ---
 
 # Honest Prose → `$unslop`

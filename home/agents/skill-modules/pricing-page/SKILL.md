@@ -1,6 +1,6 @@
 ---
 name: pricing-page
-description: "Stand up a real pricing surface — tiers, gates, payments hook, polished UI. Use when monetization needs a page, not a spreadsheet."
+description: Use when a product needs a working pricing page with tiers, feature gating, and checkout wired to a payment provider (Dodo Payments, or the Stripe or Lemon Squeezy already installed). For prepaid credits or usage metering, use ship-credits.
 category: monetization
 tags: [pricing, dodo-payments, feature-gating, subscriptions, monetization]
 author: tushaarmehtaa

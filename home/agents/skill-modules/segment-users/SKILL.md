@@ -1,6 +1,6 @@
 ---
 name: segment-users
-description: "Turn schema into behavioral segments and actions — power users, churn risk, re-activation. Use when growth needs cohorts, not vanity totals."
+description: Use when the user wants their users grouped by behaviour from the database, such as power users, churn risk, or people to re-activate, with a query and a next action for each group. It needs usage, timestamp, or plan fields in the schema.
 category: analytics
 tags: [segmentation, users, cohorts, churn, analytics]
 author: tushaarmehtaa

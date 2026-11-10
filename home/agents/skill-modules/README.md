@@ -6,74 +6,74 @@ Which modules are installed depends on the packs chosen with `beast install --pa
 
 ## Engineering
 
-| Module | What it does |
+| Module | Use when |
 |---|---|
-| `ai-features` | Build and judge features that embed AI models: evals and baselines, prompt changes, model choice by cost and quality, prompt caching, streaming, and failure handling |
-| `ai-streaming` | Ship streaming AI UX end-to-end — tokens on screen, loading and error states, abort on unmount |
-| `data-work` | Change or query data safely: schema changes and migrations, SQL and analytics questions, backfills, and one-off data fixes in development or production |
-| `debug-perf` | Hunt Next.js and web performance dragons — HMR loops, CPU spikes, bundle bloat, slow servers |
-| `dependency-upgrades` | Upgrade packages, runtimes, frameworks and CLIs safely: reading changelogs and migration guides, upgrading in steps, and verifying behaviour |
-| `domain-modeling` | Name the business correctly — ubiquitous language, sharp domain edges, decisions worth recording |
-| `grilling` | Pressure-test a plan with relentless questions before you spend build cycles |
-| `handoff` | Fold the session into a compact handoff another agent can continue |
-| `improve` | Survey a codebase as an advisor and hand other agents ranked, self-contained plans |
-| `long-work` | Plan and carry long, multi-stage work (many hours, many files, several sessions or rounds) by breaking the goal into sub-goals with their own checks and a plan file that survives compaction |
-| `agent-desktop` | Operate a native desktop app's window with the agent-desktop CLI: sessions, the visible cursor, snapshots, screenshots, and headed mode |
-| `mobile` | Build and verify iOS and Android apps, including React Native, Expo, Flutter, Swift and Kotlin projects: running on simulators and emulators, inspecting real screens, and handling device-specific behaviour |
-| `rate-limit` | Protect Next.js routes with real rate limits — IP/user windows, 429s, Retry-After |
-| `review-swarm` | Run a multi-model PR/diff review panel and sort findings into actionable, nit, or ambiguous |
-| `ruthless-release-qa` | Behave like a hostile release tester — every path, state, and awkward client |
-| `thermo-nuclear-code-quality-review` | Run a harsh maintainability review — abstraction rot, giant files, condition spaghetti |
-| `wayfinder` | Map oversized work onto an issue tracker as investigation tickets you can finish one by one |
-| `web-shader-extractor` | Extract and locally replay web GPU/canvas/shader effects from a real page |
+| `ai-features` | an app calls an LLM, or you are changing prompts, choosing models, setting up caching, or building evals |
+| `ai-streaming` | a Next.js or React app should stream model output token by token with the Vercel AI SDK |
+| `data-work` | work reads or writes a database: migrations, SQL questions, backfills, data fixes |
+| `debug-perf` | a Next.js or web app is slow: hot reload loops, high CPU, bundle bloat, slow server responses |
+| `dependency-upgrades` | bumping package, runtime, or framework versions, or fixing a dependency advisory |
+| `domain-modeling` | business terms are fuzzy and need a glossary and recorded decisions |
+| `grilling` | the user asks to be questioned on a plan before building, and is present to answer |
+| `handoff` | another agent or person must continue the work from a compact handoff document |
+| `improve` | the user wants an advisory codebase review delivered as plans, not edits |
+| `long-work` | a defined task spans many hours, files, or sessions and needs a plan file with checked sub-goals |
+| `agent-desktop` | you must operate a native desktop app's window rather than a browser or terminal |
+| `mobile` | the work targets an iOS or Android app on a simulator or emulator |
+| `rate-limit` | Next.js API routes need rate limits against abuse or AI cost |
+| `review-swarm` | the user asks for an independent or multi-model review of a PR or diff |
+| `ruthless-release-qa` | the user asks for exhaustive testing before a public release |
+| `thermo-nuclear-code-quality-review` | the user asks for a strict maintainability and structure review of a branch |
+| `wayfinder` | a large, still-vague idea should be charted on an issue tracker as tickets worked one per session |
+| `web-shader-extractor` | the user wants a WebGL, WebGPU, canvas, or shader effect from a live page understood or replayed locally |
 
 ## Design and motion
 
-| Module | What it does |
+| Module | Use when |
 |---|---|
-| `3d-scenes` | Build and visually verify real-time 3D on the web with three.js or React Three Fiber, including hero scenes, product visuals, data or concept visualizations, and 3D films |
-| `apple-design` | Apple's approach to interface design and fluid, physical motion, translated for the web |
-| `compact-landing` | Shape narrow, dense, tactile product pages — precise, quiet, premium micro-SaaS energy |
-| `drawing-canvas-films` | Make videos, launch films, and animations where every frame is drawn in code on a canvas and exported to MP4 |
-| `redesign-skill` | Upgrade an existing site or app toward premium craft without a full rewrite |
-| `review-animations` | Review motion code against a high craft bar (Emil-inspired) |
-| `scroll-scenes` | Build scroll-driven visual essays and animated story pages (sticky scenes, CSS-var animation, per-chapter art direction) |
-| `taste-craft` | Invisible polish — component feel, motion detail, and the small decisions that make software feel inevitable |
-| `text-to-lottie` | Author Lottie (Bodymovin) JSON that plays in a local skia path |
-| `transitions-dev` | Implement production UI transitions — modals, tabs, toasts, shared-element moments, state morphs |
-| `tushar-design` | Build in Tushar’s dark, precise design system — opinionated questions first, then code |
+| `3d-scenes` | the deliverable renders real-time 3D in the browser with three.js or React Three Fiber |
+| `apple-design` | the user asks for Apple-style UI, or you are building gestures, sheets, springs, or momentum |
+| `compact-landing` | the user asks for a narrow, dense, quiet micro-SaaS landing page |
+| `drawing-canvas-films` | a film or animation should be drawn frame by frame on a canvas and rendered to MP4 |
+| `redesign-skill` | an existing site works but looks generic and needs its visual quality raised without a rewrite |
+| `review-animations` | existing motion code needs a pass or fail review |
+| `scroll-scenes` | scrolling should drive the story of a page, not just trigger fade-ins |
+| `taste-craft` | building or reviewing how components feel in use: feedback, origins, interaction polish |
+| `text-to-lottie` | the deliverable is a Lottie JSON file for the Skottie player |
+| `transitions-dev` | implementing a specific CSS transition such as a modal, dropdown, tabs, or toast |
+| `tushar-design` | the user asks for Tushar's design system by name |
 
 ## Prose
 
-| Module | What it does |
+| Module | Use when |
 |---|---|
-| `app-copy` | Write (or rewrite) the words the product speaks — empty states, errors, buttons, onboarding, toasts |
-| `changelog` | Turn recent git history into a weekly social changelog card ready to screenshot |
-| `cold-email` | Write cold email that earns replies — signal, brevity, deliverability discipline |
-| `cold-outreach-sequence` | Design a multi-touch outreach campaign across email and LinkedIn with distinct jobs per touch |
-| `explaining` | Explain or teach a concept, a system, or a piece of code so the user understands it, not just hears it |
-| `honest-prose` | Write or edit essays and long-form prose that sound like a person, not a model |
-| `readme` | Raise the README to a professional standard — structure, install path, clarity, signal |
-| `unslop` | Remove formulaic AI prose and generic visual-design patterns while preserving the user's voice, brand, facts, and requested scope |
+| `app-copy` | the words inside a product need writing or auditing: empty states, errors, buttons, onboarding |
+| `changelog` | the user wants a "what shipped" social card built from recent git history |
+| `cold-email` | writing one cold email, or checking a sending domain's authentication |
+| `cold-outreach-sequence` | planning a multi-touch outreach campaign with a schedule |
+| `explaining` | the user asks what something means, how it works, or why it behaves as it does |
+| `honest-prose` | something asks for it by name; it redirects to `unslop` |
+| `readme` | writing, auditing, or improving a README.md |
+| `unslop` | prose or UI reads as machine-generated, or the user asks for an AI-slop cleanup |
 
 ## Product and growth
 
-| Module | What it does |
+| Module | Use when |
 |---|---|
-| `aeo-ready` | Make the product legible to answer engines — llms.txt, AI crawler rules, structured data for AI search |
-| `pricing-page` | Stand up a real pricing surface — tiers, gates, payments hook, polished UI |
-| `segment-users` | Turn schema into behavioral segments and actions — power users, churn risk, re-activation |
-| `seo-ready` | Full SEO + AEO pass — meta, structured data, sitemap, robots, llms.txt, crawler rules |
-| `ship-credits` | Scaffold credits/token metering end-to-end — schema, spend path, webhooks, UI |
-| `ship-email` | Scaffold email infrastructure — provider, templates, segments, send admin |
-| `startup-pressure-test` | Assess a startup's business viability, customer pain, substitutes, buyer, and validation plan |
-| `teardown` | Dissect a product or landing page — what works, what fails, what to steal |
+| `aeo-ready` | only AI answer-engine visibility is asked for: llms.txt, AI crawler rules, structured data |
+| `pricing-page` | a product needs a pricing page with tiers, gating, and checkout |
+| `segment-users` | users should be grouped by behaviour from the database, with an action per group |
+| `seo-ready` | a site needs a full search audit and fixes, covering Google and answer engines |
+| `ship-credits` | a product needs a prepaid credits balance users buy and spend |
+| `ship-email` | an app needs to send real email to its users |
+| `startup-pressure-test` | the user asks whether an idea can be a viable business |
+| `teardown` | a competitor's product or landing page should be picked apart for lessons |
 
 ## Tooling
 
-| Module | What it does |
+| Module | Use when |
 |---|---|
-| `codex-session-miner` | Analyze historical Codex session JSONL logs to find repeated workflows, expensive tool patterns, reusable skill candidates, and script/globalization opportunities without loading raw transcripts into context |
-| `headless-models` | Call Claude, Codex (GPT), or Muse models headlessly from a CLI, outside T3 Code: scratch directory, brief on stdin, background runs, reading results, follow-ups, and read-only flags |
-| `mac-codex-tooling-repair` | Repair the local macOS agent stack — CUA, MCP, daemon, auth, Python mismatches |
-| `next-runtime-triage` | Condense noisy Next.js runtime, .next chunk, Prisma, AbortError, and stack trace logs into source candidates and stale-build clues before editing |
+| `codex-session-miner` | asked to analyse past Codex session logs for repeated work and skill candidates |
+| `headless-models` | calling Claude, Codex, or Muse from a CLI outside T3 Code |
+| `mac-codex-tooling-repair` | local agent tooling on this Mac is broken and blocks the work |
+| `next-runtime-triage` | the user pastes a noisy Next.js stack trace or runtime log |

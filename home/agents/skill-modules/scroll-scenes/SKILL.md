@@ -1,6 +1,6 @@
 ---
 name: scroll-scenes
-description: Build scroll-driven visual essays and animated story pages (sticky scenes, CSS-var animation, per-chapter art direction). Use when someone wants a page where scrolling drives illustration, not just fade-ins.
+description: Use when building a page where scrolling drives the story, such as a visual essay or explainer with sticky scenes and per-chapter art, rather than fade-ins on scroll. For ordinary scroll reveals, the motion workflow is enough.
 ---
 
 # Scroll Scenes

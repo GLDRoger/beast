@@ -1,6 +1,6 @@
 ---
 name: web-shader-extractor
-description: "Extract and locally replay web GPU/canvas/shader effects from a real page. Use when the brief is to understand or port a living visual effect, not rebuild a whole site."
+description: Use when the user wants to understand, extract, or locally replay a WebGL, WebGPU, canvas, or shader effect from a live web page. Not for copying ordinary DOM or CSS, or for building a new 3D scene, which is 3d-scenes.
 ---
 
 # Web Shader Extractor

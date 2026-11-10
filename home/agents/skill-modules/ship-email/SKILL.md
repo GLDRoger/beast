@@ -1,6 +1,6 @@
 ---
 name: ship-email
-description: "Scaffold email infrastructure — provider, templates, segments, send admin. Use when the product must talk to users in their inbox for real."
+description: Use when an app needs to send email to its users, such as setting up Resend with a verified domain, transactional templates, user segments, and an admin send screen. For writing a cold email by hand, use cold-email.
 category: infrastructure
 tags: [email, resend, transactional, campaigns, deliverability]
 author: tushaarmehtaa

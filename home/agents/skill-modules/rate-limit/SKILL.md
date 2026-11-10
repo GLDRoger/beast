@@ -1,6 +1,6 @@
 ---
 name: rate-limit
-description: "Protect Next.js routes with real rate limits — IP/user windows, 429s, Retry-After. Use when abuse or AI cost spikes are a live risk."
+description: Use when Next.js API routes need rate limiting against abuse or runaway AI cost, with Upstash Redis windows per IP or user, 429 responses, and Retry-After headers. Wider access-control questions belong to the security workflow.
 category: devops
 tags: [rate-limit, upstash, redis, security, api, abuse-prevention]
 author: tushaarmehtaa

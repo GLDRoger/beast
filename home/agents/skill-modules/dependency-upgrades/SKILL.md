@@ -1,6 +1,6 @@
 ---
 name: dependency-upgrades
-description: Upgrade packages, runtimes, frameworks and CLIs safely: reading changelogs and migration guides, upgrading in steps, and verifying behaviour. Use when bumping versions, fixing security advisories, or moving to a new major version.
+description: Use when bumping package, runtime, framework, or CLI versions, moving to a new major version, or fixing a security advisory in a dependency. It covers reading changelogs and migration guides, upgrading in steps, and verifying behaviour.
 ---
 
 # Dependency upgrades

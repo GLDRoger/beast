@@ -1,6 +1,6 @@
 ---
 name: ai-streaming
-description: "Ship streaming AI UX end-to-end — tokens on screen, loading and error states, abort on unmount. Use when chat/completions should feel live, not like a spinner then a wall of text."
+description: Use when a Next.js or React app should stream model output to the browser token by token with the Vercel AI SDK, including loading and error states, auth before the stream starts, and abort on unmount. For prompt, model, eval, or caching decisions, use ai-features.
 category: ai
 tags: [ai, streaming, vercel-ai-sdk, sse, chat, generation, llm]
 author: tushaarmehtaa

@@ -1,6 +1,6 @@
 ---
 name: startup-pressure-test
-description: Assess a startup's business viability, customer pain, substitutes, buyer, and validation plan. Not a universal rubric for hackathons or exploratory demos.
+description: Use when the user asks whether an idea can become a viable business, covering customer pain, substitutes, the buyer, competition, first customers, or an MVP test. Not for picking hackathon or demo ideas, which the growth workflow handles.
 ---
 
 # Startup Pressure Test

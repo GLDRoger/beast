@@ -1,6 +1,6 @@
 ---
 name: ruthless-release-qa
-description: "Behave like a hostile release tester — every path, state, and awkward client. Use right before public ship when “seems fine” is not a strategy."
+description: Use when the user asks for exhaustive testing of an app before a public release, covering every path, state, provider, and awkward client in a real browser, with an honest record of what was and was not tested. Not for routine checks after a change.
 ---
 
 # Ruthless Release QA

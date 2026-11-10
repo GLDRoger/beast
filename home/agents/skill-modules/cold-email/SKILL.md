@@ -1,6 +1,6 @@
 ---
 name: cold-email
-description: "Write cold email that earns replies — signal, brevity, deliverability discipline. Use for investors, hiring, partners, or mentors when inbox attention is the scarce resource."
+description: Use when writing one cold email to someone who does not know the sender, such as an investor, hire, partner, or mentor, or when checking a sending domain's SPF, DKIM, and DMARC setup. For a multi-step campaign with follow-ups, use cold-outreach-sequence.
 category: marketing
 tags: [email, outreach, sales, networking, founders]
 author: tushaarmehtaa

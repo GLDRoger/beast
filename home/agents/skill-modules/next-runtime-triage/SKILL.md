@@ -1,6 +1,6 @@
 ---
 name: next-runtime-triage
-description: "Condense noisy Next.js runtime, .next chunk, Prisma, AbortError, and stack trace logs into source candidates and stale-build clues before editing. Use when users paste Next.js stack traces or browser/server runtime errors."
+description: Use when the user pastes a Next.js stack trace or runtime error log full of .next chunk paths, Prisma errors, or AbortError, before editing anything. A local script condenses it into likely source files and stale-build clues.
 ---
 
 # Next Runtime Triage

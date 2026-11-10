@@ -1,6 +1,6 @@
 ---
 name: tushar-design
-description: "Build in Tushar’s dark, precise design system — opinionated questions first, then code. Use when the UI should live in that aesthetic world, not a generic dark theme."
+description: Use only when the user asks for Tushar's design system by name, or for that exact dark look with mono labels and fixed tokens. For any other UI, follow frontend, which treats several of this system's defaults as generic.
 license: Complete terms in LICENSE.txt
 ---
 

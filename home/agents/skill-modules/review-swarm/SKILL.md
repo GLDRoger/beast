@@ -1,6 +1,6 @@
 ---
 name: review-swarm
-description: "Run a multi-model PR/diff review panel and sort findings into actionable, nit, or ambiguous. Use when one reviewer’s lens isn’t enough and you want arbitration plus fixes."
+description: Use when the user asks for an independent or multi-model review of a pull request or diff, with findings sorted into actionable, nit, or ambiguous and fixed if requested. For one strict review of structure and maintainability, use thermo-nuclear-code-quality-review.
 ---
 
 # Review Swarm

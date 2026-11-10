@@ -1,6 +1,6 @@
 ---
 name: seo-ready
-description: "Full SEO + AEO pass — meta, structured data, sitemap, robots, llms.txt, crawler rules. Use when discoverability in Google and answer engines both matter."
+description: Use when a web project needs a full search audit with fixes, covering titles, meta and Open Graph tags, structured data, sitemap, robots.txt, and llms.txt, in Next.js, Astro, Nuxt, SvelteKit, or static sites. If only AI answer-engine visibility is asked for, use aeo-ready.
 category: seo
 tags: [seo, aeo, meta-tags, structured-data, sitemap, robots-txt, llms-txt, open-graph, schema, ai-search]
 author: tushaarmehtaa

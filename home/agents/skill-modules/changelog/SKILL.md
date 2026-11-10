@@ -1,6 +1,6 @@
 ---
 name: changelog
-description: "Turn recent git history into a weekly social changelog card ready to screenshot. Use when you want a crisp public “what shipped” beat without writing it from scratch."
+description: Use when the user wants a summary of what shipped this week or recently, built from git history and formatted as a social post or screenshot-ready card. For a CHANGELOG.md file or release notes, use the writing workflow.
 category: workflow
 tags: [changelog, twitter, marketing, git]
 author: tushaarmehtaa

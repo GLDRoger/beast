@@ -1,6 +1,6 @@
 ---
 name: text-to-lottie
-description: "Author Lottie (Bodymovin) JSON that plays in a local skia path. Use when the deliverable is a Lottie file, not a CSS toy or full video."
+description: Use when the deliverable is a Lottie (Bodymovin) JSON animation that must play in the Skia Skottie player project, with a local preview to verify it. For CSS animation in a product, use motion; for a rendered video, use media.
 ---
 
 # Authoring Renderable Lottie Files

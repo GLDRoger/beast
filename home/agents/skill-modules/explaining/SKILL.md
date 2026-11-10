@@ -1,6 +1,6 @@
 ---
 name: explaining
-description: Explain or teach a concept, a system, or a piece of code so the user understands it, not just hears it. Use when the user asks what something means, how it works, or why it behaves the way it does.
+description: Use when the user asks what something means, how it works, or why it behaves the way it does, about a concept, a system, or a piece of code, and wants to understand it rather than have it changed.
 ---
 
 # Explaining

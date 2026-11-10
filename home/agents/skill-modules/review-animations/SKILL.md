@@ -1,6 +1,6 @@
 ---
 name: review-animations
-description: "Review motion code against a high craft bar (Emil-inspired). Use when animations exist and you want a hard pass/fail on quality, not more effects."
+description: Use when asked to review existing animation or motion code and return pass or fail findings against the motion rules. It only reviews; to design or implement motion, use the motion workflow.
 disable-model-invocation: true
 ---
 

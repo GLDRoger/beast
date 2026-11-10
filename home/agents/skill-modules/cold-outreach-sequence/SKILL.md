@@ -1,6 +1,6 @@
 ---
 name: cold-outreach-sequence
-description: "Design a multi-touch outreach campaign across email and LinkedIn with distinct jobs per touch. Use when one email isn’t a strategy and timing/personalization matter."
+description: Use when planning an outreach campaign of several touches over days or weeks, by email and optionally LinkedIn, with a send schedule and a different angle per touch. For a single cold email, use cold-email.
 category: workflow
 tags: [cold-email, outreach, sequence, sales, follow-up, linkedin, multichannel]
 author: tushaarmehtaa

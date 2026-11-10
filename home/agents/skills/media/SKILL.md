@@ -1,6 +1,6 @@
 ---
 name: media
-description: Produce and inspect requested video, image, audio, caption, and Lottie deliverables. Use available media tools and preserve the established project stack.
+description: Use when the deliverable is a video, launch film, image, audio track, caption file, or Lottie animation, whether new or in an existing media project. Animation inside a product UI belongs to motion, not here.
 ---
 
 # Media

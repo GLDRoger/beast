@@ -1,6 +1,6 @@
 ---
 name: data-work
-description: Change or query data safely: schema changes and migrations, SQL and analytics questions, backfills, and one-off data fixes in development or production. Use when work reads or writes a database or a dataset rather than only code.
+description: Use when work reads or writes a database or dataset rather than only code, such as schema changes and migrations, SQL or analytics questions, backfills, and one-off data fixes in development or production.
 ---
 
 # Data work

@@ -1,6 +1,6 @@
 ---
 name: mac-codex-tooling-repair
-description: "Repair the local macOS agent stack — CUA, MCP, daemon, auth, Python mismatches. Use when tooling is the blocker and code changes won’t help until the machine works."
+description: Use when local agent tooling on this Mac is the blocker, such as a Codex MCP server that will not register, a daemon that is down, auth failures, missing macOS permissions, or a Python package mismatch, and done means the tool works from Codex again.
 ---
 
 # Mac Codex Tooling Repair

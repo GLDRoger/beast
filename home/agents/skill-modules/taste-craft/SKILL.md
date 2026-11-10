@@ -1,6 +1,6 @@
 ---
 name: taste-craft
-description: "Invisible polish — component feel, motion detail, and the small decisions that make software feel inevitable. Use when \"fine\" isn't good enough and feel matters."
+description: Use when building or reviewing how components feel in use, such as press and hover feedback, popover origins, small motion details, and interaction polish. Timing and easing numbers come from the motion workflow; layout and visual direction from frontend.
 ---
 
 # Design Engineering

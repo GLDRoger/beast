@@ -1,6 +1,6 @@
 ---
 name: writing
-description: Draft and edit UI copy, documentation, essays, marketing, and outreach. Use when words are the requested deliverable.
+description: Use when words are the deliverable, such as UI copy, documentation, READMEs, essays, posts, marketing, emails, or outreach, whether drafting new text or editing the user's. Use frontend when the copy ships as part of a UI change.
 ---
 
 # Writing

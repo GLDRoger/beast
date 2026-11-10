@@ -1,6 +1,6 @@
 ---
 name: motion
-description: Design and verify micro-interactions, transitions, scroll scenes, and animation feel. Use when motion itself is the main product change.
+description: Use when animation is the main change, such as micro-interactions, transitions between states, scroll-driven scenes, gesture feel, or timing and easing. When motion is incidental to a layout or visual change, use frontend; to review existing motion code, load review-animations.
 ---
 
 # Motion

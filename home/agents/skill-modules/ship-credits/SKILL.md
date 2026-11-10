@@ -1,6 +1,6 @@
 ---
 name: ship-credits
-description: "Scaffold credits/token metering end-to-end — schema, spend path, webhooks, UI. Use when the product needs buy-and-spend balance, not a fake counter."
+description: Use when a product needs a prepaid credits or token balance that users buy and spend, with database schema, spend checks, payment webhooks, and balance UI. For subscription tiers and a pricing page, use pricing-page.
 category: monetization
 tags: [credits, payments, monetization, saas, billing, tokens, metering, webhooks]
 author: tushaarmehtaa

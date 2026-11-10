@@ -1,6 +1,6 @@
 ---
 name: teardown
-description: "Dissect a product or landing page — what works, what fails, what to steal. Use for competitive intelligence before you redesign or position."
+description: Use when the user wants a competitor's product, landing page, or app picked apart for what works, what fails, and what to borrow, usually before positioning or redesigning their own. For a verdict on their own idea, use startup-pressure-test.
 category: workflow
 tags: [teardown, analysis, competitor, landing-page, product-thinking]
 author: tushaarmehtaa

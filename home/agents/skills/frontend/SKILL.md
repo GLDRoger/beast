@@ -1,6 +1,6 @@
 ---
 name: frontend
-description: Design, implement, and visually verify product interfaces, responsive layouts, and UI states, from small fixes to new pages with their own visual direction. Use for any work a user will look at, including small UI fixes.
+description: Use when the work changes anything a user will look at in a product, such as pages, components, layouts, styling, UI states, or a small visual fix. Load the design modules it lists only when a specific look is asked for, and use motion when animation is the main change.
 ---
 
 # Frontend
@@ -61,6 +61,7 @@ For a critique, rank concrete problems and recommend what to ship, revise, or re
 - Interaction feel: `~/.agents/skill-modules/taste-craft/SKILL.md`
 - Substantial motion: `~/.agents/skills/motion/SKILL.md`
 - 3D, WebGL, or shader scenes: `~/.agents/skill-modules/3d-scenes/SKILL.md`
+- Extracting or porting a shader or canvas effect from a live page: `~/.agents/skill-modules/web-shader-extractor/SKILL.md`
 - UI language: `~/.agents/skill-modules/app-copy/SKILL.md`
 - Specific requested aesthetic: `~/.agents/skill-modules/apple-design/SKILL.md`, `~/.agents/skill-modules/redesign-skill/SKILL.md`, `~/.agents/skill-modules/tushar-design/SKILL.md`, or `~/.agents/skill-modules/compact-landing/SKILL.md`
 - Streaming, pricing, credits, or email workflows: load the corresponding specialist only when implementing that feature.

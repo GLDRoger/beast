@@ -1,6 +1,6 @@
 ---
 name: security
-description: Inspect and implement defensive controls for authentication, authorization, tenant isolation, secrets, abuse, and dependencies.
+description: Use when work touches who can do what, such as authentication, authorization and roles, tenant isolation, secrets handling, abuse and rate limits, vulnerable dependencies, or a requested security audit.
 ---
 
 # Security

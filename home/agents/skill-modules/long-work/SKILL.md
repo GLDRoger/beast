@@ -1,6 +1,6 @@
 ---
 name: long-work
-description: Plan and carry long, multi-stage work (many hours, many files, several sessions or rounds) by breaking the goal into sub-goals with their own checks and a plan file that survives compaction. Use when a request won't fit in one sitting or one context.
+description: Use when a defined task will take many hours, many files, or several sessions, and needs sub-goals with their own checks and a plan file that survives compaction. For charting a still-vague idea as tickets on an issue tracker, see wayfinder.
 ---
 
 # Long work

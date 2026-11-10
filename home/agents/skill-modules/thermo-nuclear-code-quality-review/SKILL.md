@@ -1,6 +1,6 @@
 ---
 name: thermo-nuclear-code-quality-review
-description: "Run a harsh maintainability review — abstraction rot, giant files, condition spaghetti. Use when the codebase feels radioactive and you want uncomfortably honest findings."
+description: Use when the user asks for a strict maintainability review of a branch or diff, looking at structure, abstractions, file size, scattered conditionals, and simpler rewrites that keep behaviour. For a multi-model correctness review, use review-swarm.
 disable-model-invocation: true
 ---
 

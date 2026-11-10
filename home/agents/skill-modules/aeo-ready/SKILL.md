@@ -1,6 +1,6 @@
 ---
 name: aeo-ready
-description: "Make the product legible to answer engines — llms.txt, AI crawler rules, structured data for AI search. Use when you want AI-only discoverability (pair with seo-ready for the full stack)."
+description: Use when the user wants the product found and cited by AI answer engines (ChatGPT, Perplexity, Claude) and asks about llms.txt, AI crawler rules in robots.txt, or structured data for AI search. For a full search pass that also covers Google titles, meta tags, and sitemaps, use seo-ready.
 category: seo
 tags: [aeo, schema, llms-txt, structured-data, ai-search]
 author: tushaarmehtaa

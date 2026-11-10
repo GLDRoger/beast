@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: "Name the business correctly — ubiquitous language, sharp domain edges, decisions worth recording. Use when code and conversation mean different things by the same words."
+description: Use when designing a feature or system whose business terms are fuzzy or mean different things in code and conversation, to agree a glossary in CONTEXT.md and record decisions as ADRs. Not for routine changes inside a settled model.
 ---
 
 # Domain Modeling

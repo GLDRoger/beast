@@ -1,6 +1,6 @@
 ---
 name: redesign-skill
-description: "Upgrade an existing site or app toward premium craft without a full rewrite. Use when the product is real and the UI needs a generation jump."
+description: Use when an existing site or app works but looks generic or dated, and the user wants its visual quality raised within the current stack without a rewrite. For a new page with an open direction, frontend alone is enough.
 ---
 
 # Redesign Skill

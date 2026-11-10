@@ -1,6 +1,6 @@
 ---
 name: mobile
-description: Build and verify iOS and Android apps, including React Native, Expo, Flutter, Swift and Kotlin projects: running on simulators and emulators, inspecting real screens, and handling device-specific behaviour. Use when the work targets a phone or tablet app.
+description: Use when the work targets an iOS or Android app, in React Native, Expo, Flutter, Swift, or Kotlin, and needs running on a simulator or emulator, checking real screens, or handling device-specific behaviour. For native desktop apps, use agent-desktop.
 ---
 
 # Mobile apps

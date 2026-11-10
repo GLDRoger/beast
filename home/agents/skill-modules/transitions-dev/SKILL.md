@@ -1,6 +1,6 @@
 ---
 name: transitions-dev
-description: "Implement production UI transitions — modals, tabs, toasts, shared-element moments, state morphs. Use when interaction polish should be real CSS/JS craft, not a GIF of an idea."
+description: Use when implementing a specific UI transition in CSS, such as a modal, dropdown, tabs, toast, accordion, skeleton reveal, icon swap, or number change, from a library of ready snippets. The motion workflow sets the timing rules they follow.
 ---
 
 # Transitions.dev

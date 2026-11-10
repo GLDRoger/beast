@@ -1,6 +1,6 @@
 ---
 name: compact-landing
-description: "Shape narrow, dense, tactile product pages — precise, quiet, premium micro-SaaS energy. Use for package demos, docs intros, and compact marketing surfaces."
+description: Use when the user asks for a compact, narrow, dense landing page in a quiet premium micro-SaaS style, such as a package demo, a docs intro, or a small tool's homepage. Not for wide marketing sites or for restyling an existing product UI.
 ---
 
 # Compact Landing

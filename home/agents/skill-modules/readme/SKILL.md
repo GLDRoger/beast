@@ -1,6 +1,6 @@
 ---
 name: readme
-description: "Raise the README to a professional standard — structure, install path, clarity, signal. Use when the repo’s front door under-sells the work."
+description: Use when the user asks to write, audit, or improve a project's README.md, covering structure, install steps, usage examples, and clarity for a newcomer. For other documentation, use the writing workflow.
 category: workflow
 tags: [readme, documentation, github, open-source, developer-experience]
 author: tushaarmehtaa

@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: "Fold the session into a compact handoff another agent can continue. Use at natural breakpoints so context survives a model or person switch."
+description: Use when the user asks for a handoff, or at a natural stopping point in long work, to write a compact document another agent or person can continue from. For planning multi-stage work up front, use long-work.
 argument-hint: "What will the next session be used for?"
 ---
 

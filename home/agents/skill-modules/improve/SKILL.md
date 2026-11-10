@@ -1,6 +1,6 @@
 ---
 name: improve
-description: "Survey a codebase as an advisor and hand other agents ranked, self-contained plans. Use when you want direction and tickets, not this session implementing everything."
+description: Use when the user wants an advisory review of a codebase, such as architecture, refactoring opportunities, or testability, delivered as ranked, self-contained plans for other agents without this session editing code. When they want the change made now, use code.
 license: MIT
 metadata:
   author: shadcn

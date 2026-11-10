@@ -1,6 +1,6 @@
 ---
 name: headless-models
-description: Call Claude, Codex (GPT), or Muse models headlessly from a CLI, outside T3 Code: scratch directory, brief on stdin, background runs, reading results, follow-ups, and read-only flags. Use when delegating across providers without T3's delegate_task.
+description: Use when calling Claude, Codex (GPT), or Muse models from a command line outside T3 Code to delegate work across providers. It covers the scratch directory, brief on stdin, background runs, reading results, follow-ups, and read-only flags. Inside T3 Code, use delegate_task.
 ---
 
 # Calling models headlessly

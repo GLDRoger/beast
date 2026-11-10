@@ -1,6 +1,6 @@
 ---
 name: ai-features
-description: Build and judge features that embed AI models: evals and baselines, prompt changes, model choice by cost and quality, prompt caching, streaming, and failure handling. Use when an application calls an LLM or when comparing models or prompts.
+description: Use when an application calls an LLM, or when changing a prompt, choosing a model by cost and quality, setting up prompt caching, or building evals and baselines. For wiring token streaming into a Next.js UI, use ai-streaming.
 ---
 
 # AI features

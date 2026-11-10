@@ -1,6 +1,6 @@
 ---
 name: agent-desktop
-description: Use when a task needs you to operate a native desktop app's window (click, type, read its screen) rather than a browser page or a terminal. Covers the agent-desktop CLI: sessions, the visible cursor, snapshots, screenshots, and when headed mode is needed.
+description: Use when a task needs you to operate a native desktop app's window (click, type, read its screen) rather than a browser page or a terminal. It covers agent-desktop CLI sessions, the visible cursor, snapshots, screenshots, and when headed mode is needed.
 ---
 
 # Driving desktop apps

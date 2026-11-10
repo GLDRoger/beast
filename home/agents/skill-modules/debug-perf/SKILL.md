@@ -1,6 +1,6 @@
 ---
 name: debug-perf
-description: "Hunt Next.js and web performance dragons — HMR loops, CPU spikes, bundle bloat, slow servers. Use when the app feels laggy in dev or production and you need causes, not vibes."
+description: Use when a Next.js or web app is slow in dev or production, with hot reload loops, high CPU, slow compiles, bundle bloat, or slow server responses, and you need the cause. The performance workflow owns measuring and verifying the fix.
 category: devops
 tags: [performance, nextjs, turbopack, webpack, bundle, caching, cpu]
 author: tushaarmehtaa

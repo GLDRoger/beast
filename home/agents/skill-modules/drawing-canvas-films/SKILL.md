@@ -1,6 +1,6 @@
 ---
 name: drawing-canvas-films
-description: Use when the person wants a video, launch film, short, or animation where Claude draws every frame in code (the "Claude drew every frame of this animation in JavaScript" trend), asks for a procedural canvas animation exported to MP4, or wants to extend, restyle, or re-render a film built from this skill's template.
+description: Use when the user wants a video, launch film, or short animation where every frame is drawn with JavaScript on a canvas and rendered to MP4, or wants to extend or re-render a film built from this template. For Lottie files, use text-to-lottie.
 ---
 
 # Drawing canvas films

@@ -1,6 +1,6 @@
 ---
 name: app-copy
-description: "Write (or rewrite) the words the product speaks — empty states, errors, buttons, onboarding, toasts. Use when the UI is structurally fine but sounds placeholder, cold, or confusing."
+description: Use when the words inside a product need writing or auditing, such as empty states, error messages, button labels, onboarding, toasts, form validation, and loading text. For READMEs, essays, or marketing prose, use the writing workflow.
 category: workflow
 tags: [microcopy, ux-writing, ui-copy, empty-states, onboarding]
 author: tushaarmehtaa

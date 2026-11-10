@@ -1,6 +1,6 @@
 ---
 name: growth
-description: Develop and assess ideas, product choices, positioning, pricing, and distribution. Distinguish exploratory concepts, competitions, and business validation.
+description: Use when the user is choosing or judging an idea, product direction, positioning, pricing, audience, or distribution, including hackathon and demo ideas and startup viability. Use code, frontend, or writing to build the deliverable that follows.
 ---
 
 # Growth

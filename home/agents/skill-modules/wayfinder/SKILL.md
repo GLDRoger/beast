@@ -1,6 +1,6 @@
 ---
 name: wayfinder
-description: "Map oversized work onto an issue tracker as investigation tickets you can finish one by one. Use when the goal is bigger than one context window."
+description: Use when the user wants a large, still-vague idea charted on the repo's issue tracker as a map of investigation tickets, resolved one per session. For carrying a defined multi-stage task to completion, use long-work.
 ---
 
 A loose idea has arrived — too big for one agent session, and wrapped in fog: the route from here to a plan isn't visible yet. This skill charts it as a **shared map** on the repo's issue tracker, then works its tickets one at a time. The map is domain-agnostic — engineering work, course content, whatever fits the shape.

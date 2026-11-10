@@ -1,6 +1,6 @@
 ---
 name: unslop
-description: Remove formulaic AI prose and generic visual-design patterns while preserving the user's voice, brand, facts, and requested scope.
+description: Use when prose or a UI reads as machine-generated or templated, or when the user asks for an AI-slop review or cleanup of writing, copy, essays, or visual design. It keeps the user's voice, facts, and scope; for writing UI microcopy from scratch, use app-copy.
 metadata:
   trigger: Synthetic prose, repetitive copy, generic UI, or an explicitly requested AI-slop review or cleanup
 ---

@@ -1,6 +1,6 @@
 ---
 name: 3d-scenes
-description: Build and visually verify real-time 3D on the web with three.js or React Three Fiber, including hero scenes, product visuals, data or concept visualizations, and 3D films. Use when WebGL or WebGPU rendering is part of the deliverable.
+description: Use when the deliverable renders real-time 3D in the browser with three.js, React Three Fiber, WebGL, or WebGPU, such as a hero scene, product visual, 3D data view, or 3D shots in a film. To port a shader from an existing site, use web-shader-extractor.
 ---
 
 # 3D scenes
