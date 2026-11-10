@@ -1,6 +1,6 @@
 # User preferences
 
-Beast is the operating contract. This file adds model routing, skills, and engineering conventions. It is self-contained: everything needed to delegate is here.
+Beast is the operating contract. This file adds model routing, skills, and engineering conventions.
 
 ## Model routing
 
@@ -20,10 +20,11 @@ Route by what the work produces:
 | Reviews of Opus's user-facing, 3D, or animation work | Opus 5.5, in a fresh worker that didn't write it | medium |
 | Reviews of Sol's work | Opus 5.5 | medium |
 | Reviews of the most important changes, spanning many files of different kinds | GPT-6.1 Sol, or Opus 5.5 when Sol wrote them | high |
+| Critiquing a plan and its checks before long data jobs or security-sensitive designs, a second opinion after two failed attempts, creative work with an unclear goal | Mythos 5.2 | high |
 
-Don't route to Fable: it drains usage limits and is slower. Prefer Opus for user-facing work and GPT-6.1 Sol for work outside the frontend.
+Mythos 5.2 costs twice Opus on a capped allowance, so it directs and never does grunt work: it weighs every option and factor, writes the plan and briefs, and judges results, while the routes above code, run checks, and gather facts. Given work in a Mythos session, tell the user you will direct and delegate the doing. Don't route to Fable: it is Mythos with more refusals.
 
-Effort: medium is enough for about 90% of work. Use high only for the top 10%: the hardest debugging, security-sensitive changes, and reviews of the most important changes. Never run Opus 5.5 at xhigh, and don't use xhigh on any route.
+Effort: medium is enough for about 90% of work. Use high only for the top 10%: the hardest debugging, security-sensitive changes, and reviews of the most important changes. Don't use xhigh on any route.
 
 Briefs:
 
@@ -34,9 +35,9 @@ Briefs:
 
 Routing rules:
 
-- When you are the routed model, do the work yourself; spawn a worker of your own model only for parallel or context-heavy pieces.
-- GPT-6.1 Sol owns code outside the UI. User-facing code, 3D, and animation go to Opus. Muse Wonder Full is the backup for Sol and can't do frontend or 3D work at all.
-- A reviewer is never the author's model: an independent model catches what the author's own tests passed. The one exception is Opus's user-facing, 3D, and animation work, which only Opus can review; use a fresh Opus worker with no part in writing it.
+- When you are the routed model, do the work yourself (Mythos excepted); spawn a worker of your own model only for parallel or context-heavy pieces.
+- Muse Wonder Full is the backup for Sol and can't do frontend or 3D work at all.
+- A reviewer is never the author's model: an independent model catches what the author's own tests passed. The exception is Opus's user-facing, 3D, and animation work: a fresh Opus worker reviews it.
 - Split mixed tasks along the boundary: Sol builds the API, Opus builds the screen that calls it. Give each worker its own files.
 - If a routed model fails (auth, rate limit, outage), retry once, then fall back: Muse Wonder Full covers for Sol, and Opus covers for both, using a fresh worker when the work under review is Opus's own; if Haiku is unavailable, do the research or check run yourself. If user-facing, 3D, or animation work cannot reach Opus, tell the user. When you are the fallback, do the work yourself. Tell the user which model did the work.
 
@@ -48,8 +49,8 @@ When `t3-code` MCP tools are available (`delegate_task`, `orchestrator_capabilit
 
 ### Native subagents
 
-- **Claude Code:** the Agent tool with `model: "haiku"` or `model: "opus"`.
-- **Codex:** `spawn_agent` with `model: "gpt-6.1-sol"` and `reasoning_effort: "medium"` (or `"high"` for the top 10%).
+- **Claude Code:** the Agent tool with `model: "haiku"` or `model: "opus"`. Mythos has no alias: use `claude-mythos-5-2` via `delegate_task` or the headless CLI.
+- **Codex:** `spawn_agent` with `model: "gpt-6.1-sol"` and `reasoning_effort: "medium"`.
 - **Muse Code:** its native subagent tool, for Muse models.
 
 ### Headless CLIs (outside T3, across providers)

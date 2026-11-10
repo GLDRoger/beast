@@ -22,6 +22,7 @@ cd <project> && AGENT_CALL_DEPTH=1 claude -p --model haiku --effort medium \
 ```
 
 - Opus: `--model claude-opus-5-5 --effort medium`.
+- Mythos (direction and critique only, never grunt work): `--model claude-mythos-5-2 --effort high`.
 - Keep `--system-prompt-file`; without it headless Claude runs a generic prompt instead of Beast.
 - `jq -r .result` is the answer. `.is_error` flags failure, `.permission_denials` lists blocked actions, and `.session_id` continues the conversation.
 - Follow up with full context from the same directory: `claude -p --resume <session_id> --output-format json < "$W/followup.md"`.

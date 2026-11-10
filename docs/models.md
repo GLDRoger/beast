@@ -1,6 +1,6 @@
 # Coding models
 
-The maintainer's personal ranking from daily use, as of 19 October 2026. It's opinion, not a benchmark: nothing here was measured, and models change quickly. This is the only copy; Jevis links here. The routing table in [`USER.md`](../home/shared/USER.md) follows it, except that Fable is not routed: it drains usage limits and is slower, so Opus takes its place.
+The maintainer's personal ranking from daily use, as of 19 October 2026. It's opinion, not a benchmark: nothing here was measured, and models change quickly. This is the only copy; Jevis links here. The routing table in [`USER.md`](../home/shared/USER.md) follows it, except that Fable is not routed and Mythos only directs: it costs twice what Opus does on a capped allowance, so Opus and the other routes do the work. The Mythos 5.2 row dates from 10 November 2026, the day after launch, and rests on launch reports and a review of a month of past sessions, not on use.
 
 ## What each is good for
 
@@ -12,8 +12,8 @@ Models in tier A+ and above.
 | GPT-6.1 Sol | SS | Code outside the UI (APIs, data, infrastructure, scripts, tests, debugging, refactors), reviewing Opus's code outside the UI, and reviewing the most important changes. As good as Astra. |
 | GPT-6 Astra | SS | 3D modeling work and decent frontend designs. Expensive: use GPT-6.1 Sol instead, except for the most thorough reviews. |
 | Muse Wonder Full | SS | Backend code, as GPT-6.1 Sol's backup. It can't do frontend or 3D work at all, so never use it for either. |
-| Claude Fable 5.1 | S | Frontend animation. Strong, but Opus 5.5 is better and cheaper. |
-| Claude Mythos 5.1 | S | Fable 5.1 with lowered safeguards. |
+| Claude Mythos 5.2 | S | Direction, not execution: critiquing a plan and its checks before long data jobs or security-sensitive designs, a second opinion after two failed attempts, and creative work where the goal is unclear. |
+| Claude Fable 5.2 | S | The same model as Mythos 5.2 with more refusals. Not routed. |
 | Claude Haiku 5.5 | A+ | Research and exploration (codebase search, docs, web research), and long check runs. |
 | GPT-6 Luna | A+ | Research and exploration (codebase search, docs, web research), and long check runs. |
 | Gemini 4 Argon | A+ | 3D modeling work, spatial reasoning, and multilingual and multimodal reasoning. Don't use it for frontend or backend code. Tends to reread the same files. |
@@ -24,9 +24,9 @@ Models in tier A+ and above.
 |---|---|
 | SSS | Claude Opus 5.5 |
 | SS | GPT-6.1 Sol, GPT-6 Astra, Muse Wonder Full |
-| S | Claude Fable 5.1, Claude Mythos 5.1 |
+| S | Claude Mythos 5.2, Claude Fable 5.2 |
 | A+ | Claude Haiku 5.5, Claude Sonnet 5.5, Gemini 4 Argon, GPT-6 Luna |
-| A | GPT-6 Sol, Claude Opus 5, Claude Fable 5, GPT-5.6 Sol, Daybreak Blue, Kimi K3, Grok 4.7, Grok 4.6, Qwen3.8 Max 0902, GLM-5.3 Flash, DeepSeek V4.1 Flash, Hy-4 Preview |
+| A | Claude Fable 5.1, Claude Mythos 5.1, GPT-6 Sol, Claude Opus 5, Claude Fable 5, GPT-5.6 Sol, Daybreak Blue, Kimi K3, Grok 4.7, Grok 4.6, Qwen3.8 Max 0902, GLM-5.3 Flash, DeepSeek V4.1 Flash, Hy-4 Preview |
 | B | Muse Wonder, Muse Spark 1.3, GPT-5.6 Terra, Qwen3.8-Flash-Next, GLM-5.3, Claude Sonnet 5 |
 | C | K2 Horizon 375B A23B, GPT-5.6 Luna, Grok 4.5, Qwen3.8 27B, Muse Spark 1.2, MiMo V2.5 Pro, Hy-3, MiniMax-M3 |
 | D | Thinking Machines Inkling, Nemotron 3 Ultra, Muse Glimmer |
