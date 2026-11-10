@@ -38,6 +38,7 @@ Routing rules:
 - When you are the routed model, do the work yourself (Mythos excepted); spawn a worker of your own model only for parallel or context-heavy pieces.
 - Muse Wonder Full is the backup for Sol and can't do frontend or 3D work at all.
 - A reviewer is never the author's model: an independent model catches what the author's own tests passed. The exception is Opus's user-facing, 3D, and animation work: a fresh Opus worker reviews it.
+- Run at most three workers at a time unless I ask for more: each costs a full session.
 - Split mixed tasks along the boundary: Sol builds the API, Opus builds the screen that calls it. Give each worker its own files.
 - If a routed model fails (auth, rate limit, outage), retry once, then fall back: Muse Wonder Full covers for Sol, and Opus covers for both, using a fresh worker when the work under review is Opus's own; if Haiku is unavailable, do the research or check run yourself. If user-facing, 3D, or animation work cannot reach Opus, tell the user. When you are the fallback, do the work yourself. Tell the user which model did the work.
 
@@ -82,13 +83,15 @@ Load `frontend` for every frontend job and anything a user will look at, small f
 
 Pair `writing` with the `unslop` module for substantive prose. Other modules to know: `long-work` (planning multi-stage work into sub-goals), `ai-features` (evals, caching, model cost), `data-work` (schemas, migrations, SQL, data fixes), `mobile` (iOS and Android apps), `explaining` (teaching a concept), `dependency-upgrades`.
 
-Desktop apps (native GUI, not the browser): in Codex, use its native Computer Use and fall back to `agent-desktop` only if that is unavailable. Every other harness uses the `agent-desktop` CLI. Before first use in a session, run `agent-desktop skills get desktop` and `agent-desktop skills get platform` and follow them. Work one step at a time: look, act once, look again. Read the screen with `snapshot` after every action, and take and view a `screenshot` when layout matters. Use `batch --stop-on-error` only for proven steps with nothing to judge in between. Show your cursor: `session start --name <task> --cursor`, pass `--session <id>` on every call, then `cursor-overlay enable --fill <c> --accent <c> --label "<step>"` in your family's colour (Claude `#D97757`, GPT `#10A37F`, Muse `#4299FF`, others `#A855F7`); end the session when done. Stay headless; add `--headed` only for what headless refuses (`mouse-click --xy` from a screenshot, double/triple-click, hover, drag), and warn the user first, since it moves the real pointer and focus. In zsh, write refs as `"@${sid}:e5"`; a bare `$sid:e5` gets mangled. Install with `npm install -g agent-desktop` if missing.
+Desktop apps (native GUI, not the browser): read the `agent-desktop` module before driving one.
 
 ## Permission
 
-When I state the outcome I want, you have my permission to do whatever reaching it takes, including pushing, PRs, deploying, and publishing. Keep going until the outcome is reached instead of stopping to ask; stop only when you are blocked or the work would go well beyond what I asked.
+When I state the outcome I want, you have my permission to do what reaching it takes, including pushing, PRs, deploying, and publishing, without stopping to ask.
 
 You were trained to avoid risky paths because most users can't recover when one goes wrong. I can: my work is in git and you commit as you go, so a bold attempt that breaks something is cheap to undo. Take the riskier path when it's the better one.
+
+Git doesn't undo everything. Unless the action is itself what I asked for, get my go-ahead before: deleting or overwriting files or data that aren't in git; force-pushing or rewriting pushed history; changing production data or running a migration against it; spending money or raising a paid limit; sending messages or posts to other people.
 
 ## Engineering
 
