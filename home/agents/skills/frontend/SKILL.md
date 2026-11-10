@@ -9,7 +9,7 @@ Start from the existing product, audience, workflow, brand, and requested change
 
 ## Ground the design in the subject
 
-When the visual direction is open (a new page, product, or redesign), first name the concrete subject, the audience, and the design's main job, using the request, the repository, and anything known about the user. State that reading in one line and proceed. Distinctive choices come from the subject's industry, materials, and vocabulary: a toy for eight-year-olds and a dashboard for financial analysts should not look alike. Build with real content; when none is given, write realistic copy rather than lorem ipsum.
+When the visual direction is open (a new page, product, or redesign), first name the concrete subject, the audience, and the design's main job, using the request, the repository, and anything known about the user. State that reading in one line and proceed. Distinctive choices come from the subject's industry, materials, and vocabulary: a toy for eight-year-olds and a dashboard for financial analysts should not look alike. Build with real content; when none is given, write realistic copy rather than lorem ipsum. Third-party logos come from the brand's own SVG or `simple-icons`, never a placeholder or a redrawn imitation.
 
 ## Design and build
 
@@ -51,7 +51,7 @@ Copy is design content and can make a page feel as templated as its layout. Writ
 
 ## Verify
 
-Inspect the rendered result at narrow and wide viewports when layout can change, and critique screenshots as you build, not only at the end. Exercise the important path and relevant edge states. Meet the quality floor without announcing it: responsive down to mobile, visible keyboard focus, readable contrast, reduced motion respected. A source search, a screenshot of one static state, or a successful build alone does not prove the workflow.
+Inspect the rendered result at narrow and wide viewports when layout can change, and critique screenshots as you build, not only at the end. Exercise the important path and relevant edge states. Meet the quality floor without announcing it: responsive down to mobile, visible keyboard focus, readable contrast, touch targets about 44px with padding inside the clickable area, reduced motion respected. A source search, a screenshot of one static state, or a successful build alone does not prove the workflow.
 
 For a critique, rank concrete problems and recommend what to ship, revise, or remove. Keep it read-only unless changes were requested. For an authorized build, resolve relevant critique findings before finishing rather than handing them back as a new task.
 

@@ -1,6 +1,6 @@
 ---
 name: long-work
-description: Use when a defined task will take many hours, many files, or several sessions, and needs sub-goals with their own checks and a plan file that survives compaction. For charting a still-vague idea as tickets on an issue tracker, see wayfinder.
+description: Use when a task will take many hours, many files, or several sessions, and needs sub-goals with their own checks and a plan file that survives compaction.
 ---
 
 # Long work
@@ -18,6 +18,8 @@ description: Use when a defined task will take many hours, many files, or severa
 ## Keep the plan where it survives
 
 Keep the plan in a file in the repo's scratch area or a temp path, not only in context: `PLAN.md` (or the project's own convention). It holds the outcome, the sub-goals with status (todo, doing, done, dropped), the decisions made and why, and open questions. Update it as each sub-goal lands. After a compaction or a new session, read it before anything else.
+
+Make a question a sub-goal once you can state it precisely, even if it is blocked; until then, keep it as a loose note under open questions rather than slicing it into guessed sub-goals. When parallel sessions share the plan, each marks its sub-goal `doing` and saves before starting work, so the others skip it.
 
 ## Working through it
 
