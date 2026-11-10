@@ -42,8 +42,8 @@ Then open the printed local URL. If you already have the project, just
 ## Where to write the file (and how it loads)
 
 - Write the animation JSON to **`public/lottie.json`**. That is the only file
-  you need to touch to change what the app shows — [`src/App.tsx`](../../../src/App.tsx)
-  fetches `/lottie.json` at startup.
+  you need to touch to change what the app shows — the player project's
+  `src/App.tsx` fetches `/lottie.json` at startup.
 - With the dev server running (`npm run dev`), a Vite plugin watches that file
   and **full-reloads the page on save**, so your edit appears immediately. No
   other wiring is required.

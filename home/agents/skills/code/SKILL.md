@@ -27,7 +27,7 @@ Report checks actually performed, skipped boundaries, and material residual risk
 Load only when the task needs the procedure:
 
 - Domain contracts: `~/.agents/skill-modules/domain-modeling/SKILL.md`
-- Requested architecture review/planning: `~/.agents/skill-modules/improve/SKILL.md` or `~/.agents/skill-modules/improve-codebase-architecture/SKILL.md`
+- Requested architecture review/planning: `~/.agents/skill-modules/improve/SKILL.md` (its architecture review mode covers module and interface design)
 - Streaming or abuse controls: `~/.agents/skill-modules/ai-streaming/SKILL.md` or `~/.agents/skill-modules/rate-limit/SKILL.md`
 - Generated Next.js runtime/type noise: `~/.agents/skill-modules/next-runtime-triage/SKILL.md`
 - Explicit independent review or exhaustive release QA: `~/.agents/skill-modules/review-swarm/SKILL.md` or `~/.agents/skill-modules/ruthless-release-qa/SKILL.md`

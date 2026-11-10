@@ -151,7 +151,7 @@ Input: user identifier, amount to deduct, reason string
 Output: boolean (success/failure)
 Logic:
   1. Get current credits
-  2. If credits < amount → return false (DO NOT go negative)
+  2. If credits < amount → return false (a balance never goes negative)
   3. Update users.credits = credits - amount
   4. Insert credit_transactions record with negative amount
   5. Return true
@@ -168,10 +168,10 @@ Logic:
 ```
 
 **Important implementation details:**
-- The deduct function MUST check balance before deducting — never trust the frontend
+- The deduct function checks the balance itself before deducting, because the frontend's view of the balance can be stale or forged
 - Use database-level constraints or transactions to prevent race conditions
 - For high-throughput: use `UPDATE users SET credits = credits - $amount WHERE id = $id AND credits >= $amount` and check affected rows
-- Always log to credit_transactions — this is your financial audit trail
+- Record every change in credit_transactions; it is the financial audit trail, and a balance with no matching transactions cannot be reconciled
 
 ### Credit Check Middleware
 
@@ -290,12 +290,18 @@ Logic:
   1. Verify webhook signature using STRIPE_WEBHOOK_SECRET
   2. Handle event type: checkout.session.completed
   3. Extract metadata.user_id and metadata.credits_amount
-  4. IDEMPOTENCY CHECK: query credit_transactions for this payment_id
+  4. Idempotency check: query credit_transactions for this payment_id
      - If found → return 200 (already processed)
   5. Call add_credits(user_id, credits_amount, 'purchase', { payment_id: session.id })
-  6. Return 200
+  6. Return 200 once the credits are recorded
 
-CRITICAL: Always return 200 to prevent retries, even on errors. Log the error instead.
+Status codes:
+  - Bad or missing signature → 400. The request did not come from Stripe.
+  - Verified, and recorded or already processed → 2xx, so Stripe stops retrying.
+  - Verified event types you don't handle → 2xx; a retry would not change anything.
+  - Transient failure (database down, timeout) → 5xx, so Stripe retries later.
+    The idempotency check makes the retry safe. Returning 200 here would
+    acknowledge a payment whose credits were never added.
 ```
 
 **Environment variables needed:**
@@ -362,10 +368,10 @@ Logic:
 
 ### Webhook Security Checklist
 
-Regardless of provider, every webhook handler MUST:
-1. **Verify the signature** — never trust unverified webhooks
-2. **Check idempotency** — payment_id should be unique in credit_transactions
-3. **Return 200 always** — even on errors, to prevent infinite retries
+Whatever the provider, a webhook handler should:
+1. **Verify the signature**, and reject a bad one with a 4xx: anyone can post to the endpoint
+2. **Check idempotency**: payment_id should be unique in credit_transactions, because providers deliver the same event more than once
+3. **Acknowledge with 2xx once the event is safely recorded or was already processed**, and return a non-2xx for transient failures so the provider retries; a 200 on failure loses the payment's credits
 4. **Log everything** — payment_id, user_id, amount, timestamp
 5. **Use raw body for signature verification** — parsed JSON won't match the signature
 

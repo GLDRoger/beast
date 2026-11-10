@@ -48,7 +48,7 @@ OPENAI_API_KEY=
 
 ## Phase 3: The Route Handler
 
-Create the streaming API route. Auth check must come first — before any SDK call:
+Create the streaming API route. Auth check must come first — before any SDK call. The model IDs below were current when this was written (`claude-sonnet-5-5`); IDs date quickly, so check the provider's model list and use what the project already configures:
 
 ```typescript
 // app/api/chat/route.ts
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
 
   // 4. Stream
   const result = streamText({
-    model: anthropic('claude-sonnet-4-6'),
+    model: anthropic('claude-sonnet-5-5'),
     messages,
     system: 'You are a helpful assistant.',
     maxTokens: 1024,
@@ -105,7 +105,7 @@ export async function POST(req: Request) {
   const { prompt } = await req.json();
 
   const result = streamText({
-    model: anthropic('claude-sonnet-4-6'),
+    model: anthropic('claude-sonnet-5-5'),
     prompt,
     abortSignal: req.signal,
   });
@@ -250,4 +250,4 @@ Never deduct before the stream — if the model errors on token 1, the user lost
 [ ] Test: trigger an error — confirm error state renders, not a frozen UI
 ```
 
-See [references/guide.md](references/guide.md) for tool calling patterns, multi-modal (image) inputs, and streaming with structured output.
+For tool calling, image inputs, and streaming structured output, read the AI SDK documentation for the version the project has installed; those APIs change between major versions.

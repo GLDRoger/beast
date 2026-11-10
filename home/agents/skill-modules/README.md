@@ -17,8 +17,8 @@ Which modules are installed depends on the packs chosen with `beast install --pa
 | `grilling` | Pressure-test a plan with relentless questions before you spend build cycles |
 | `handoff` | Fold the session into a compact handoff another agent can continue |
 | `improve` | Survey a codebase as an advisor and hand other agents ranked, self-contained plans |
-| `improve-codebase-architecture` | Review architectural friction, coupled modules, interface complexity, and testability; recommend evidence-backed refactoring opportunities within the requested scope |
 | `long-work` | Plan and carry long, multi-stage work (many hours, many files, several sessions or rounds) by breaking the goal into sub-goals with their own checks and a plan file that survives compaction |
+| `agent-desktop` | Operate a native desktop app's window with the agent-desktop CLI: sessions, the visible cursor, snapshots, screenshots, and headed mode |
 | `mobile` | Build and verify iOS and Android apps, including React Native, Expo, Flutter, Swift and Kotlin projects: running on simulators and emulators, inspecting real screens, and handling device-specific behaviour |
 | `rate-limit` | Protect Next.js routes with real rate limits — IP/user windows, 429s, Retry-After |
 | `review-swarm` | Run a multi-model PR/diff review panel and sort findings into actionable, nit, or ambiguous |
@@ -39,7 +39,6 @@ Which modules are installed depends on the packs chosen with `beast install --pa
 | `review-animations` | Review motion code against a high craft bar (Emil-inspired) |
 | `scroll-scenes` | Build scroll-driven visual essays and animated story pages (sticky scenes, CSS-var animation, per-chapter art direction) |
 | `taste-craft` | Invisible polish — component feel, motion detail, and the small decisions that make software feel inevitable |
-| `taste-skill-gpt` | Push elite editorial UI and GSAP-grade scroll motion — bold type, gapless bento, serious craft constraints |
 | `text-to-lottie` | Author Lottie (Bodymovin) JSON that plays in a local skia path |
 | `transitions-dev` | Implement production UI transitions — modals, tabs, toasts, shared-element moments, state morphs |
 | `tushar-design` | Build in Tushar’s dark, precise design system — opinionated questions first, then code |

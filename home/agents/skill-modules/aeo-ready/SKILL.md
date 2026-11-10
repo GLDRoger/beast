@@ -15,8 +15,8 @@ This skill audits and fixes all four.
 Three types of AI crawlers exist. Know the difference before touching robots.txt:
 
 - **Training crawlers** (GPTBot, ClaudeBot, CCBot) — index content once for model training datasets. Blocking them means future model versions won't know about you.
-- **Retrieval crawlers** (PerplexityBot, OAI-SearchBot) — fetch pages in real time to answer specific user queries. Blocking these has immediate effect — your pages stop appearing in answers within hours.
-- **Live browsing agents** (ChatGPT-User) — fetch a single page on demand when a user asks the model to visit a URL.
+- **Retrieval crawlers** (PerplexityBot, OAI-SearchBot, Claude-SearchBot) — fetch pages in real time to answer specific user queries. Blocking these has immediate effect — your pages stop appearing in answers within hours.
+- **Live browsing agents** (ChatGPT-User, Claude-User) — fetch a single page on demand when a user asks the model to visit a URL.
 
 ## Phase 1: Scan the Codebase
 
@@ -231,7 +231,7 @@ Rules:
 
 ## Phase 4: AI Crawler Access
 
-Check `robots.txt`. Add explicit allow rules for every major AI crawler. Categorized by what each one does:
+Check `robots.txt`. Add explicit allow rules for every major AI crawler. Crawler names change, so check each vendor's published list before writing rules (Anthropic's: https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler). Categorized by what each one does:
 
 ```
 # OpenAI — training + retrieval + live browsing
@@ -244,11 +244,14 @@ Allow: /
 User-agent: ChatGPT-User
 Allow: /
 
-# Anthropic — training + retrieval
+# Anthropic — training + search indexing + user-requested fetches
 User-agent: ClaudeBot
 Allow: /
 
-User-agent: anthropic-ai
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
 Allow: /
 
 # Google — AI products (separate from Search)
@@ -283,7 +286,7 @@ User-agent: FacebookBot
 Allow: /
 ```
 
-If the user wants to block a specific crawler: generate the `Disallow: /` rule and note the tradeoff. Blocking a retrieval crawler (PerplexityBot, OAI-SearchBot) means immediate loss of citations from that engine. Blocking a training crawler (GPTBot, ClaudeBot) affects future model versions only.
+If the user wants to block a specific crawler: generate the `Disallow: /` rule and note the tradeoff. Blocking a retrieval crawler (PerplexityBot, OAI-SearchBot, Claude-SearchBot) means immediate loss of citations from that engine. Blocking a training crawler (GPTBot, ClaudeBot) affects future model versions only.
 
 ---
 

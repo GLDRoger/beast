@@ -78,7 +78,7 @@ Select independent lenses that add value for this diff, preserving any panel siz
 - **Security and boundaries:** authentication, authorization, tenancy, input/files, privacy, and dependencies.
 - **Tests and operations:** regression coverage, migrations, observability, performance, and rollback.
 
-Read `~/.beast/delegation.md` and use current runtime capabilities. Prefer native subagents for suitable same-task review. Use agent-broker for intentional cross-provider work; discover actual provider/model availability before dispatch. When agent-broker is unavailable, call Codex or Claude Code headless as that runbook shows. Do not require a saved model roster or a wrapper CLI when native tools fit. If delegation is unavailable or disallowed, review directly and disclose the lack of independence.
+Choose reviewer models and the way to call them from "Model routing" and "Calling each model" in `~/.agents/AGENTS.md`. Those sections cover T3 Code's `delegate_task`, native subagents and the headless CLIs, and say which model may review whose work. Check which providers and models are actually available before dispatch. If delegation is unavailable or disallowed, review directly and disclose the lack of independence.
 
 Give reviewers the minimum relevant diff/context and read-only access. They must not see one another's findings or mutate the target. The primary owner integrates the results.
 
@@ -206,7 +206,7 @@ For PRs, after each push:
 1. Wait for required CI checks to complete. Do not wait indefinitely for
    optional bots without required status checks.
 2. Refetch the PR head and all current review items.
-3. Rerun the independent panel on the new HEAD when substantive code changed.
+3. Size the rerun to what the push changed. A fix confined to one area needs one reviewer with the lens that area calls for; rerun the full panel only when the push changed behavior across several lenses or reshaped the design. A push of formatting, copy, or a mechanical correction needs no rerun: verify it yourself. Each reviewer costs a full session, and the newest Claude model delegates readily, so the default is the smallest rerun that would catch a regression in what changed.
 4. Re-arbitrate new and remaining items.
 5. Repeat fix, verify, push, and triage.
 

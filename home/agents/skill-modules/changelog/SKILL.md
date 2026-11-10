@@ -31,13 +31,15 @@ git show [commit-hash] --stat
 ```
 Group commits into themes. Ignore pure refactors, dependency bumps, and test fixes — users don't care. Focus on what changed for them.
 
-### 3. Distill into exactly 6 items
-Each item needs:
-- **An emoji** that fits the work (✨ new feature, 🐛 fix, ⚡ performance, 🎨 design, 🔒 security, etc.)
+### 3. Distill into items
+Let the number of items follow what shipped: one per change a user would notice, usually somewhere between three and eight. Padding a quiet week or squeezing a busy one into a fixed count misrepresents it. If earlier changelogs exist, match their length and format.
+
+Each item has:
+- **An emoji, if the project's changelog uses them** (✨ new feature, 🐛 fix, ⚡ performance, 🎨 design, 🔒 security, etc.). Leave them out when earlier entries do, or when there is no earlier changelog and the product's voice is plain.
 - **A short title** — 3-5 words, lowercase, punchy
 - **2-3 lines of body** — explain the user benefit, not the technical detail. Write like a human, not a release note. "credits update in real time" not "implemented shared zustand store for credit synchronisation."
 
-If fewer than 6 meaningful things shipped, combine small related items or include one "under the hood" item about stability/performance.
+When many small related fixes shipped, group them into one item rather than listing each. An "under the hood" item about stability or performance is fine when that work was real.
 
 ### 4. Find or create the changelog template
 Look for a `changelogs/` directory in the repo. If there's a `template.html`, use it.
@@ -70,7 +72,7 @@ If no template exists, create `changelogs/template.html` with this structure:
   <div class="header">what shipped this week · <span>MONTH DAY</span></div>
   <div class="grid">
     <div class="item"><div class="emoji">EMOJI</div><div class="content"><h3>TITLE</h3><p>BODY LINE 1<br>BODY LINE 2<br><strong>BODY LINE 3</strong></p></div></div>
-    <!-- repeat 5 more times -->
+    <!-- one .item per change; drop the .emoji div if the changelog doesn't use emoji -->
   </div>
   <div class="footer">N commits · N files · N lines · all live</div>
 </body>
@@ -82,7 +84,7 @@ Create `changelogs/YYYY-MM-DD.html` (use today's date).
 
 Fill in:
 - Header date (e.g. "what shipped this week · march 1")
-- All 6 items
+- The items from step 3
 - Footer stats from step 1
 
 ### 6. Open in browser

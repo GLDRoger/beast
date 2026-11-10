@@ -5,7 +5,7 @@ description: "Behave like a hostile release tester — every path, state, and aw
 
 # Ruthless Release QA
 
-Use this skill when the user wants Codex to test an app like a public-release gatekeeper, not a casual smoke tester.
+Use this skill when the user wants you to test an app like a public-release gatekeeper, not a casual smoke tester.
 
 The mindset: **assume the app is not ready until evidence says otherwise.** Click broadly, verify deeply, document honestly, and never claim coverage you did not perform.
 
@@ -33,8 +33,7 @@ The mindset: **assume the app is not ready until evidence says otherwise.** Clic
    - what will be clicked
    - what will not be clicked without seeded test accounts/test mode
 4. If using Browser, initialize the in-app Browser session and name it clearly.
-5. If repo context is needed, prefer a compact snapshot before broad searching:
-   - `~/.codex/scripts/repo_snapshot.py <repo>`
+5. If repo context is needed, prefer a compact snapshot before broad searching, such as `~/.codex/scripts/repo_snapshot.py <repo>` when that script exists.
 
 ## Coverage model
 
@@ -131,47 +130,16 @@ For every interaction verify:
 - loading state appears for slow work
 - success/error state is scoped to the current action and clears correctly
 
-### 4. Standard mail-client matrix
+### 4. Mail-client matrix
 
-For mail apps, cover both provider-specific and generic behavior.
-
-#### Safe browser checks
-
-- inbox/drafts/sent/archive/folders/labels load states
-- search query and URL state
-- unread/read filter
-- selected thread persistence
-- thread open/close/back/next
-- sender details/contact popover
-- attachments visible but do not download unless safe
-- reply/forward/compose modal opens
-- empty send validation
-- schedule-send modal opens and validates fields
-- overflow menus show provider-correct labels (`Open in Gmail`, `Open in Outlook`, or generic fallback)
-- bulk selection UI and disabled states
-- archive/block/unsubscribe controls are identified but not executed on real data
-
-#### Seeded-test-only mutation checks
-
-Run only with seeded test Gmail/Outlook accounts:
-
-- compose new email -> save draft -> discard -> send test email
-- reply -> discard -> send
-- forward -> discard -> send
-- schedule send -> cancel -> reschedule
-- archive -> undo/recover -> verify provider state
-- delete/trash/spam -> recover where supported
-- block sender -> unblock/recover
-- unsubscribe -> confirm result/failure/undo
-- rule create/edit/delete/reorder/test
-- process past emails with confirmation/progress/cancel/undo
+When the app reads or sends email, read [references/mail-client-matrix.md](references/mail-client-matrix.md) and run its safe browser checks, plus its mutation checks on seeded test accounts only. Skip this step for apps without mail.
 
 ### 5. Provider parity pass
 
 For every first-class provider/account:
 
 1. Run the same route sweep.
-2. Run the same mail-client matrix.
+2. Run the same mail-client matrix, if step 4 applied.
 3. Run the same cleanup/automation/calendar/settings/assistant/integrations checks.
 4. Compare findings.
 5. Switch Provider A -> Provider B -> Provider A and look for stale state.

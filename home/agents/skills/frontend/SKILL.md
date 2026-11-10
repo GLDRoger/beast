@@ -15,7 +15,7 @@ When the visual direction is open (a new page, product, or redesign), first name
 
 - Make the important action and information hierarchy clear. Carry one visual direction through typography, spacing, color, shape, copy, and interaction.
 - Preserve the existing design system unless changing it is part of the request. Where the brief or product sets a direction, follow it exactly, even when it is one of the defaults listed below.
-- Spend boldness in one place. Let one element be the memorable thing, keep everything around it quiet, and cut decoration that does not serve the brief. Before finishing, remove one accessory.
+- Spend boldness in one place. Let one element be the memorable thing, keep everything around it quiet, and cut decoration that does not serve the brief. Before finishing, look for an accessory that adds nothing and remove it; if every element earns its place, leave the design as it is.
 - Typography carries the personality. Use one family, or two that are clearly distinct, chosen for this subject rather than the family you would reach for on any project. Set a clear type scale with deliberate weights and spacing. Keep body lines under about 80 characters, and give serif body text slightly more line height than sans.
 - Structure is information. Borders, dividers, numbering, eyebrows, and labels should say something about the content, not decorate it. Number items only when they really are a sequence.
 - Keep frequent feedback fast and restrained. Motion that answers a person's action should show what changed. For motion nobody triggered, one orchestrated moment beats a fade-up on every section and a hover effect on every card. Never hide content until an animation runs, and honor reduced motion.
@@ -62,7 +62,7 @@ For a critique, rank concrete problems and recommend what to ship, revise, or re
 - Substantial motion: `~/.agents/skills/motion/SKILL.md`
 - 3D, WebGL, or shader scenes: `~/.agents/skill-modules/3d-scenes/SKILL.md`
 - UI language: `~/.agents/skill-modules/app-copy/SKILL.md`
-- Specific requested aesthetic: `~/.agents/skill-modules/apple-design/SKILL.md`, `~/.agents/skill-modules/redesign-skill/SKILL.md`, `~/.agents/skill-modules/tushar-design/SKILL.md`, `~/.agents/skill-modules/taste-skill-gpt/SKILL.md`, or `~/.agents/skill-modules/compact-landing/SKILL.md`
+- Specific requested aesthetic: `~/.agents/skill-modules/apple-design/SKILL.md`, `~/.agents/skill-modules/redesign-skill/SKILL.md`, `~/.agents/skill-modules/tushar-design/SKILL.md`, or `~/.agents/skill-modules/compact-landing/SKILL.md`
 - Streaming, pricing, credits, or email workflows: load the corresponding specialist only when implementing that feature.
 
 These are available methods, not mandatory stages. Use the code, performance, or security workflow when that domain is the main problem.

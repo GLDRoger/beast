@@ -8,7 +8,7 @@ Uses the vocabulary in [LANGUAGE.md](LANGUAGE.md) — **module**, **interface**,
 
 ### 1. Frame the problem space
 
-Before spawning sub-agents, write a user-facing explanation of the problem space for the chosen candidate:
+Before designing alternatives, write a user-facing explanation of the problem space for the chosen candidate:
 
 - The constraints any new interface would need to satisfy
 - The dependencies it would rely on, and which category they fall into (see [DEEPENING.md](DEEPENING.md))
@@ -18,7 +18,7 @@ Show this to the user, then immediately proceed to Step 2. The user reads and th
 
 ### 2. Spawn sub-agents
 
-Spawn 3+ sub-agents in parallel using the Agent tool. Each must produce a **radically different** interface for the deepened module.
+Spawn sub-agents in parallel, usually three or four, each producing a **radically different** interface for the deepened module. Do this when the module is central enough that a wrong interface would be costly and the design space is genuinely open. Each sub-agent costs a full session, and the newest Claude model delegates readily, so for a small module or one whose shape the constraints already settle, sketch two or three alternatives yourself instead.
 
 Prompt each sub-agent with a separate technical brief (file paths, coupling details, dependency category from [DEEPENING.md](DEEPENING.md), what sits behind the seam). The brief is independent of the user-facing problem-space explanation in Step 1. Give each agent a different design constraint:
 

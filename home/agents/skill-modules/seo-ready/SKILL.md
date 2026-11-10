@@ -96,10 +96,11 @@ Check each of these across all pages. Score each as PASS / WARN / FAIL.
 - In `robots.txt`, check for explicit rules for AI crawlers:
   - `GPTBot` (OpenAI / ChatGPT)
   - `ChatGPT-User` (ChatGPT browsing)
-  - `Claude-Web` (Anthropic)
+  - `ClaudeBot`, `Claude-SearchBot`, `Claude-User` (Anthropic: training, search indexing, user-requested fetches)
   - `PerplexityBot` (Perplexity)
   - `Applebot-Extended` (Apple Intelligence)
   - `Google-Extended` (Gemini)
+- Crawler names change; check each vendor's published list before writing rules (Anthropic's: https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler)
 - These should be explicitly ALLOWED for public content pages
 - WARN if not mentioned (defaults vary), FAIL if explicitly blocked
 
@@ -167,7 +168,7 @@ AEO checks:
 Top issues to fix (by impact):
 1. (HIGH) Add FAQPage JSON-LD schema — captures AI answer citations
 2. (HIGH) Create llms.txt — makes your site readable by AI tools
-3. (HIGH) Add AI crawler allow rules — GPTBot, Claude-Web, PerplexityBot
+3. (HIGH) Add AI crawler allow rules — GPTBot, ClaudeBot, Claude-SearchBot, PerplexityBot
 4. (MEDIUM) Add meta descriptions to 2 pages
 5. (LOW) Add alt text to 3 images
 ```
@@ -284,7 +285,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: ['/', '/docs/', '/blog/'],
       },
       {
-        userAgent: 'Claude-Web',
+        userAgent: ['ClaudeBot', 'Claude-SearchBot', 'Claude-User'],
         allow: ['/', '/docs/', '/blog/'],
       },
       {

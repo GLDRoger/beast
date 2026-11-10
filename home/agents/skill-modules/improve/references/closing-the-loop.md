@@ -16,7 +16,7 @@ The founding rule survives unchanged: **the advisor never edits source code.** I
 
 ### Dispatch
 
-Spawn **one** `general-purpose` subagent with `isolation: "worktree"`. Executor model: default `sonnet`; use what the user named if they named one (`execute 003 haiku`).
+Spawn **one** `general-purpose` subagent with `isolation: "worktree"`. Executor model: use what the user named if they named one (`execute 003 haiku`); otherwise choose it from "Model routing" in `~/.agents/AGENTS.md` by what the plan produces, and call it as that file's "Calling each model" section describes.
 
 The subagent prompt must contain:
 

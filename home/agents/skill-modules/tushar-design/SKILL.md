@@ -267,7 +267,7 @@ Self-audit every line of copy before output. If it fails any rule, rewrite it.
 - Section headers are fragments: "how it works", "what you get"
 - Feature descriptions: 1–2 sentences max. Ends when the point is made.
 - No summary paragraphs. Copy doesn't recap what was just said.
-- Footer always includes: "built by @[handle]"
+- A "built by @[handle]" credit goes in the footer only when the user asks for one; it is their product, and an unrequested credit line reads as the tool signing its work.
 - No em dashes. Use a period or rewrite the sentence.
 - No empty adjectives: powerful, seamless, robust, comprehensive, cutting-edge are banned.
 

@@ -18,8 +18,8 @@ Before writing anything, read the codebase:
 - **Auth**: How is the current user identified in API routes?
 - **Existing payments**: Check `package.json` for payment provider:
   - `@dodopayments/sdk` → Dodo Payments (use Phase 4 below)
-  - `stripe` → Stripe (use [references/stripe.md](references/stripe.md))
-  - `@lemonsqueezy/lemonsqueezy.js` → Lemon Squeezy (use [references/lemonsqueezy.md](references/lemonsqueezy.md))
+  - `stripe` → Stripe (checkout and webhook pattern in `~/.agents/skill-modules/ship-credits/SKILL.md`, "Stripe Integration")
+  - `@lemonsqueezy/lemonsqueezy.js` → Lemon Squeezy (checkout and webhook pattern in `~/.agents/skill-modules/ship-credits/SKILL.md`, "Lemon Squeezy Integration")
   - None → ask the user which provider to set up
 
 If the codebase already has a payment provider, wire into it — don't install a second one.

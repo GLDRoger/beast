@@ -23,7 +23,7 @@ The economics of this skill: use independent expertise when it helps understandi
 
 ## Architecture review mode
 
-For architecture/deepening audits that previously used `improve-codebase-architecture`, keep using `improve` and open `references/architecture-review/README.md`. That reference preserves the module/interface/seam/adapter vocabulary, deepening heuristics, HTML report format, and interface-design workflow.
+For architecture and deepening audits, use `improve` and open `references/architecture-review/README.md`. That reference preserves the module/interface/seam/adapter vocabulary, deepening heuristics, HTML report format, and interface-design workflow.
 
 Use this mode when the user asks to improve architecture, consolidate tightly coupled modules, find refactoring opportunities, or make a codebase more testable and AI-navigable. It remains read-only unless the user explicitly chooses an execution flow handled by `improve`.
 

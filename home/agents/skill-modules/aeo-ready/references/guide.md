@@ -148,7 +148,9 @@ Open source / Free / [pricing details]
 | Crawler | Engine | What it indexes |
 |---------|--------|----------------|
 | GPTBot | ChatGPT | Public web content for training + browsing |
-| ClaudeBot | Claude.ai | Web content for Claude's browsing feature |
+| ClaudeBot | Claude | Public web content for training |
+| Claude-SearchBot | Claude | Search index for Claude's web search answers |
+| Claude-User | Claude | Pages fetched when a user asks Claude a question |
 | PerplexityBot | Perplexity | Real-time search content |
 | Google-Extended | Google AI Overviews | Content for AI-generated search summaries |
 | Amazonbot | Alexa | Alexa voice responses |
