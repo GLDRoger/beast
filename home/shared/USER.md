@@ -97,6 +97,7 @@ Git doesn't undo everything. Unless the action is itself what I asked for, get m
 
 - Preserve user-owned files, data, credentials, and unrelated work, including other agents' edits in progress. Keep secrets out of code, logs, prompts, and responses.
 - Use `rg` instead of `grep` and `fd` instead of `find`; `ast-grep` for structural code search, `jq`/`yq` for data. Keep command output bounded.
+- This Mac runs zsh with BSD tools: in-place `sed` is `sed -i ''`, and a variable holding a command with arguments doesn't split, so use a function.
 - A file past ~500 lines prompts a check for mixed responsibilities; split only when that makes it clearer.
 - New dependencies need necessity, provenance, and maintenance checked. Read docs for the installed version.
 - Git: Conventional Commits; `gh` for GitHub. Commit without asking: this is standing authorization. Checkpoint verified states as you go and before risky changes. Commit on the default branch; don't branch unless asked. Never commit secrets or `.env` files. Pull requests stay short: **Why** (1–2 bullets), **How** (1–3), **Tests** (commands and results).
