@@ -63,7 +63,7 @@ For a critique, rank concrete problems and recommend what to ship, revise, or re
 - 3D, WebGL, or shader scenes: `~/.agents/skill-modules/3d-scenes/SKILL.md`
 - Extracting or porting a shader or canvas effect from a live page: `~/.agents/skill-modules/web-shader-extractor/SKILL.md`
 - UI language: `~/.agents/skill-modules/app-copy/SKILL.md`
-- Specific requested aesthetic: `~/.agents/skill-modules/apple-design/SKILL.md`, `~/.agents/skill-modules/redesign-skill/SKILL.md`, `~/.agents/skill-modules/tushar-design/SKILL.md`, or `~/.agents/skill-modules/compact-landing/SKILL.md`
+- Specific requested aesthetic: `~/.agents/skill-modules/apple-design/SKILL.md`, `~/.agents/skill-modules/redesign-skill/SKILL.md`, or `~/.agents/skill-modules/compact-landing/SKILL.md`
 - Streaming, pricing, credits, or email workflows: load the corresponding specialist only when implementing that feature.
 
 These are available methods, not mandatory stages. Use the code, performance, or security workflow when that domain is the main problem.

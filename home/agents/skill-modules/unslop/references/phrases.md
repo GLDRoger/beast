@@ -24,7 +24,7 @@ Cut these. State the content directly.
 
 Any "here's what/this/that" construction is throat-clearing. Cut and state the point.
 
-## Insight announcements (honest-prose)
+## Insight announcements
 
 - "Its deepest idea is…"
 - "The part I want you to sit with…"

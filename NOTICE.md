@@ -7,7 +7,7 @@ beast's own code (`bin/`, `lib/`, `scripts/`) is MIT — see LICENSE.
 The skills below are **other people's work, vendored into this repository**, and
 each retains its own upstream license.
 
-Original to this project: `code`, `writing`, `motion`, `performance`, `security`, `growth`, `media`, `codex-session-miner`, `headless-models`, `honest-prose`, `mac-codex-tooling-repair`, `next-runtime-triage`, `review-swarm`, `ruthless-release-qa`, `scroll-scenes`, `3d-scenes`, `drawing-canvas-films`, `ai-features`, `data-work`, `dependency-upgrades`, `explaining`, `long-work`, `mobile`, `agent-desktop`.
+Original to this project: `code`, `writing`, `motion`, `performance`, `security`, `growth`, `media`, `codex-session-miner`, `headless-models`, `mac-codex-tooling-repair`, `next-runtime-triage`, `review-swarm`, `ruthless-release-qa`, `scroll-scenes`, `3d-scenes`, `drawing-canvas-films`, `ai-features`, `data-work`, `dependency-upgrades`, `explaining`, `long-work`, `mobile`, `agent-desktop`.
 
 **Attribution is recorded here, not inside the skill files.** These skills are being
 rewritten and will diverge from what their original authors published, so stamping a
@@ -109,7 +109,6 @@ License: MIT — © Matt Pocock
 - domain-modeling
 - grilling
 - handoff
-- wayfinder (substantially rewritten)
 
 ### shadcn/improve
 
@@ -120,8 +119,6 @@ License: MIT — © Matt Pocock
 ### tushaarmehtaa/tushar-skills
 
 <https://github.com/tushaarmehtaa/tushar-skills.git>
-
-License: MIT — © Tushar Mehta
 
 - aeo-ready
 - ai-streaming
@@ -138,14 +135,12 @@ License: MIT — © Tushar Mehta
 - ship-credits
 - ship-email
 - teardown
-- tushar-design
 
 ## Full license texts
 
 Naming a license is not the same as shipping one. Apache-2.0 section 4(a) requires a copy
 of the license to travel with any redistribution, so the texts live in the repository:
 
-- [`home/agents/skill-modules/tushar-design/LICENSE.txt`](home/agents/skill-modules/tushar-design/LICENSE.txt)
 - [`home/agents/skill-modules/unslop/LICENSE`](home/agents/skill-modules/unslop/LICENSE)
 - [`licenses/lixiaolin94-skills-grant.md`](licenses/lixiaolin94-skills-grant.md)
 

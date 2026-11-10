@@ -61,7 +61,7 @@ Use these as diagnostic examples, not blanket bans or required passes. Preserve 
 
 ---
 
-## Example 6: Insight announcement (honest-prose)
+## Example 6: Insight announcement
 
 **Before:**
 > "Its deepest idea is structural. The protagonist is not one person."

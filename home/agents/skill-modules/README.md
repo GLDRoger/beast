@@ -17,14 +17,13 @@ Which modules are installed depends on the packs chosen with `beast install --pa
 | `grilling` | the user asks to be questioned on a plan before building, and is present to answer |
 | `handoff` | another agent or person must continue the work from a compact handoff document |
 | `improve` | the user wants an advisory codebase review delivered as plans, not edits |
-| `long-work` | a defined task spans many hours, files, or sessions and needs a plan file with checked sub-goals |
+| `long-work` | a task spans many hours, files, or sessions and needs a plan file with checked sub-goals |
 | `agent-desktop` | you must operate a native desktop app's window rather than a browser or terminal |
 | `mobile` | the work targets an iOS or Android app on a simulator or emulator |
 | `rate-limit` | Next.js API routes need rate limits against abuse or AI cost |
 | `review-swarm` | the user asks for an independent or multi-model review of a PR or diff |
 | `ruthless-release-qa` | the user asks for exhaustive testing before a public release |
 | `thermo-nuclear-code-quality-review` | the user asks for a strict maintainability and structure review of a branch |
-| `wayfinder` | a large, still-vague idea should be charted on an issue tracker as tickets worked one per session |
 | `web-shader-extractor` | the user wants a WebGL, WebGPU, canvas, or shader effect from a live page understood or replayed locally |
 
 ## Design and motion
@@ -41,7 +40,6 @@ Which modules are installed depends on the packs chosen with `beast install --pa
 | `taste-craft` | building or reviewing how components feel in use: feedback, origins, interaction polish |
 | `text-to-lottie` | the deliverable is a Lottie JSON file for the Skottie player |
 | `transitions-dev` | implementing a specific CSS transition such as a modal, dropdown, tabs, or toast |
-| `tushar-design` | the user asks for Tushar's design system by name |
 
 ## Prose
 
@@ -52,7 +50,6 @@ Which modules are installed depends on the packs chosen with `beast install --pa
 | `cold-email` | writing one cold email, or checking a sending domain's authentication |
 | `cold-outreach-sequence` | planning a multi-touch outreach campaign with a schedule |
 | `explaining` | the user asks what something means, how it works, or why it behaves as it does |
-| `honest-prose` | something asks for it by name; it redirects to `unslop` |
 | `readme` | writing, auditing, or improving a README.md |
 | `unslop` | prose or UI reads as machine-generated, or the user asks for an AI-slop cleanup |
 

@@ -18,7 +18,6 @@ Apache-2.0. Nothing shipped that text before.
 Where an upstream shipped its own copyright line or notice, that file travels with the
 skill instead of being flattened into a shared template:
 
-- `home/agents/skill-modules/tushar-design/LICENSE.txt` — MIT © 2026 Tushar Mehta
 - `home/agents/skill-modules/impeccable/NOTICE.md` — Apache-2.0, plus upstream's own
   third-party notice carried forward
 

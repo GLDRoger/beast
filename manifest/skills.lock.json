@@ -262,15 +262,6 @@
       "installedAt": "2026-06-23T14:08:10.269Z",
       "updatedAt": "2026-06-23T14:08:10.269Z"
     },
-    "tushar-design": {
-      "source": "tushaarmehtaa/tushar-skills",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/tushaarmehtaa/tushar-skills.git",
-      "skillPath": "tushar-design/SKILL.md",
-      "skillFolderHash": "a631885b65ad467172c2f72e00cb5d3e5fb880bc",
-      "installedAt": "2026-06-23T14:08:10.269Z",
-      "updatedAt": "2026-06-23T14:08:10.269Z"
-    },
     "compact-landing": {
       "source": "Danilaa1/compact-landing-skill",
       "sourceType": "github",
