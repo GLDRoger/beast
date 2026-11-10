@@ -1,5 +1,5 @@
 ---
-name: redesign-existing-projects
+name: redesign-skill
 description: "Upgrade an existing site or app toward premium craft without a full rewrite. Use when the product is real and the UI needs a generation jump."
 ---
 
@@ -71,17 +71,18 @@ Check for these problems and fix them:
 
 ### Interactivity and States
 
-- **No hover states on buttons.** Add background shift, slight scale, or translate on hover.
-- **No active/pressed feedback.** Add a subtle `scale(0.98)` or `translateY(1px)` on press to simulate a physical click.
-- **Instant transitions with zero duration.** Add smooth transitions (200-300ms) to all interactive elements.
+- **No hover states on buttons.** Add a background shift, or a slight scale or translate gated behind `@media (hover: hover) and (pointer: fine)`.
+- **No active/pressed feedback.** Add a subtle `scale(0.97)` or `translateY(1px)` on press to simulate a physical click.
+- **State changes with no transition.** Add short transitions where they show what changed: 100–200ms for hover and color, 100–160ms for press feedback. Keyboard and other very frequent actions stay immediate. Ranges for larger surfaces are in `~/.agents/skills/motion/SKILL.md`.
 - **Missing focus ring.** Ensure visible focus indicators for keyboard navigation. This is an accessibility requirement, not optional.
 - **No loading states.** Replace generic circular spinners with skeleton loaders that match the layout shape.
 - **No empty states.** An empty dashboard showing nothing is a missed opportunity. Design a composed "getting started" view.
 - **No error states.** Add clear, inline error messages for forms. Do not use `window.alert()`.
 - **Dead links.** Buttons that link to `#`. Either link to real destinations or visually disable them.
 - **No indication of current page in navigation.** Style the active nav link differently so users know where they are.
-- **Scroll jumping.** Anchor clicks jump instantly. Add `scroll-behavior: smooth`.
-- **Animations using `top`, `left`, `width`, `height`.** Switch to `transform` and `opacity` for GPU-accelerated, smooth animation.
+- **Scroll jumping.** Anchor clicks jump instantly. Add `scroll-behavior: smooth` inside `@media (prefers-reduced-motion: no-preference)`.
+- **Animations using `top`, `left`, `width`, `height`.** Switch to `transform` and `opacity` unless the interaction needs real reflow (an accordion pushing content down).
+- **Content hidden until an animation runs.** Sections that start at `opacity: 0` and wait for JavaScript or a scroll trigger stay blank when the script fails or motion is reduced. Make the resting state visible and animate from a start state only while the animation runs.
 
 ### Content
 
@@ -152,12 +153,13 @@ When upgrading a project, pull from these high-impact techniques to replace gene
 - **Whitespace maximization.** Aggressive use of negative space to force focus on a single element.
 - **Parallax card stacks.** Sections that stick and physically stack over each other during scroll.
 - **Split-screen scroll.** Two halves of the screen sliding in opposite directions.
+- Scroll-linked layouts like these hold still under `prefers-reduced-motion: reduce` and stay readable at every scroll position.
 
 ### Motion Upgrades
-- **Smooth scroll with inertia.** Decouple scrolling from browser defaults for a heavier, cinematic feel.
-- **Staggered entry.** Elements cascade in with slight delays, combining Y-axis translation with opacity fade. Never mount everything at once.
-- **Spring physics.** Replace linear easing with spring-based motion for a natural, weighty feel on all interactive elements.
-- **Scroll-driven reveals.** Content entering through expanding masks, wipes, or draw-on SVG paths tied to scroll progress.
+Motion follows `~/.agents/skills/motion/SKILL.md`: one orchestrated moment per page beats a reveal on every section, and content is visible without the animation. Pick at most one or two of these for a page, and keep working views (dashboards, settings, lists) restrained.
+- **One staged entrance.** A single group, such as the hero or a feature row, cascades in with a short stagger (30–80ms between items), combining a small Y translation with an opacity fade. Everything else, and anything that updates often, appears at once.
+- **Springs where things are handled.** Use spring motion with no bounce for drags, sheets, and interruptible open and close; keep duration-based easing for simple hover and press states.
+- **Scroll-driven reveals.** Content entering through expanding masks, wipes, or draw-on SVG paths tied to scroll progress, using CSS scroll-driven animations or IntersectionObserver over native scrolling. For a full scroll-controlled narrative, load `~/.agents/skill-modules/scroll-scenes/SKILL.md`. Replacing native scroll with inertia libraries breaks keyboard, trackpad, and assistive scrolling, so reserve it for a deliberate scroll scene.
 
 ### Surface Upgrades
 - **True glassmorphism.** Go beyond `backdrop-filter: blur`. Add a 1px inner border and a subtle inner shadow to simulate edge refraction.
