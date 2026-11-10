@@ -19,6 +19,7 @@ Which modules are installed depends on the packs chosen with `beast install --pa
 | `improve` | the user wants an advisory codebase review delivered as plans, not edits |
 | `long-work` | a task spans many hours, files, or sessions and needs a plan file with checked sub-goals |
 | `agent-desktop` | you must operate a native desktop app's window rather than a browser or terminal |
+| `t3-preview` | you drive a page with T3 Code's `preview_*` in-app browser tools |
 | `mobile` | the work targets an iOS or Android app on a simulator or emulator |
 | `rate-limit` | Next.js API routes need rate limits against abuse or AI cost |
 | `review-swarm` | the user asks for an independent or multi-model review of a PR or diff |

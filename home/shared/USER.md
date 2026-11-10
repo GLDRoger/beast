@@ -83,7 +83,7 @@ Load `frontend` for every frontend job and anything a user will look at, small f
 
 Pair `writing` with the `unslop` module for substantive prose. Other modules to know: `long-work` (planning multi-stage work into sub-goals), `ai-features` (evals, caching, model cost), `data-work` (schemas, migrations, SQL, data fixes), `mobile` (iOS and Android apps), `explaining` (teaching a concept), `dependency-upgrades`.
 
-Desktop apps (native GUI, not the browser): read the `agent-desktop` module before driving one.
+Desktop apps (native GUI, not the browser): read the `agent-desktop` module before driving one. Read `t3-preview` before using T3 Code's `preview_*` tools.
 
 ## Permission
 
