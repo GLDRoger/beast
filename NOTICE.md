@@ -153,18 +153,3 @@ Skills that referenced them still work; supply the assets locally.
 
 - `gsap.min.js` (GreenSock Standard License) — install from npm or a CDN.
 - Cyberpunk 2077 fankit font and logos (CD Projekt Red IP, non-commercial only).
-
-## Stale lockfile entries
-
-Recorded as installed, but not present in this payload:
-
-- Agent Browser (am-will/codex-skills)
-- Frontend Responsive Design Standards (am-will/codex-skills)
-- llm-council (am-will/codex-skills)
-- markdown-url (am-will/codex-skills)
-- parallel (am-will/codex-skills)
-- plan-harder (am-will/codex-skills)
-- role-creator (am-will/codex-skills)
-- super-swarm-spark (am-will/codex-skills)
-- vercel-react-best-practices (am-will/codex-skills)
-- find-skills (vercel-labs/skills)

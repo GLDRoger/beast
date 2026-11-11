@@ -9,11 +9,11 @@ Modules live in `~/.agents/skill-modules/`, which no harness scans, so they cost
 | Pack | Modules | For |
 |---|---:|---|
 | `core` | 8 | The eight workflows (always installed) |
-| `design` | 12 | Visual and interaction craft, Lottie, 3D scenes, canvas films |
-| `prose` | 8 | Writing cleanup, explaining, docs, changelogs, outreach |
+| `design` | 10 | Visual and interaction craft, Lottie, 3D scenes, canvas films |
+| `prose` | 7 | Writing cleanup, explaining, docs, changelogs, outreach |
 | `product` | 8 | Positioning, pricing, discoverability, validation |
 | `engineering` | 18 | Architecture, review, planning, data, AI features, mobile, upgrades |
-| `tooling` | 5 | Agent and runtime diagnostics, headless model calls |
+| `tooling` | 4 | Agent and runtime diagnostics, headless model calls |
 
 Skills that belong to one product live in that product's repository, not here.
 

@@ -12,7 +12,7 @@ Models in tier A+ and above.
 | GPT-6.1 Sol | SS | Code outside the UI (APIs, data, infrastructure, scripts, tests, debugging, refactors), reviewing Opus's code outside the UI, and reviewing the most important changes. As good as Astra. |
 | GPT-6 Astra | SS | 3D modeling work and decent frontend designs. Expensive: use GPT-6.1 Sol instead, except for the most thorough reviews. |
 | Muse Wonder Full | SS | Backend code, as GPT-6.1 Sol's backup. It can't do frontend or 3D work at all, so never use it for either. |
-| Claude Mythos 5.2 | S | Consulting, not execution: creative direction, review of plans, architecture, specs, and how the work will be checked, a re-review once progress is made, and a second opinion after two failed attempts. |
+| Claude Mythos 5.2 | S | Consulting, not execution: directing a whole long project, creative direction, review of plans, architecture, specs, and how the work will be checked, a re-review once progress is made, and a second opinion after two failed attempts. |
 | Claude Fable 5.2 | S | The same model as Mythos 5.2 with more refusals. Not routed. |
 | Claude Haiku 5.5 | A+ | Research and exploration (codebase search, docs, web research), and long check runs. |
 | GPT-6 Luna | A+ | Research and exploration (codebase search, docs, web research), and long check runs. |

@@ -6,7 +6,7 @@ It installs three things:
 
 - **A system prompt**, [`home/shared/BEAST.md`](home/shared/BEAST.md): how the agent works, written to hold for any user on any machine.
 - **Your standing instructions**, [`home/shared/USER.md`](home/shared/USER.md), installed as the global `CLAUDE.md` / `AGENTS.md`. It covers model routing, how to call each model, skills, and engineering conventions.
-- **Skills**: eight workflows (`code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, `media`) and 51 specialist modules that a workflow loads only when a task needs one.
+- **Skills**: eight workflows (`code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, `media`) and 47 specialist modules that a workflow loads only when a task needs one.
 
 For example, after `beast install`, `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` both resolve to `home/shared/USER.md` in your clone, through per-harness aliases such as `home/claude/CLAUDE.md` that `lib/manifest.mjs` lists. Change a line there, and the next Claude Code or Codex session reads the new line. Most installed files are links like these, so `git pull` updates them. A few prompts are generated and need a refresh ([Updating](docs/setup.md#updating)).
 
@@ -29,7 +29,7 @@ Then add `source ~/.beast/beast.zsh` to `~/.zshrc` for the launch helpers, such 
 
 `USER.md` is the maintainer's own file. It routes work to specific models, tells agents to commit without asking, and gives standing permission to push, open pull requests, and deploy. Rewrite it before you rely on it ([Make it yours](docs/setup.md#make-it-yours)). The `c` helper also turns off Claude Code's permission prompts.
 
-The benefit is one setup to maintain across your tools; better model output hasn't been measured. Beast makes no network calls, and adds roughly 4,000 tokens of context per session ([Cost and privacy](docs/setup.md#cost-and-privacy)).
+The benefit is one setup to maintain across your tools; better model output hasn't been measured. Beast makes no network calls, and adds roughly 4,700 tokens of context per session ([Cost and privacy](docs/setup.md#cost-and-privacy)).
 
 ## Beast and Jevis
 

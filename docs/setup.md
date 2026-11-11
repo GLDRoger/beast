@@ -65,7 +65,7 @@ To keep your changes under version control, commit them in your clone or on a fo
 
 ## Cost and privacy
 
-- **Context:** `BEAST.md` and `USER.md` together are about 16 KB of text, roughly 4,000 tokens, read at the start of every session. Each installed skill adds a one-line listing; its full text is read only when a task uses it. `beast doctor` checks Claude Code's skill-listing budget.
+- **Context:** `BEAST.md` and `USER.md` together are about 19 KB of text, roughly 4,700 tokens, read at the start of every session. Each installed skill adds a one-line listing; its full text is read only when a task uses it. `beast doctor` checks Claude Code's skill-listing budget.
 - **Network:** Beast makes no network calls and needs no API keys. Your harness talks to its model provider as usual.
 - **Secrets:** `beast doctor` looks for secrets in the installed files, and `bootstrap` scans for them before copying a live setup back into the repository.
 
