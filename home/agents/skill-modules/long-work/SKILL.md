@@ -26,5 +26,28 @@ Make a question a sub-goal once you can state it precisely, even if it is blocke
 - Finish, check and commit one sub-goal before starting the next. A commit per sub-goal is the restore point.
 - When a sub-goal reveals the plan is wrong, change the plan file first, then the code. Don't let the plan and the work drift apart.
 - Keep the change size in proportion to what each sub-goal gains. Drop a sub-goal whose cost has grown past its payoff, and note why.
+- For many similar edits, do the first one by hand, then write the script or codemod that does the rest, and check it reproduces your hand-made edit, so a reviewer can rerun one script instead of rereading every edit.
 - Report progress at sub-goal boundaries: what landed, its evidence, what's next. Not every edit.
 - The goal is reached when the outcome's own check passes, not when the list is ticked.
+
+## When the goal is a number
+
+For sustained work on one measurable thing (load time, bundle size, an eval score, test runtime):
+
+1. Fix the metric, which direction is better, and a stop condition that pairs a target with a minimum number of attempts, so one lucky early win does not end the run.
+2. Build the measurement once, show that it separates a bad case from a good one, then freeze it. It reports the median of several runs, an error count, and a count of the work done. Record the baseline and a green run of the tests that must keep passing.
+3. One change per attempt. Each names the mechanism it targets ("move X off the startup path because it blocks first paint"), not "try memoising something".
+4. Measure, run the tests, and keep the change only when the number moves past the noise and the tests stay green. Otherwise revert it completely. One commit per kept change.
+5. Log every attempt, kept or reverted, with before, after, and why, in the plan file.
+6. At the first plateau, change category, combine near misses, or try something bolder before stopping. Never loosen the stop condition to meet it. Correctness and simplicity outrank the number.
+
+Report the baseline, the final number with the change in percent, attempts kept and reverted, one line per kept change, and the best idea not yet tried.
+
+## Directing workers
+
+When sub-goals go to other agents:
+
+- Take one unit through brief, work, review, and merge before fanning out, so a flaw in the brief costs one worker, not ten.
+- Each brief names the evidence that proves the unit done (a command and its expected output, a capture, a chart) and the files the worker may and may not touch. If you cannot name the evidence, the unit is not scoped yet.
+- Judge the diff and the artifact, not the worker's summary. A verdict covers one commit; a new push needs a new look.
+- Retry by cause: a smaller scope after running out of context, the same brief after a dropped connection, and the fallback your model routing names after an outage or repeated errors. After two failed retries, drop the unit and replan around it.

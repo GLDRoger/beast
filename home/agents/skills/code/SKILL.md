@@ -22,11 +22,16 @@ Read the tests supporting the claim. Run the focused success/failure check, then
 
 Report checks actually performed, skipped boundaries, and material residual risk. Do not repair unrelated existing failures merely to make a broad command green.
 
+When a change alters behaviour someone will judge, hand them something to look at rather than a description of code: a statechart of the changed flow before and after, a capture of the new state, or a before/after table of the numbers. When the project has an app driver and feature map (often a project-local `verify-*` skill), prove the change through them, on every entry point the map lists for that feature.
+
+When the same mistake has been corrected twice, fix the class, not just the instance: make it impossible in the design, then in the types, then with a lint or CI check whose error names the fix, then with a test. A sentence in an instruction file comes last, because nothing fails when an agent skips it. Show the new check failing on the past mistake.
+
 ## Optional specialists
 
 Load only when the task needs the procedure:
 
-- Domain contracts: `~/.agents/skill-modules/domain-modeling/SKILL.md`
+- Domain contracts, or a flow where a bug costs most that needs a state model, property tests, or a model checker: `~/.agents/skill-modules/domain-modeling/SKILL.md`
+- A flow shown as a chart for someone who judges behaviour rather than code: `~/.agents/skill-modules/statecharts/SKILL.md`
 - Requested architecture review/planning: `~/.agents/skill-modules/improve/SKILL.md` (its architecture review mode covers module and interface design)
 - Streaming or abuse controls: `~/.agents/skill-modules/ai-streaming/SKILL.md` or `~/.agents/skill-modules/rate-limit/SKILL.md`
 - Generated Next.js runtime/type noise: `~/.agents/skill-modules/next-runtime-triage/SKILL.md`

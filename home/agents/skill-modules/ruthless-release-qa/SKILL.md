@@ -1,6 +1,6 @@
 ---
 name: ruthless-release-qa
-description: Use when the user asks for exhaustive testing of an app before a public release, covering every path, state, provider, and awkward client in a real browser, with an honest record of what was and was not tested. Not for routine checks after a change.
+description: Use when the user asks for exhaustive testing of an app before a public release, covering every path, state, provider, and awkward client in a real browser, with an honest record of what was and was not tested. Also use it to build or repair a project's app driver and feature map, to run UI property tests (Bombadil), or to compare a new build against the previous one. Not for routine checks after a change; those reuse the driver this builds.
 ---
 
 # Ruthless Release QA
@@ -34,6 +34,8 @@ The mindset: **assume the app is not ready until evidence says otherwise.** Clic
    - what will not be clicked without seeded test accounts/test mode
 4. If using Browser, initialize the in-app Browser session and name it clearly.
 5. If repo context is needed, prefer a compact snapshot before broad searching, such as `~/.codex/scripts/repo_snapshot.py <repo>` when that script exists.
+6. Find the project's app driver and feature map, often a project-local `verify-*` skill. Use them for every pass below. If they don't exist and the app will be checked again, build them first with [references/driver-and-feature-map.md](references/driver-and-feature-map.md); for a one-off pass, record their absence as a coverage gap.
+7. Identify the previous released build and whether it can run beside this one, for [the comparison](#compare-with-the-previous-build).
 
 ## Coverage model
 
@@ -63,7 +65,7 @@ Document as findings:
 
 ### 2. Route inventory and route sweep
 
-Find route surfaces from code or navigation. Sweep both directly by URL and through UI navigation.
+Find route surfaces from code or navigation. Sweep both directly by URL and through UI navigation. When a feature map exists, it is the inventory: cover every feature, entry point, kind of user, and client it lists, and add to it any surface the sweep finds that it lacks.
 
 Common surfaces:
 
@@ -293,6 +295,14 @@ Check local and deployed environment, as applicable:
 - no internal markers in public legal/docs pages
 - production env validation/security scripts pass
 
+### 12. UI property pass
+
+When the app has a DOM or a terminal UI and an isolated instance with seeded data, run property tests per kind of user: privacy, raw internals, dead ends, depth, loading, and counts. Read [references/ui-property-testing.md](references/ui-property-testing.md). Report each violation as numbered product steps with its trace path.
+
+## Compare with the previous build
+
+Run the same driver passes and property runs against the previous release and against this build, with the same seed data and options. Sort every finding as new, pre-existing, or fixed. Lead the report with the new ones and give counts for the rest ("3 new: 0 P0, 2 P2, 1 P3; 47 pre-existing; 5 fixed"), so a long list of known issues cannot bury a new P1. When fixes are authorized, fix the new findings first, one change per finding, each with its failing check first. If the previous build cannot run, say so and treat every finding as unclassified.
+
 ## Severity model
 
 Use practical release severity:
@@ -315,6 +325,11 @@ Append findings to the QA markdown with this shape:
 **Browser:** <browser/runtime>  
 **Workspace/account/provider:** <if applicable>  
 **Purpose:** <why this pass exists>
+
+## New since <previous build>
+
+- <counts: new by severity, pre-existing, fixed>
+- <each new finding: title, severity, link to its entry below>
 
 ## Routes / surfaces covered
 
@@ -344,77 +359,9 @@ Append findings to the QA markdown with this shape:
 - Ready / not ready / blocked, with concrete blockers.
 ```
 
-## Useful browser snippets
+## Browser snippets
 
-Use only if available in the runtime. Adapt variable names to avoid redeclaration conflicts.
-
-### DOM snapshot
-
-```js
-await tab.playwright.evaluate(() => {
-  const body = document.body.innerText.replace(/\s+/g, ' ').trim();
-  const controls = [...document.querySelectorAll('button,a,input,textarea,select,[role="button"],[role="menuitem"]')]
-    .map((el, i) => {
-      const r = el.getBoundingClientRect();
-      return {
-        i,
-        tag: el.tagName.toLowerCase(),
-        label: (el.getAttribute('aria-label') || el.innerText || el.value || el.getAttribute('placeholder') || el.textContent || '')
-          .replace(/\s+/g, ' ')
-          .trim(),
-        href: el.getAttribute('href'),
-        disabled: !!el.disabled || el.getAttribute('aria-disabled') === 'true',
-        visible: r.width > 0 && r.height > 0,
-      };
-    })
-    .filter((x) => x.visible);
-  return {
-    url: location.href,
-    title: document.title,
-    headings: [...document.querySelectorAll('h1,h2')].map((e) => e.innerText.replace(/\s+/g, ' ').trim()),
-    mainCount: document.querySelectorAll('main,[role="main"]').length,
-    emptyLabels: controls.filter((c) => !c.label).slice(0, 20),
-    genericLabels: controls.filter((c) => /^(Open thread|Edit|More rule actions|Toggle menu|Close|Block|Connect|View|Save|Cancel|Delete|Archive|More)$/i.test(c.label)).slice(0, 30),
-    text: body.slice(0, 2500),
-  };
-});
-```
-
-### Rendered leak scan
-
-```js
-await tab.playwright.evaluate(() => {
-  const body = document.body.innerText;
-  return [...body.matchAll(/\b(pde:v1:[A-Za-z0-9._:-]{20,}|Bearer\s+[A-Za-z0-9._-]{8,}|sk_(live|test)_[A-Za-z0-9_]{8,}|pk_(live|test)_[A-Za-z0-9_]{8,}|ya29\.[A-Za-z0-9._-]{8,}|eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,})/g)]
-    .slice(0, 20)
-    .map((m) => m[0].slice(0, 120));
-});
-```
-
-### Keyboard focus smoke
-
-```js
-async function activeInfo() {
-  return await tab.playwright.evaluate(() => {
-    const e = document.activeElement;
-    return {
-      tag: e?.tagName,
-      role: e?.getAttribute('role'),
-      label: (e?.getAttribute('aria-label') || e?.getAttribute('placeholder') || e?.innerText || e?.value || '')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .slice(0, 120),
-    };
-  });
-}
-const sequence = [];
-for (let i = 0; i < 20; i++) {
-  await tab.cua.keypress({ keys: ['Tab'] });
-  await new Promise((r) => setTimeout(r, 80));
-  sequence.push(await activeInfo());
-}
-sequence;
-```
+A DOM snapshot, a rendered leak scan, and a keyboard focus check, for runtimes with a Playwright-style browser object: [references/browser-snippets.md](references/browser-snippets.md).
 
 ## Stop condition
 
@@ -425,3 +372,4 @@ Stop only when:
 3. The browser is restored to a sensible route/account.
 4. You clearly state whether the app is public-release ready.
 5. You list exact remaining prerequisites for anything not executed.
+6. The feature map, if the project has one, includes any surface the sweep found missing.

@@ -11,12 +11,13 @@ Choose the smallest change that addresses the measured cause. Inspect query brea
 
 Exercise the touched surface under realistic edge conditions: long strings, empty/loading/error states, overlapping requests, repeated submit, cancellation, offline recovery, or localization as applicable. Preserve successful behavior while fixing failure paths.
 
-Compare before/after evidence under comparable conditions and run the relevant regression checks. Label qualitative inspection as qualitative; do not invent performance numbers. A benchmark improvement is not proof of runtime safety.
+Compare before/after evidence under comparable conditions and run the relevant regression checks. Label qualitative inspection as qualitative; do not invent performance numbers. A benchmark improvement is not proof of runtime safety. Vet every number with [references/benchmark-checklist.md](references/benchmark-checklist.md) before you report it or act on it, and report it as a before/after table with run count and range.
 
 Optional methods:
 
 - `~/.agents/skill-modules/debug-perf/SKILL.md` for profiling and Next.js/dev/HMR investigations.
 - `~/.agents/skill-modules/next-runtime-triage/SKILL.md` for generated runtime/type noise.
 - `~/.agents/skill-modules/ruthless-release-qa/SKILL.md` for an explicitly exhaustive release check.
+- `~/.agents/skill-modules/long-work/SKILL.md` ("When the goal is a number") for a sustained loop of measured attempts toward a target.
 
 Use the code, frontend, or security workflow when correctness, UI structure, or trust boundaries are the primary problem.

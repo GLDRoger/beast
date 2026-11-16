@@ -82,6 +82,8 @@ Choose reviewer models and the way to call them from "Model routing" and "Callin
 
 Give reviewers the minimum relevant diff/context and read-only access. They must not see one another's findings or mutate the target. The primary owner integrates the results.
 
+Ask reviewers to prove each behaviour finding with a run against the real code: a failing test, a repro script, or command output showing the wrong result. They run it in their own scratch worktree or temp directory, never in the target. Findings about structure, naming, or design that no run can show are judged on code evidence and say so.
+
 Each reviewer returns only:
 
 ```text
@@ -95,6 +97,7 @@ FINDINGS:
   line: <line or general>
   claim: <what is wrong>
   evidence: <specific code/data-flow evidence>
+  proof: <exact command and the output it printed, or "not runnable" and why>
   consequence: <real failure mode>
   fix: <smallest correct root-cause fix>
   confidence: <high|medium|low>
@@ -123,7 +126,7 @@ Human authorship does not make a clear finding ambiguous. Fix eligibility still 
 
 The primary owner verifies the panel findings against the current target. Use a separate available arbiter only when independent arbitration adds value and delegation is permitted. The arbiter remains read-only and must:
 
-1. Verify every claim against current code and the actual target.
+1. Verify every claim against current code and the actual target. Rerun each proof command; a behaviour claim whose proof does not reproduce is rejected or downgraded, and one that came without a runnable proof gets one before it is accepted as actionable.
 2. Reject false, stale, already-fixed, duplicate, or out-of-scope claims.
 3. Merge findings that share the same root cause and record convergence.
 4. Classify every accepted item:

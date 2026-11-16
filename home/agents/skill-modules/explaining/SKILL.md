@@ -12,3 +12,5 @@ description: Use when the user asks what something means, how it works, or why i
 - Define a term the first time you use it, or don't use it.
 - When they've misunderstood something, say what's actually true and why the confusion is a natural one.
 - A diagram or small table helps when there are parts and relationships; skip it for a single fact.
+- With three or more moving parts, build the picture up: draw the first two, then redraw with one more part each time, rather than one diagram with everything at once.
+- For how something behaves over time (a flow, a lifecycle, what happens when a step fails), a statechart in the reader's words often lands faster than prose: `~/.agents/skill-modules/statecharts/SKILL.md`.

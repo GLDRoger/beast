@@ -17,4 +17,8 @@ Inspect package manifests, lockfiles, CI configuration, and the relevant test be
 
 If a required boundary cannot be exercised, say what evidence exists, what remains unverified, and which fact/access would resolve it. Do not turn an unavailable check into a pass or silently substitute a weaker check.
 
+Judge a test by two imagined edits. Break the behaviour it claims to cover: if it still passes, it proves nothing. Restructure the internals without changing what callers observe: if it now fails, it is pinned to the implementation. Keep tests that catch the first and survive the second.
+
+For a small change you do not fully trust, find the one fact its safety rests on ("this call only drops cache entries that are already dead") and prove that fact by running code against the real library or function, not by argument. Look where a symbol search stops: wire formats, stored columns, feature flags, another language reading the same bytes, timing on teardown.
+
 Run additional checks when new evidence, a changed surface, or a release requirement calls for them. Repeating an unchanged successful command adds no proof. Whitespace checks are useful diff hygiene, not behavioral validation.

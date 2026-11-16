@@ -13,7 +13,7 @@ Which modules are installed depends on the packs chosen with `beast install --pa
 | `data-work` | work reads or writes a database: migrations, SQL questions, backfills, data fixes |
 | `debug-perf` | a Next.js or web app is slow: hot reload loops, high CPU, bundle bloat, slow server responses |
 | `dependency-upgrades` | bumping package, runtime, or framework versions, or fixing a dependency advisory |
-| `domain-modeling` | business terms are fuzzy and need a glossary and recorded decisions |
+| `domain-modeling` | business terms are fuzzy and need a glossary and recorded decisions, or a flow where a bug costs most needs a state model, property tests, or a model checker |
 | `grilling` | the user asks to be questioned on a plan before building, and is present to answer |
 | `handoff` | another agent or person must continue the work from a compact handoff document |
 | `improve` | the user wants an advisory codebase review delivered as plans, not edits |
@@ -23,7 +23,8 @@ Which modules are installed depends on the packs chosen with `beast install --pa
 | `mobile` | the work targets an iOS or Android app on a simulator or emulator |
 | `rate-limit` | Next.js API routes need rate limits against abuse or AI cost |
 | `review-swarm` | the user asks for an independent or multi-model review of a PR or diff |
-| `ruthless-release-qa` | the user asks for exhaustive testing before a public release |
+| `ruthless-release-qa` | the user asks for exhaustive testing before a public release, or a project needs an app driver and feature map, UI property tests, or a new-build-versus-previous comparison |
+| `statecharts` | a flow should be shown as a chart in the reader's words for someone who judges behaviour rather than code, with bugs drawn as paths |
 | `thermo-nuclear-code-quality-review` | the user asks for a strict maintainability and structure review of a branch |
 | `web-shader-extractor` | the user wants a WebGL, WebGPU, canvas, or shader effect from a live page understood or replayed locally |
 

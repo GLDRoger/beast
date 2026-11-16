@@ -1,11 +1,13 @@
 ---
 name: domain-modeling
-description: Use when designing a feature or system whose business terms are fuzzy or mean different things in code and conversation, to agree a glossary in CONTEXT.md and record decisions as ADRs. Not for routine changes inside a settled model.
+description: Use when designing a feature or system whose business terms are fuzzy or mean different things in code and conversation, to agree a glossary in CONTEXT.md and record decisions as ADRs; or when a flow where a bug costs most (money, privacy, messages sent for someone, retries, restarts) should be modelled as states and checked beyond tests with property tests or a model checker such as TLA+. Not for routine changes inside a settled model.
 ---
 
 # Domain Modeling
 
 Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+
+The model has two halves: the words (the glossary and decisions below) and how things move (the states and rules of the flows that matter most, near the end).
 
 ## File structure
 
@@ -72,3 +74,13 @@ Only offer to create an ADR when all three are true:
 3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
 
 If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+
+## Model the flows where a bug costs most
+
+Some flows hurt the user when they go wrong once: money moves, something private reaches the wrong person, a message goes out on someone's behalf, a retry repeats an action, a job runs twice across a restart or a second device. Tests check the cases someone thought of; these bugs live in the orderings nobody wrote down.
+
+- **Write the flow as a state machine.** Named states, named events, and the rules that must hold in every state. Prefer one status value (a tagged union or enum) over several booleans that must agree. Take the state and event names from `CONTEXT.md`.
+- **Agree the rules in the user's words before checking anything:** "a payment goes out at most once", "a member never sees an amount", "every message either arrives or shows as failed". These sentences become the properties, the invariants, and the labels on the chart.
+- **Let the question pick the check.** Plain tests for chosen examples, property tests for a rule over every input of a pure function, a model checker (TLA+ with TLC by default) for steps from several actors, retries, and restarts in any order. [FORMAL-CHECKS.md](./FORMAL-CHECKS.md) has the table, how to write each, and how to keep a model true to the code.
+- **Never weaken a rule to get a pass.** When the code breaks a rule, report it: the rule, the counterexample told as product steps, and the harm. Replay it against the real code before calling it a bug.
+- **Show the result as a chart** for the person who judges the behaviour: `~/.agents/skill-modules/statecharts/SKILL.md`.
