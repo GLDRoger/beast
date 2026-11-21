@@ -27,7 +27,11 @@ test('Google prompt composition preserves templates, with one copy of each inten
   }
   assert.equal(count(system, '# User preferences'), 0)
   assert.equal(count(rules, '# User preferences'), 1)
-  assert.ok(system.endsWith(input.overlay.trim() + '\n'))
+  // The payload is CRLF in a Windows autocrlf checkout; the assembled prompt is LF only.
+  assert.ok(system.endsWith(input.overlay.replace(/\r\n/g, '\n').trim() + '\n'))
+  const crlf = Object.fromEntries(Object.entries(input).map(([k, v]) => [k, v.replace(/\r?\n/g, '\r\n')]))
+  assert.deepEqual(assembleGemini(crlf), { system, rules })
+  for (const text of [system, rules]) assert.ok(!text.includes('\r'))
   for (const key of ['AvailableTools', 'AgentSkills', 'SubAgents']) {
     assert.ok(system.includes('${' + key + '}'))
     assert.ok(!rules.includes('${' + key + '}'))
