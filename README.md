@@ -1,47 +1,47 @@
 # Beast
 
-Beast keeps one set of agent instructions and installs it into every coding harness you use: Claude Code, Codex, Grok, Gemini CLI, Antigravity, Muse Code, and Hermes. You edit the text once in this clone, and every harness reads the same words.
+One set of coding-agent instructions, symlinked into every harness I use: Claude Code, Codex, Grok, Gemini CLI, Antigravity, Muse Code, and Hermes. Edit a file once here and every harness picks it up.
 
 It installs three things:
 
-- **A system prompt**, [`home/shared/BEAST.md`](home/shared/BEAST.md): how the agent works, written to hold for any user on any machine.
-- **Your standing instructions**, [`home/shared/USER.md`](home/shared/USER.md), installed as the global `CLAUDE.md` / `AGENTS.md`. It covers model routing, how to call each model, skills, and engineering conventions.
-- **Skills**: eight workflows (`code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, `media`) and 48 specialist modules that a workflow loads only when a task needs one.
+- **System prompt** ([`home/shared/BEAST.md`](home/shared/BEAST.md)): how I want agents to think and work — tool-agnostic, no personal preferences.
+- **Standing instructions** ([`home/shared/USER.md`](home/shared/USER.md)): installed as global `CLAUDE.md` / `AGENTS.md`. My model routing, brief rules, skills index, permissions, and git/engineering conventions.
+- **Skills**: 8 core workflows (`code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, `media`) plus 48 specialist modules loaded only when a workflow needs them.
 
-For example, after `beast install`, `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` both resolve to `home/shared/USER.md` in your clone, through per-harness aliases such as `home/claude/CLAUDE.md` that `lib/manifest.mjs` lists. Change a line there, and the next Claude Code or Codex session reads the new line. Most installed files are links like these, so `git pull` updates them. A few prompts are generated and need a refresh ([Updating](docs/setup.md#updating)).
+Most installed files are symlinks back to this clone (for example, `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` both resolve to `home/shared/USER.md`), so `git pull` updates them immediately. Generated prompts (Gemini, Antigravity, Hermes) just need a quick refresh ([Updating](docs/setup.md#updating)).
 
 ## Install
 
-You need Node 22 or newer and Git. Keep the clone where you put it, because the installed files link into it.
+Needs Node 22+ and Git. Keep the clone where you put it since the symlinks point here.
 
 ```sh
 git clone https://github.com/GLDRoger/beast.git ~/code/beast
 cd ~/code/beast
 npm link                  # puts `beast` on your PATH
-beast install --dry-run   # shows what would change
-beast install             # asks which harnesses and skill packs
-beast doctor              # checks the result
+beast install --dry-run   # preview changes
+beast install             # pick harnesses and skill packs
+beast doctor              # verify links and configs
 ```
 
-Then add `source ~/.beast/beast.zsh` to `~/.zshrc` for the launch helpers, such as `c` for Claude Code and `co` for Codex. [Setup](docs/setup.md) covers flags, config edits, Windows, updating, and removal.
+Add `source ~/.beast/beast.zsh` to `~/.zshrc` for the shell shortcuts (`c` for Claude Code, `co` for Codex, etc.). See [Setup](docs/setup.md) for flags, Windows, updating, and uninstalling.
 
-## Before you adopt it
+## Make it yours
 
-`USER.md` is the maintainer's own file. It routes work to specific models, tells agents to commit without asking, and gives standing permission to push, open pull requests, and deploy. Rewrite it before you rely on it ([Make it yours](docs/setup.md#make-it-yours)). The `c` helper also turns off Claude Code's permission prompts.
+`USER.md` is my personal setup: it routes to my models, gives agents standing permission to commit, push, open PRs, and deploy, and `c` runs Claude Code with permission prompts off (`bypassPermissions`). Edit `USER.md` and `home/shell/beast.zsh` to match how you actually work ([Make it yours](docs/setup.md#make-it-yours)).
 
-The benefit is one setup to maintain across your tools; better model output hasn't been measured. Beast makes no network calls, and adds roughly 4,700 tokens of context per session ([Cost and privacy](docs/setup.md#cost-and-privacy)).
+Beast makes zero network calls and adds ~4,700 tokens of session-start context.
 
-## Beast and Jevis
+## Beast + Jevis
 
-[Jevis](https://github.com/GLDRoger/jevis) is a separate project by the same maintainer. It uses hooks to add short tips at set moments in a session. Beast is the standing text, and Jevis is the timed reminders. Each works without the other. [Beast and Jevis](docs/layers.md) explains how they fit together, how to adopt either or both, and where a new instruction belongs.
+[Jevis](https://github.com/GLDRoger/jevis) is my companion hook project. Beast is the standing text; Jevis injects short reminders at specific moments in a session. Each works on its own. [Beast and Jevis](docs/layers.md) explains how I split instructions between them.
 
 ## Docs
 
-- [Setup](docs/setup.md): install options, config edits, where each harness loads Beast from, launch helpers, making it yours, updating, removal, and checks.
-- [Skills](docs/skills.md): the workflows, the packs, and maintaining the library.
-- [Beast and Jevis](docs/layers.md): what each is, adoption paths, and where an instruction belongs.
-- [Coding models](docs/models.md): the maintainer's dated tier list and what each top model is good for.
+- [Setup](docs/setup.md) — install flags, config edits, file map, shell helpers, updating, and removal.
+- [Skills](docs/skills.md) — workflows, packs, and library maintenance.
+- [Beast and Jevis](docs/layers.md) — how Beast and Jevis fit together and where any rule belongs.
+- [Coding models](docs/models.md) — my current model tier list and what each model is actually good for.
 
 ## License
 
-The original tooling and the vendored skills have different terms. See [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).
+Original tooling and vendored skills carry separate terms — see [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).

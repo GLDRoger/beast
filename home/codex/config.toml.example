@@ -9,7 +9,7 @@
 # Model is deliberately NOT set here. Availability depends on your account and
 # plan, and a name hardcoded in an example goes stale fast — pick one your CLI
 # actually offers (`codex -m <model>` to try one first).
-# model = "gpt-5.6-sol"
+# model = "gpt-6.2-sol"
 
 model_reasoning_effort = "high"
 model_reasoning_summary = "detailed"

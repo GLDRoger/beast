@@ -1,24 +1,24 @@
 # Skills
 
-Eight workflows are discoverable in every harness: `code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, and `media`. Each owns one kind of outcome and loads a specialist module only when the task needs it.
+Eight top-level workflows are exposed to every harness: `code`, `frontend`, `writing`, `motion`, `performance`, `security`, `growth`, and `media`. Each owns an outcome and pulls in specialist modules only when needed.
 
-Modules live in `~/.agents/skill-modules/`, which no harness scans, so they cost nothing until a workflow or `USER.md` points an agent at one. The [module index](../home/agents/skill-modules/README.md) lists each with a one-line description.
+Specialist modules live in `~/.agents/skill-modules/`. Harnesses don't scan that folder, so modules cost zero context until a workflow or `USER.md` points at one. See the [module index](../home/agents/skill-modules/README.md) for the full list.
 
-`beast skills` lists what's installed. `beast install --packs=...` chooses which modules to install:
+Run `beast skills` to see what's installed, or choose packs with `beast install --packs=...`:
 
-| Pack | Modules | For |
+| Pack | Modules | Covers |
 |---|---:|---|
-| `core` | 8 | The eight workflows (always installed) |
+| `core` | 8 | The 8 top-level workflows (always installed) |
 | `design` | 10 | Visual and interaction craft, Lottie, 3D scenes, canvas films |
-| `prose` | 7 | Writing cleanup, explaining, docs, changelogs, outreach |
-| `product` | 8 | Positioning, pricing, discoverability, validation |
-| `engineering` | 18 | Architecture, review, planning, data, AI features, mobile, upgrades |
-| `tooling` | 4 | Agent and runtime diagnostics, headless model calls |
+| `prose` | 7 | Unslop, explaining, docs, changelogs, outreach |
+| `product` | 8 | Positioning, pricing, SEO/AEO, validation |
+| `engineering` | 19 | Architecture, review, planning, statecharts, data, AI features, mobile, upgrades |
+| `tooling` | 4 | Agent/runtime diagnostics, T3 preview, headless model calls |
 
-Skills that belong to one product live in that product's repository, not here.
+Product-specific skills stay inside that product's own repo, not here.
 
 ## Maintaining the library
 
-- `npm run notice -- --strict` must pass before publishing. [`NOTICE.md`](../NOTICE.md) records where vendored skills came from and under what terms; `LICENSE` explains the split between original tooling and vendored material.
-- `npm run scrub` applies the scrub rules (rewrites that remove private details) to the payload in place.
-- `node scripts/bootstrap.mjs --force` copies the live installation back into this repository through a scrubbed, secret-scanned staging copy. Each mapped file or tree is replaced whole, so a partial live module library can delete modules here. Read the diff before committing.
+- `npm run notice -- --strict` — must pass before publishing; [`NOTICE.md`](../NOTICE.md) tracks upstream skill provenance and licenses.
+- `npm run scrub` — runs scrub rules in place to strip private details from the payload.
+- `node scripts/bootstrap.mjs --force` — copies your live setup back into the repo through a scrubbed, secret-scanned staging copy. Because each mapped tree is replaced whole, always inspect `git diff` before committing.

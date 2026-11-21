@@ -2,7 +2,7 @@
 # keys below, and only when they are absent.
 
 [models]
-default = "grok-4.6"
+default = "grok-4.7"
 default_reasoning_effort = "high"
 
 [ui]

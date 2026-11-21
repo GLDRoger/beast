@@ -1,19 +1,19 @@
 ---
 name: headless-models
-description: Use when calling Claude, Codex (GPT), or Muse models from a command line outside T3 Code to delegate work across providers. It covers the scratch directory, brief on stdin, background runs, reading results, follow-ups, and read-only flags. Inside T3 Code, use delegate_task.
+description: Use when calling Claude, Codex (GPT), Gemini, or Muse models from a command line outside T3 Code to delegate work across providers. Covers scratch directories, stdin briefs, background runs, reading results, follow-ups, and read-only flags. Inside T3 Code, use delegate_task.
 ---
 
 # Calling models headlessly
 
-Briefs follow the rules in the user's instruction file (`~/.claude/CLAUDE.md` / `~/.codex/AGENTS.md`): open with "You were called by another agent. Do this task yourself.", explicit for GPT and Muse, open for Claude.
+Follow the brief rules in `USER.md`: start with `"You were called by another agent. Do this task yourself."`, write explicit briefs for GPT/Muse, and open briefs for Claude and Gemini 4 Neon.
 
-Every call follows the same steps:
+Every call follows the same pattern:
 
-1. Make a scratch directory outside the repo: `W=$(mktemp -d)`. Write the brief to `$W/brief.md`, following the brief rules.
-2. Pass the brief on standard input, or through the CLI's prompt-file option where it has one; never inline it in the command.
-3. Calls take seconds to tens of minutes. Run them in the background: in Claude Code use the Bash tool's background mode; elsewhere wrap the call as `( <call>; echo $? > "$W/exit" ) &` and poll for `$W/exit`. Parallel workers each get their own scratch directory and disjoint files.
+1. Create a scratch dir outside the repo: `W=$(mktemp -d)` and write the brief to `$W/brief.md`.
+2. Pass the brief on stdin or via prompt-file flag; never inline long prompts in shell args.
+3. Run in the background (Claude Code's background Bash mode, or `( <call>; echo $? > "$W/exit" ) &` elsewhere). Give parallel workers separate scratch dirs and disjoint files.
 
-**Claude Code, from Codex, Grok, or Muse Code.** Claude has no `--cd`, so run it from the project directory:
+**Claude Code (from Codex, Grok, Gemini, or Muse):**
 
 ```sh
 cd <project> && AGENT_CALL_DEPTH=1 claude -p --model haiku --effort medium \
@@ -21,36 +21,36 @@ cd <project> && AGENT_CALL_DEPTH=1 claude -p --model haiku --effort medium \
   --output-format json < "$W/brief.md" > "$W/result.json"
 ```
 
-- Opus: `--model claude-opus-5-5 --effort medium`.
-- Mythos (direction and critique only, never grunt work): `--model claude-mythos-5-2 --effort medium`.
-- Keep `--system-prompt-file`; without it headless Claude runs a generic prompt instead of Beast.
-- `jq -r .result` is the answer. `.is_error` flags failure, `.permission_denials` lists blocked actions, and `.session_id` continues the conversation.
-- Follow up with full context from the same directory: `claude -p --resume <session_id> --output-format json < "$W/followup.md"`.
-- Read-only work: add `--disallowedTools Edit Write MultiEdit NotebookEdit`. Editing work blocked by permission denials: rerun with `--permission-mode bypassPermissions`.
+- Top-tier models: `--model claude-opus-5-5`, `--model claude-mythos-5-2`, or `--model claude-fable-5-2` (all `--effort medium`).
+- Keep `--system-prompt-file` so headless Claude loads Beast.
+- Answer is `jq -r .result`; check `.is_error` and `.permission_denials`; resume with `claude -p --resume <session_id> --output-format json < "$W/followup.md"`.
+- Read-only: `--disallowedTools Edit Write MultiEdit NotebookEdit`. Blocked edits: `--permission-mode bypassPermissions`.
 
-**Codex, from Claude Code, Grok, or Muse Code.**
+**Codex (from Claude, Grok, Gemini, or Muse):**
 
 ```sh
-AGENT_CALL_DEPTH=1 codex exec --model gpt-6.1-sol -c model_reasoning_effort=medium \
+AGENT_CALL_DEPTH=1 codex exec --model gpt-6.2-sol -c model_reasoning_effort=medium \
   -C <project> --skip-git-repo-check \
   --json -o "$W/result.md" - < "$W/brief.md" > "$W/events.jsonl"
 ```
 
-- Use `model_reasoning_effort=high` only for the hardest work. Codex loads Beast and this file from its own config; no prompt flag is needed.
-- `$W/result.md` is the answer. A nonzero exit or an empty file means failure; read the end of `events.jsonl`.
-- The thread ID: `jq -r 'select(.type=="thread.started").thread_id' "$W/events.jsonl"`. Follow up with full context from the project directory: `codex exec resume --skip-git-repo-check <thread_id> -o "$W/result2.md" - < "$W/followup.md"`.
-- Read-only work: add `--sandbox read-only`. The default config already allows edits.
+- Focused 3D Blender / game-asset work: `--model gpt-6.2-astra` (not for long unattended threads).
+- Use `model_reasoning_effort=high` only on the hardest tasks. Codex loads Beast from `~/.codex/config.toml`.
+- Answer is in `$W/result.md`. Resume via `thread_id` (`jq -r 'select(.type=="thread.started").thread_id' "$W/events.jsonl"`): `codex exec resume --skip-git-repo-check <thread_id> -o "$W/result2.md" - < "$W/followup.md"`.
+- Read-only: `--sandbox read-only`.
 
-**Muse Code, from Claude Code, Codex, or Grok.**
+**Gemini 4 Neon (via Antigravity / Gemini CLI):**
+
+Inside T3 Code, use `delegate_task` with provider `antigravity` and model `gemini-4-neon`. Outside T3, invoke your local `agy` or `gemini` CLI with `gemini-4-neon` (Gemini 4 Neon is the only Gemini model worth calling) and `AGENT_CALL_DEPTH=1`.
+
+**Muse Code (backup for GPT-6.2 Sol, backend only):**
 
 ```sh
 cd <project> && AGENT_CALL_DEPTH=1 muse exec --yolo --model muse-wonder-full-1.0 --reasoning-effort medium \
   --prompt-file "$W/brief.md" > "$W/result.md" 2> "$W/log.txt"
 ```
 
-- Standard output is the answer; Muse's notes go to `$W/log.txt`. A nonzero exit means failure.
-- Muse loads Beast and this file from its own settings; no prompt flag is needed.
-- Headless runs cannot resume. For a follow-up, send a new brief that carries the earlier result.
-- Read-only work: replace `--yolo` with `--trust-workspace --disable-write --disable-shell --approval-mode never`. `--disable-write` alone still lets the shell write.
+- Answer goes to stdout; notes to `$W/log.txt`. No resume — send a fresh brief with prior context.
+- Read-only: replace `--yolo` with `--trust-workspace --disable-write --disable-shell --approval-mode never`.
 
-**Grok Build** has no native route to these models; use the commands above for every model.
+**Grok Build:** no native delegation to other providers; use the commands above.
