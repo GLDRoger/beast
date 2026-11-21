@@ -28,7 +28,7 @@ TOML edits need Python 3.11+ and leave everything else untouched. Claude, Muse, 
 | Codex | `~/.codex/BEAST.v2.md` via `model_instructions_file` | `~/.codex/AGENTS.md` | `~/.agents/skills` |
 | Grok | `~/.grok/AGENT.md` (appended to Grok's prompt) | `~/.grok/AGENTS.md` | `~/.agents/skills` |
 | Gemini CLI | `~/.gemini/system.md` (generated) via `GEMINI_SYSTEM_MD` | `~/.gemini/GEMINI.md` | `~/.agents/skills` |
-| Antigravity | `~/.gemini/config/AGENTS.md` (generated, both combined) | (same file) | `~/.gemini/config/skills`, `~/.gemini/antigravity-cli/skills` |
+| Antigravity | `~/.gemini/config/AGENTS.md` + `~/.t3/userdata/providers/antigravity/*/config/AGENTS.md` (generated, both combined) | (same file) | `~/.gemini/config/skills`, `~/.gemini/antigravity-cli/skills` |
 | Muse Code | `run.system_prompt` in `~/.config/muse/settings.json` (written by `mu`) | (same field) | `~/.agents/skills` |
 | Hermes | `~/.hermes/SOUL.md` (generated) | (same file) | `~/.agents/skills` via `skills.external_dirs`, else `~/.hermes/skills/beast` |
 

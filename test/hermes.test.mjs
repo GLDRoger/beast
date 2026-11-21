@@ -25,7 +25,8 @@ test('assembleSoul produces the Hermes SOUL from the shared payloads', () => {
   // body without copying a volatile provider roster into the prompt.
   assert.ok(soul.includes('read_file'))
   assert.ok(soul.includes('active Hermes profile'))
-  assert.ok(soul.includes('agent-broker MCP'))
+  assert.ok(soul.includes('T3 Code'))
+  assert.ok(!soul.includes('agent-broker'))
   assert.ok(soul.includes('headless CLI'))
   assert.ok(soul.includes('~/.beast/delegation.md'))
   assert.ok(!soul.includes('grok-4.6'))

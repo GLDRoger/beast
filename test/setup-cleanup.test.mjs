@@ -78,13 +78,14 @@ test('a reinstall retires stale owned aliases while preserving the remaining set
   rmSync(home, { recursive: true, force: true })
 })
 
-test('delegation discovery does not infer providers from installation targets or a broker binary', () => {
-  const cap = delegationCapabilities(['hermes'], (name) => ['broker', 'codex'].includes(name) ? `/test/${name}` : null)
-  assert.deepEqual(cap, { targets: ['hermes'], direct: ['codex'], broker: true })
+test('delegation discovery does not infer providers from installation targets', () => {
+  const cap = delegationCapabilities(['hermes'], (name) => name === 'codex' ? `/test/${name}` : null)
+  assert.deepEqual(cap, { targets: ['hermes'], direct: ['codex'] })
   const text = renderDelegation(cap)
   assert.match(text, /Configured Beast harnesses: Hermes/)
+  assert.match(text, /T3 Code/)
   assert.match(text, /codex exec/)
-  assert.doesNotMatch(text, /claude -p|grok -p|Fable|Opus/)
+  assert.doesNotMatch(text, /agent-broker|claude -p|grok -p|Fable|Opus/)
   assert.match(text, /does not establish|do not establish/)
 })
 

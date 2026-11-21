@@ -43,16 +43,20 @@ test('Gemini install backs up hand copies and configs, preserves other keys, and
   const home = mkdtempSync(join(tmpdir(), 'beast-gemini-'))
   try {
     mkdirSync(join(home, '.gemini/config'), { recursive: true })
+    const t3Cfg = join(home, '.t3/userdata/providers/antigravity/test-provider/config')
+    mkdirSync(t3Cfg, { recursive: true })
     const old = { context: { fileName: ['GEMINI.md', 'AGENTS.md', 'CLAUDE.md'], includeDirectories: ['/user/skills'] }, userKey: { preserved: true } }
     writeFileSync(join(home, '.gemini/settings.json'), JSON.stringify(old), { mode: 0o600 })
     writeFileSync(join(home, '.gemini/.env'), 'OTHER=preserve\nGEMINI_SYSTEM_MD=/stale\n', { mode: 0o600 })
     for (const path of ['system.md', 'GEMINI.md', 'config/AGENTS.md']) writeFileSync(join(home, '.gemini', path), `hand copy ${path}\n`)
+    writeFileSync(join(t3Cfg, 'AGENTS.md'), 'hand copy t3 AGENTS.md\n')
     for (let i = 0; i < 2; i++) {
       const r = run(home, ['install', '--harness=gemini', '--packs=core', '--write-config'])
       assert.equal(r.status, 0, r.stdout + r.stderr)
     }
     const parked = join(home, '.beast/pre-beast/.gemini')
     for (const path of ['system.md', 'GEMINI.md', 'config/AGENTS.md']) assert.equal(read(join(parked, path)), `hand copy ${path}\n`)
+    assert.equal(read(join(home, '.beast/pre-beast/.t3/userdata/providers/antigravity/test-provider/config/AGENTS.md')), 'hand copy t3 AGENTS.md\n')
     assert.deepEqual(JSON.parse(read(join(parked, 'settings.json'))), old)
     assert.deepEqual(JSON.parse(read(join(home, '.gemini/settings.json'))), { ...old, context: { ...old.context, fileName: ['GEMINI.md', 'AGENTS.md'] } })
     assert.equal(read(join(home, '.gemini/.env')), `OTHER=preserve\nGEMINI_SYSTEM_MD=${join(home, '.gemini/system.md')}\n`)
@@ -61,6 +65,7 @@ test('Gemini install backs up hand copies and configs, preserves other keys, and
     assert.equal(readlinkSync(join(home, '.gemini/GEMINI.md')), join(REPO, 'home/shared/USER.md'))
     assert.equal(count(read(join(home, '.gemini/system.md')), '# Beast'), 1)
     assert.equal(count(read(join(home, '.gemini/config/AGENTS.md')), '# Beast'), 1)
+    assert.equal(read(join(t3Cfg, 'AGENTS.md')), read(join(home, '.gemini/config/AGENTS.md')))
     const doctor = run(home, ['doctor'])
     assert.equal(doctor.status, 0, doctor.stdout + doctor.stderr)
     writeFileSync(join(home, '.gemini/system.md'), 'stale')

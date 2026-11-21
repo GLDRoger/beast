@@ -274,14 +274,12 @@ test('no skill still carries a standing order to update itself unattended', () =
   assert.deepEqual(offenders, [])
 })
 
-test('delegation distinguishes runtime tools, detected CLIs, unverified broker access, and cross-harness calls', () => {
+test('delegation distinguishes T3 Code orchestration, runtime tools, detected CLIs, and cross-harness calls', () => {
   const d = tmp()
-  const brokerBin = join(d, 'broker-bin')
   const bothBin = join(d, 'both-bin')
   const codexBin = join(d, 'codex-bin')
   const empty = join(d, 'empty')
-  for (const p of [brokerBin, bothBin, codexBin, empty]) mkdirSync(p, { recursive: true })
-  writeFileSync(join(brokerBin, IS_WINDOWS ? 'broker.exe' : 'broker'), '#!/bin/sh\n', { mode: 0o755 })
+  for (const p of [bothBin, codexBin, empty]) mkdirSync(p, { recursive: true })
   for (const name of ['claude', 'codex']) writeFileSync(join(bothBin, IS_WINDOWS ? `${name}.exe` : name), '#!/bin/sh\n', { mode: 0o755 })
   writeFileSync(join(codexBin, IS_WINDOWS ? 'codex.exe' : 'codex'), '#!/bin/sh\n', { mode: 0o755 })
   const install = (home, path, selection = '--all') =>
@@ -290,29 +288,19 @@ test('delegation distinguishes runtime tools, detected CLIs, unverified broker a
       env: { ...process.env, HOME: home, USERPROFILE: home, PATH: path, Path: path },
     })
 
-  for (const selection of ['--all', '--harness=hermes']) {
-    const home = join(d, selection === '--all' ? 'all' : 'hermes')
-    assert.equal(install(home, brokerBin, selection).status, 0)
-    const text = readFileSync(join(home, '.beast', 'delegation.md'), 'utf8')
-    assert.match(text, /agent-broker executable is present/)
-    assert.match(text, /discover its current providers, authentication, models/)
-    assert.match(text, /native subagents/)
-    assert.doesNotMatch(text, /Fable|Opus|grok-4\.|gpt-5\.|Providers reachable/)
-    assert.doesNotMatch(text, /## Direct CLIs detected|## Calling the other harness/)
-  }
-
-  // Codex and Claude Code both present: each gets the headless fallback for calling the other.
+  // Codex and Claude Code both present: T3 Code orchestration first, headless CLI fallback outside T3.
   for (const selection of ['--all', '--harness=hermes']) {
     const home = join(d, selection === '--all' ? 'both-all' : 'both-hermes')
     assert.equal(install(home, bothBin, selection).status, 0)
     const text = readFileSync(join(home, '.beast', 'delegation.md'), 'utf8')
-    assert.match(text, /## Calling the other harness/)
+    assert.match(text, /Cross-provider orchestration \(T3 Code\)/)
+    assert.match(text, /delegate_task/)
+    assert.match(text, /## Calling another harness outside T3 Code/)
     assert.match(text, /AGENT_CALL_DEPTH=1 claude -p .*--output-format json < brief\.md/)
     assert.match(text, /AGENT_CALL_DEPTH=1 codex exec .*--json -o result\.md - < brief\.md/)
     assert.match(text, /codex exec resume --skip-git-repo-check <thread_id>/)
     assert.match(text, /native subagents/)
-    assert.match(text, /when agent-broker is unavailable/)
-    assert.doesNotMatch(text, /agent-broker executable is present|Fable|Opus|grok-4\.|gpt-5\.|Providers reachable/)
+    assert.doesNotMatch(text, /agent-broker|Fable|Opus|grok-4\.|gpt-5\.|Providers reachable/)
   }
 
   const directHome = join(d, 'direct')
@@ -321,13 +309,13 @@ test('delegation distinguishes runtime tools, detected CLIs, unverified broker a
   assert.match(direct, /Configured Beast harnesses: Hermes/)
   assert.match(direct, /## Direct CLIs detected on PATH/)
   assert.match(direct, /codex exec/)
-  assert.doesNotMatch(direct, /claude -p|grok -p|agent-broker executable|## Calling the other harness/)
+  assert.doesNotMatch(direct, /claude -p|grok -p|agent-broker|## Calling another harness outside T3 Code/)
   assert.match(direct, /executable-presence checks only/)
 
   const emptyHome = join(d, 'no-clis')
   assert.equal(install(emptyHome, empty).status, 0)
   const none = readFileSync(join(emptyHome, '.beast', 'delegation.md'), 'utf8')
   assert.match(none, /No external harness CLI was detected/)
-  assert.doesNotMatch(none, /codex exec|claude -p|grok -p/)
+  assert.doesNotMatch(none, /agent-broker|codex exec|claude -p|grok -p/)
   rmSync(d, { recursive: true, force: true })
 })
